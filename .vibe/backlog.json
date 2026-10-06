@@ -124,6 +124,26 @@
       "id": "R2-E7",
       "name": "Điểm danh/ads trên web (nếu PO duyệt Q-32)",
       "refs": "BR-WEB-03"
+    },
+    {
+      "id": "R2-E8",
+      "name": "Smart contract AnimaCards + AnimaCommitments, audit độc lập",
+      "refs": "BR-NFT-06..08, BR-PF-06, SAD 17"
+    },
+    {
+      "id": "R2-E9",
+      "name": "Liên kết ví (EIP-4361), KYC, sàng lọc ví",
+      "refs": "BR-NFT-02, 03, 10"
+    },
+    {
+      "id": "R2-E10",
+      "name": "Rút thẻ (mint), nạp lại (indexer), tạm dừng khẩn cấp",
+      "refs": "BR-NFT-02..05, SC-NFT-*"
+    },
+    {
+      "id": "R2-E11",
+      "name": "Neo Merkle root hằng ngày lên chuỗi",
+      "refs": "BR-PF-06"
     }
   ],
   "tasks": [
@@ -1400,7 +1420,9 @@
         "SAD §8"
       ],
       "dependencies": [
-        "T044"
+        "T044",
+        "T100",
+        "T101"
       ],
       "allowed_files": [
         "backend/src/Modules/Gacha/Gacha.Application/Open/**"
@@ -1541,7 +1563,8 @@
       ],
       "expected_outputs": [],
       "acceptance": [
-        "Test report"
+        "Test report",
+        "SC-PF-01 khớp vector chuẩn"
       ],
       "risk_tier": "high",
       "estimate": "2d",
@@ -2812,6 +2835,376 @@
       "granularity": "story",
       "status": "BACKLOG",
       "context_files": []
+    },
+    {
+      "id": "T099",
+      "sprint": "S003",
+      "title": "FRD Lò rèn, kiểm chứng công bằng, quy đổi Gem ↔ Coin, số lượng phát hành",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "CR-002",
+        "BR-FRG-*",
+        "BR-PF-*",
+        "BR-SUP-*",
+        "BR-WAL-05/06"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/frd/FRD-11-forge-fairness.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đạt FRD checklist"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T112",
+      "sprint": "S004",
+      "title": "Handoff UX Lò rèn + màn kiểm chứng công bằng (app + web)",
+      "workstream": "design",
+      "owner_skill": "product-designer",
+      "source_refs": [
+        "US-11.1..11.5"
+      ],
+      "dependencies": [
+        "T099"
+      ],
+      "allowed_files": [
+        "design/forge/**",
+        "design/fairness/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Handoff đủ trạng thái và mã lỗi"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T100",
+      "sprint": "S004",
+      "title": "Số lượng phát hành: edition, chọn thẻ theo số bản còn lại, ngừng bán khi hết",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-SUP-01..06"
+      ],
+      "dependencies": [
+        "T037"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Catalog/Catalog.Application/Editions/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-SUP-01→04"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T101",
+      "sprint": "S004",
+      "title": "Module Fairness: seed, HMAC-SHA256, đổi seed, API kiểm chứng",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-PF-01..05",
+        "SAD 8.1"
+      ],
+      "dependencies": [
+        "T008"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Fairness/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-PF-01→05 (vector chuẩn khớp)"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T110",
+      "sprint": "S004",
+      "title": "Xin ý kiến pháp lý cho mô hình NFT (Q-41) và chọn pháp nhân",
+      "workstream": "release",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "CR-002",
+        "RK-13"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/release/legal-nft.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Có văn bản ý kiến pháp lý"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T102",
+      "sprint": "S005",
+      "title": "Module Forge: rèn 2 → 1, thu phí Coin/Gem, lật thẻ chưa lật",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-FRG-01..07"
+      ],
+      "dependencies": [
+        "T045",
+        "T101",
+        "T100"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Forge/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-FRG-01→09"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T103",
+      "sprint": "S005",
+      "title": "Quy đổi Gem ↔ Coin hai chiều + hạn mức",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WAL-05",
+        "BR-WAL-06"
+      ],
+      "dependencies": [
+        "T036"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Wallet/Wallet.Application/Conversion/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WAL-16→23"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T104",
+      "sprint": "S006",
+      "title": "App: màn Lò rèn + hiệu ứng lật thẻ rèn",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-11.1",
+        "US-11.2"
+      ],
+      "dependencies": [
+        "T102",
+        "T051",
+        "T112"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Forge/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Rèn và lật trên thiết bị"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T107",
+      "sprint": "S006",
+      "title": "App: màn kiểm chứng công bằng (mã băm seed, đổi seed, xem số thứ tự thẻ)",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-11.3",
+        "US-11.4"
+      ],
+      "dependencies": [
+        "T101",
+        "T112"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Fairness/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Hiển thị đúng dữ liệu SC-PF-02/03"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T105",
+      "sprint": "S006",
+      "title": "Web: Lò rèn, kiểm chứng công bằng (công cụ tự tính lại), quy đổi",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-11.1..11.5"
+      ],
+      "dependencies": [
+        "T102",
+        "T101",
+        "T103",
+        "T112"
+      ],
+      "allowed_files": [
+        "web/apps/player/src/app/forge/**",
+        "web/apps/player/src/app/fairness/**",
+        "web/apps/player/src/app/wallet/convert/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Công cụ kiểm chứng tính đúng vector SC-PF-01"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T109",
+      "sprint": "S006",
+      "title": "QA Lò rèn, kiểm chứng, số lượng phát hành, quy đổi",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-FRG-*",
+        "SC-PF-*",
+        "SC-SUP-*",
+        "SC-WAL-16..23"
+      ],
+      "dependencies": [
+        "T102",
+        "T101",
+        "T100",
+        "T103"
+      ],
+      "allowed_files": [
+        "docs/qa/S006-cr002/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Test report"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T108",
+      "sprint": "S009",
+      "title": "Admin: quản lý mùa, số lượng phát hành, tỷ lệ rèn, phí rèn/quy đổi",
+      "workstream": "web-admin",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-10.7",
+        "BR-SUP-01",
+        "BR-ADM-02"
+      ],
+      "dependencies": [
+        "T100",
+        "T102"
+      ],
+      "allowed_files": [
+        "web/apps/admin/src/resources/seasons/**",
+        "web/apps/admin/src/resources/forge/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Maker-checker cho mùa và tham số rèn"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
+    },
+    {
+      "id": "T111",
+      "sprint": "S011",
+      "title": "Spike: chọn chuỗi (T-09), prototype contract ERC-721 + ERC-2981 trên testnet",
+      "workstream": "spike",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "T-09",
+        "SAD 17"
+      ],
+      "dependencies": [
+        "T110"
+      ],
+      "allowed_files": [
+        "chain/**",
+        "docs/spikes/SPIKE-T111.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Mint/nạp thử trên testnet; báo cáo phí"
+      ],
+      "risk_tier": "low",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-002"
     }
   ]
 }

@@ -80,5 +80,9 @@ window.ANIMA = (function () {
     const maxR = rarityIndex(order[order.length - 1].rarity);
     return { cards: order, pityAfter, pityTriggered, climax: maxR >= 3, maxRarity: RARITIES[maxR].key };
   }
-  return { ELEMENTS, RARITIES, cards, rarityIndex, openPack };
+  /* Số lượng phát hành tối đa mỗi Card Definition theo rarity (BRD BR-SUP-01, đề xuất). */
+  const MAX_SUPPLY = { common: 50000, uncommon: 20000, rare: 5000, epic: 1000, legendary: 300, secret: 100 };
+  /* Lò rèn: lật 1 slot theo tỷ lệ rèn (bằng tỷ lệ 1 slot của pack), không pity, không yếu tố tác động. */
+  function revealSealed() { return pickCard(rollRarity()); }
+  return { ELEMENTS, RARITIES, cards, rarityIndex, openPack, revealSealed, MAX_SUPPLY };
 })();

@@ -12,7 +12,7 @@ Nền tảng sưu tầm thẻ bài số (app mobile + website người chơi + w
 - [BDD](docs/BDD_ANIMA.md) — Đặc tả hành vi v0.2 (Draft): 150 kịch bản và 22 sơ đồ kịch bản phủ mọi Business Rule, kèm traceability.
 - [Tech Stack](docs/TECH_STACK.md) — Tech stack v0.3: đã chốt Unity 6 và ASP.NET Core (.NET 10); PostgreSQL, Redis, Firebase; cloud chưa chốt; kiến trúc, tích hợp, CI/CD, ánh xạ NFR.
 - [Solution Design](docs/SOLUTION_DESIGN.md) — Kiến trúc, cấu trúc repo, module backend, mô hình dữ liệu, API, luồng xử lý, bảo mật, Git contract, chiến lược kiểm thử.
-- [Sprint Plan](docs/SPRINT_PLAN.md) — 12 sprint × 2 tuần, 98 task, DoR/DoD, đường găng; dữ liệu gốc ở `.vibe/backlog.json`.
+- [Sprint Plan](docs/SPRINT_PLAN.md) — 12 sprint × 2 tuần, 111 task, DoR/DoD, đường găng; dữ liệu gốc ở `.vibe/backlog.json`.
 
 ## Prototype giao diện
 

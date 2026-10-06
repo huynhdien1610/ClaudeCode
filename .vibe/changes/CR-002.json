@@ -1,0 +1,28 @@
+{
+  "id": "CR-002",
+  "title": "Mô hình tài sản số: NFT, số lượng phát hành giới hạn, commit–reveal, Lò rèn, quy đổi Gem ↔ Coin hai chiều",
+  "requested_by": "Product owner (người dùng phiên làm việc)",
+  "requested_at": "2026-10-06",
+  "stage_at_request": "BACKLOG (trước READY_FOR_DEV)",
+  "decisions": [
+    "Thẻ là tài sản số duy nhất; định danh và rút về ví dưới dạng NFT (R2, sau gate pháp lý)",
+    "Công ty KHÔNG mua lại thẻ bằng tiền thật/tiền mã hóa; thu qua phí chợ, royalty, phí rèn, phí rút",
+    "Độ hiếm đến từ số lượng phát hành giới hạn theo mùa, không hạ tỷ lệ ngầm",
+    "Lò rèn: 2 thẻ + phí (Coin hoặc Gem) → 1 thẻ chưa lật; tỷ lệ công khai, không có yếu tố tác động",
+    "Giá: 1 pack 5 thẻ = $1",
+    "Phí rèn trả bằng Coin hoặc Gem; Gem ↔ Coin quy đổi hai chiều",
+    "Thẻ có được từ Coin quảng cáo được rút về ví như mọi thẻ khác"
+  ],
+  "impact": {
+    "documents": ["BRD v0.4", "BDD v0.3", "SOLUTION_DESIGN v0.2", "TECH_STACK v0.4", "Master Document v1.2", "PRD v0.3", "SPRINT_PLAN"],
+    "business_rules_changed": ["BR-ECO-01", "BR-ECO-02", "BR-WAL-05"],
+    "business_rules_added": ["BR-WAL-06", "BR-SUP-01..06", "BR-PF-01..06", "BR-FRG-01..07", "BR-NFT-01..10"],
+    "open_questions_added": ["Q-36", "Q-37", "Q-38", "Q-39", "Q-40", "Q-41", "Q-42"],
+    "risks_added": ["RK-13", "RK-14", "RK-15", "RK-16"],
+    "schedule": "R1 thêm commit–reveal, số lượng phát hành, Lò rèn, quy đổi hai chiều; R2 thêm NFT có gate pháp lý"
+  },
+  "decision_owner": "Product Owner",
+  "decision": "APPROVED_BY_PO_IN_SESSION (cần định danh PO chính thức — Q-01)",
+  "open_points": ["Q-36: có cho chuyển Gem/Coin trực tiếp giữa người chơi không"],
+  "invalidated_gates": []
+}

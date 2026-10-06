@@ -3,7 +3,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | TECH-ANIMA-001 |
-| Phiên bản | 0.3 — thêm website người chơi (CR-001) |
+| Phiên bản | 0.4 — thêm blockchain/NFT cho R2 (CR-002) |
 | Ngày | 2026-10-06 |
 | Đầu vào | [Master Document](ANIMA_Master_Document.md) v1.1, [BRD](BRD_ANIMA.md) v0.2, [PRD](PRD_ANIMA.md) v0.1 |
 | Tóm tắt trong | Master Document mục 9 |
@@ -19,6 +19,7 @@
 | 2026-10-06 | **Backend dùng .NET** (ASP.NET Core, .NET 10 LTS) | T-01 |
 | 2026-10-06 | **Cloud chưa chốt**, quyết định sau | T-02, T-03 vẫn mở |
 | 2026-10-06 | **Người chơi dùng được cả website** ngoài app mobile (CR-001) | Thêm mục 2.4 |
+| 2026-10-06 | **Thẻ là NFT khi rút về ví; commit–reveal; Lò rèn** (CR-002) | Thêm mục 5.1; NFT ở R2 sau gate pháp lý |
 
 Vì chưa chốt cloud, backend được thiết kế **không phụ thuộc nhà cung cấp cloud**: chạy trong container, dùng PostgreSQL và Redis chuẩn, đo lường bằng OpenTelemetry, hạ tầng viết bằng Terraform. Các dịch vụ cloud ở mục 6 chỉ là phương án tham khảo.
 
@@ -205,6 +206,21 @@ Firebase Analytics xuất sang BigQuery hằng ngày; worker đẩy thêm sự k
 | Push notification | Firebase Cloud Messaging | Nhắc điểm danh, đấu giá sắp kết thúc |
 | Chia sẻ | Share sheet gốc của iOS/Android | FR-21 |
 
+### 5.1. Blockchain và NFT (CR-002, R2)
+
+| Nhu cầu | Đề xuất | Ghi chú |
+|---|---|---|
+| Chuỗi | Một EVM L2 phí thấp: **Polygon PoS** hoặc **Base** (T-09) | Ví phổ biến hỗ trợ sẵn; phí mint thấp |
+| Smart contract | Solidity + OpenZeppelin (ERC-721, ERC-2981, AccessControl, Pausable) | Audit độc lập trước mainnet |
+| Công cụ contract | Foundry (test, fuzz, deploy script) | Thư mục `chain/` |
+| Backend gọi chuỗi | Nethereum (.NET) | Cùng ngôn ngữ backend |
+| Khóa ký giao dịch | KMS/HSM của cloud được chọn; admin contract dùng multisig (Safe) | Không để private key trong code hay biến môi trường thường |
+| Lưu ảnh, metadata | IPFS qua dịch vụ pin + bản sao Arweave | BR-NFT-07 |
+| Kết nối ví trên web | wagmi + viem + WalletConnect; Sign-In with Ethereum (EIP-4361) | Chỉ website (BR-NFT-01) |
+| KYC | Nhà cung cấp KYC có hỗ trợ giấy tờ Việt Nam (T-10) | ANIMA chỉ lưu kết quả, không lưu ảnh giấy tờ |
+| Sàng lọc ví AML | Dịch vụ sàng lọc địa chỉ ví (T-10) | BR-NFT-10 |
+| Commit–reveal | HMAC-SHA256 trong .NET (R1), không cần chuỗi; neo Merkle root lên chuỗi ở R2 | SAD mục 8.1 |
+
 ---
 
 ## 6. Hạ tầng và vận hành
@@ -311,6 +327,8 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 | T-06 | Mua license Unity/FMOD/DOTween Pro | Kiểm tra điều kiện theo doanh thu dự kiến | PO + Finance | Mở |
 | T-07 | Mở pack trên web: Unity Web hay làm lại bằng công nghệ web | Unity Web + chế độ rút gọn; chốt sau spike T009 | Tech Lead | Mở |
 | T-08 | Cổng thanh toán web | Chờ Q-31 | PO + Finance | Mở |
+| T-09 | Blockchain cho NFT | Polygon PoS hoặc Base; chốt sau gate pháp lý | Tech Lead + PO | Mở |
+| T-10 | Nhà cung cấp KYC và sàng lọc ví | So sánh chi phí, hỗ trợ giấy tờ VN | PO + Legal | Mở |
 
 ---
 

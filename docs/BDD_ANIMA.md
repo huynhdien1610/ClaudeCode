@@ -4,9 +4,9 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BDD-ANIMA-001 |
-| Phiên bản | 0.2 (Draft) — thêm mục 12A website người chơi (CR-001) |
+| Phiên bản | 0.3 (Draft) — thêm mục 12B tài sản số (CR-002); 12A website (CR-001) |
 | Ngày | 2026-10-06 |
-| Nguồn | [BRD](BRD_ANIMA.md) v0.3, [PRD](PRD_ANIMA.md) v0.2 |
+| Nguồn | [BRD](BRD_ANIMA.md) v0.4, [PRD](PRD_ANIMA.md) v0.3 |
 | Trạng thái | **DRAFT — một số kịch bản phụ thuộc quyết định của PO** |
 
 Tài liệu này là bộ kịch bản đầy đủ. Mục 11 của BRD chỉ là trích đoạn; khi hai bên khác nhau, tài liệu này là bản chuẩn. Các ID kịch bản trong BRD được giữ nguyên.
@@ -40,7 +40,9 @@ Các giá trị dưới đây lấy từ đề xuất trong BRD. Khi PO thay đ�
 | Giá pack "Awakening Standard" | 1,000 Coin hoặc 100 Gem |
 | Số thẻ/pack | 5 (`@cho-Q08`) |
 | Ngưỡng pity | 49 pack liên tiếp không có Legendary+ → pack thứ 50 đảm bảo (`@cho-Q09`) |
-| Đổi Gem → Coin | 1 Gem = 9 Coin (`@cho-Q05`) |
+| Đổi Gem → Coin / Coin → Gem | 1 Gem → 9 Coin; 11 Coin → 1 Gem; tối đa 1,000 Gem/ngày từ Coin (CR-002) |
+| Phí rèn | 50 Coin hoặc 5 Gem (CR-002) |
+| Phí rút NFT, thời gian chờ | 200 Coin hoặc 20 Gem; 30 ngày (CR-002, `@cho-Q37`) |
 | Thưởng điểm danh ngày 1→7 | 20, 30, 40, 50, 60, 80, 150 Coin |
 | Mốc streak 14 / 30 / 100 | +200 / +1,000 / +5,000 Coin + thẻ độc quyền |
 | Streak Freeze | 200 Coin hoặc 3 ads; giữ tối đa 2 (`@cho-Q15`) |
@@ -409,11 +411,11 @@ Tính năng: EP-02 — Ví & Ledger
       Khi P1 đổi 0 Gem sang Coin
       Thì server từ chối với mã lỗi INVALID_AMOUNT
 
-    @R2 @negative @cho-Q05
-    Kịch bản: SC-WAL-19 — Đổi Coin sang Gem
-      Cho trước P1 có 9,000 Coin
-      Khi P1 gửi yêu cầu đổi Coin sang Gem
-      Thì server từ chối với mã lỗi CONVERSION_NOT_SUPPORTED
+    @R1 @happy
+    Kịch bản: SC-WAL-19 — Đổi Coin sang Gem (CR-002: được phép)
+      Cho trước P1 có 9,900 Coin và 0 Gem
+      Khi P1 đổi 9,900 Coin sang Gem
+      Thì P1 có 900 Gem và 0 Coin
 ```
 
 ---
@@ -1624,6 +1626,338 @@ Tính năng: Website người chơi — đa nền tảng
 
 ---
 
+## 12B. Tính năng: Tài sản số — CR-002
+
+```gherkin
+Tính năng: Số lượng phát hành giới hạn (BR-SUP)
+  Bối cảnh chung:
+    Cho trước mùa "Awakening S1" đang mở bán
+    Và rarity Legendary của pack "Awakening Standard" gồm "Seraphel" (tối đa 300 bản) và "Tidemourn" (tối đa 300 bản)
+
+  Quy tắc: BR-SUP-02 — Số thứ tự trong edition
+
+    @R1 @bien
+    Kịch bản: SC-SUP-01 — Bản cuối cùng của một thẻ
+      Cho trước "Seraphel" đã phát hành 299/300 bản
+      Khi một slot của P1 quay ra Legendary và chọn trúng "Seraphel"
+      Thì P1 nhận "Seraphel #300/300" với serial duy nhất toàn hệ thống
+      Và "Seraphel" hiển thị "Đã phát hành hết 300/300"
+
+  Quy tắc: BR-SUP-03 — Chỉ chọn thẻ còn bản
+
+    @R1 @happy
+    Kịch bản: SC-SUP-02 — Thẻ hết bản bị loại khỏi lượt chọn
+      Cho trước "Seraphel" đã phát hành 300/300 và "Tidemourn" đã phát hành 120/300
+      Khi một slot của P1 quay ra Legendary
+      Thì P1 nhận "Tidemourn #121/300"
+
+  Quy tắc: BR-SUP-04 — Ngừng bán khi một rarity hết sạch
+
+    @R1 @negative
+    Kịch bản: SC-SUP-03 — Mọi Legendary đã hết
+      Cho trước "Seraphel" 300/300 và "Tidemourn" 300/300
+      Khi bản Legendary cuối cùng được phát hành
+      Thì pack "Awakening Standard" chuyển sang trạng thái "Tạm ngừng bán"
+      Và mọi yêu cầu mua pack này bị từ chối với mã lỗi PACK_SUPPLY_EXHAUSTED cho đến khi version tỷ lệ mới được công bố
+      Và Pack Instance đã mua trước đó vẫn mở được theo BR-SUP-03 với các rarity còn bản
+
+  Quy tắc: BR-SUP-05 — Mùa đã đóng
+
+    @R1 @negative
+    Kịch bản: SC-SUP-04 — Không phát hành thêm thẻ của mùa đã đóng
+      Cho trước mùa "Awakening S1" đã đóng và mùa "S2" đang mở
+      Khi P1 lật một thẻ chưa lật từ Lò rèn
+      Thì kết quả là một thẻ thuộc mùa "S2"
+      Và số bản đã phát hành của mọi thẻ mùa "S1" không đổi
+
+Tính năng: Kiểm chứng công bằng — Commit–reveal (BR-PF)
+  Bối cảnh chung:
+    Cho trước bảng tỷ lệ v1 tính theo phần triệu: Common [0, 450000), Uncommon [450000, 700000), Rare [700000, 880000), Epic [880000, 950000), Legendary [950000, 990000), Secret [990000, 1000000)
+    Và cách tính theo SOLUTION_DESIGN mục 8.1
+
+  Quy tắc: BR-PF-02 — Kết quả tính lại được
+
+    @R1 @tinhtoan
+    Kịch bản: SC-PF-01 — Vector kiểm thử chuẩn
+      Cho trước server seed "anima-demo-server-seed-001", client seed "keeper2049", nonce 1
+      Khi P1 mở một pack 5 slot với pity 0
+      Thì giá trị quay của slot 0 → 4 lần lượt là 457142, 594361, 140124, 227524, 278885
+      Và kết quả rarity là Uncommon, Uncommon, Common, Common, Common
+      Và nonce của P1 tăng lên 2
+
+  Quy tắc: BR-PF-03 — Công bố mã băm trước khi quay
+
+    @R1 @happy
+    Kịch bản: SC-PF-02 — Mã băm hiển thị trước lần quay đầu
+      Cho trước P1 vừa nhận server seed mới "anima-demo-server-seed-001"
+      Khi P1 xem màn hình kiểm chứng trước khi mở pack
+      Thì phản hồi chứa mã băm "9bda19bd88620c85d06a774f70f150a0379a20995f91a3525caf895375f6ccdf"
+      Và không chứa server seed
+
+  Quy tắc: BR-PF-04 — Công bố seed cũ khi đổi seed
+
+    @R1 @happy
+    Kịch bản: SC-PF-03 — Đổi seed
+      Cho trước P1 đã quay 12 lần với server seed có mã băm "9bda19bd…cdf"
+      Khi P1 yêu cầu đổi seed và đặt client seed mới "my-lucky-seed"
+      Thì server công bố server seed cũ "anima-demo-server-seed-001"
+      Và SHA-256 của seed cũ bằng mã băm đã công bố
+      Và P1 nhận mã băm của server seed mới và nonce về 1
+
+    @R1 @negative
+    Kịch bản: SC-PF-04 — Xin seed hiện tại khi chưa đổi
+      Khi P1 gửi yêu cầu xem server seed đang dùng
+      Thì server từ chối với mã lỗi SEED_NOT_REVEALED
+
+    @R1 @dongthoi
+    Kịch bản: SC-PF-05 — Đổi seed trong khi đang mở pack
+      Cho trước P1 gửi yêu cầu mở pack và yêu cầu đổi seed cùng lúc
+      Khi server xử lý hai yêu cầu
+      Thì lần mở pack dùng trọn vẹn một seed (cũ hoặc mới), không trộn
+      Và bản ghi mở pack lưu mã băm của seed đã dùng
+
+Tính năng: Lò rèn (BR-FRG)
+  Bối cảnh chung:
+    Cho trước P1 ở trạng thái Verified, có 500 Coin và 20 Gem
+    Và P1 sở hữu thẻ Common "Driftkoi #12001" và "Cinderpup #8812"
+    Và phí rèn là 50 Coin hoặc 5 Gem
+
+  Quy tắc: BR-FRG-01 / BR-FRG-02 — 2 thẻ + phí → 1 thẻ chưa lật
+
+    @R1 @happy @tinhtoan
+    Kịch bản: SC-FRG-01 — Rèn trả bằng Coin
+      Khi P1 rèn "Driftkoi #12001" và "Cinderpup #8812", chọn trả bằng Coin
+      Thì P1 có 450 Coin và 20 Gem
+      Và hai thẻ đầu vào ở trạng thái "Burned"
+      Và P1 có 1 thẻ chưa lật mới
+      Và số bản đã hủy của "Driftkoi" và "Cinderpup" mỗi thẻ tăng 1
+
+    @R1 @happy @tinhtoan
+    Kịch bản: SC-FRG-02 — Rèn trả bằng Gem
+      Khi P1 rèn hai thẻ đó, chọn trả bằng Gem
+      Thì P1 có 500 Coin và 15 Gem
+
+    @R1 @negative
+    Kịch bản: SC-FRG-03 — Không đủ phí thì không hủy thẻ
+      Cho trước P1 có 49 Coin và 4 Gem
+      Khi P1 rèn hai thẻ đó, chọn trả bằng Coin
+      Thì server từ chối với mã lỗi INSUFFICIENT_BALANCE
+      Và hai thẻ vẫn ở trạng thái "Owned"
+
+    @R1 @negative
+    Sơ đồ kịch bản: SC-FRG-04 — Đầu vào không hợp lệ
+      Khi P1 rèn với đầu vào <đầu vào>
+      Thì server từ chối với mã lỗi <mã lỗi>
+      Và không có thẻ nào bị hủy, không trừ phí
+
+      Ví dụ:
+        | đầu vào                                        | mã lỗi                     |
+        | chỉ 1 thẻ "Driftkoi #12001"                    | FORGE_REQUIRES_TWO_CARDS   |
+        | "Driftkoi #12001" hai lần                      | FORGE_DUPLICATE_INPUT      |
+        | 1 thẻ của P1 và 1 thẻ của P2                   | CARD_NOT_OWNED             |
+        | 1 thẻ đang niêm yết trên chợ                   | CARD_LOCKED                |
+        | 1 thẻ soulbound streak 100 ngày                | CARD_NOT_FORGEABLE         |
+        | 1 thẻ đang nằm trong ví ngoài (In Wallet)      | CARD_NOT_IN_ACCOUNT        |
+
+  Quy tắc: BR-FRG-03 — Không có gì tác động vào tỷ lệ rèn
+
+    @R1 @tinhtoan
+    Kịch bản: SC-FRG-05 — Pity của pack không áp dụng cho rèn
+      Cho trước bộ đếm pity "Awakening Standard" của P1 là 49
+      Và giá trị quay khi lật thẻ rèn là 140124
+      Khi P1 lật thẻ chưa lật
+      Thì P1 nhận một thẻ Common
+      Và bộ đếm pity "Awakening Standard" vẫn là 49
+
+    @R1 @happy
+    Kịch bản: SC-FRG-06 — Lật thẻ rèn dùng commit–reveal
+      Cho trước P1 có 1 thẻ chưa lật và nonce hiện tại là 7
+      Khi P1 lật thẻ đó
+      Thì kết quả tính từ HMAC(server seed, "client seed:7:0")
+      Và nonce của P1 là 8
+
+  Quy tắc: BR-FRG-06 — Thẻ chưa lật không giao dịch được
+
+    @R1 @negative
+    Kịch bản: SC-FRG-07 — Niêm yết thẻ chưa lật
+      Khi P1 niêm yết một thẻ chưa lật
+      Thì server từ chối với mã lỗi SEALED_CARD_NOT_TRADABLE
+
+  Quy tắc: BR-FRG-07 — Giới hạn lượt rèn theo ngày
+
+    @R1 @bien
+    Sơ đồ kịch bản: SC-FRG-08 — Hạn mức rèn
+      Cho trước tài khoản <trạng thái> đã rèn <đã rèn> lần hôm nay
+      Khi tài khoản rèn thêm 1 lần
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | trạng thái | đã rèn | kết quả             |
+        | Unverified | 4      | thành công          |
+        | Unverified | 5      | FORGE_DAILY_LIMIT   |
+        | Verified   | 99     | thành công          |
+        | Verified   | 100    | FORGE_DAILY_LIMIT   |
+
+  Quy tắc: BR-FRG-01 — Đồng thời
+
+    @R1 @dongthoi
+    Kịch bản: SC-FRG-09 — Cùng một thẻ trong hai lần rèn đồng thời
+      Cho trước P1 sở hữu "Driftkoi #12001", "Cinderpup #8812" và "Sparkit #3301"
+      Khi P1 gửi cùng lúc rèn ("Driftkoi #12001", "Cinderpup #8812") và rèn ("Driftkoi #12001", "Sparkit #3301")
+      Thì đúng một lần rèn thành công
+      Và lần còn lại bị từ chối với mã lỗi CARD_NOT_AVAILABLE, thẻ của nó không bị hủy, không bị trừ phí
+
+Tính năng: Quy đổi Gem ↔ Coin (BR-WAL-05, BR-WAL-06)
+  Bối cảnh chung:
+    Cho trước tỷ lệ 1 Gem → 9 Coin và 11 Coin → 1 Gem
+    Và P1 ở trạng thái Verified
+
+    @R1 @happy @tinhtoan
+    Kịch bản: SC-WAL-20 — Đổi Coin sang Gem, làm tròn xuống
+      Cho trước P1 có 120 Coin và 0 Gem
+      Khi P1 đổi 120 Coin sang Gem
+      Thì P1 có 10 Gem và 10 Coin
+
+    @R1 @negative
+    Kịch bản: SC-WAL-21 — Chưa đủ cho 1 Gem
+      Cho trước P1 có 10 Coin
+      Khi P1 đổi 10 Coin sang Gem
+      Thì server từ chối với mã lỗi INVALID_AMOUNT
+      Và P1 vẫn có 10 Coin
+
+    @R1 @bien @cho-Q38
+    Sơ đồ kịch bản: SC-WAL-22 — Hạn mức đổi Coin → Gem mỗi ngày
+      Cho trước P1 đã đổi được <đã đổi> Gem từ Coin hôm nay và có 50,000 Coin
+      Khi P1 đổi 110 Coin sang Gem
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | đã đổi | kết quả                         |
+        | 990    | thành công, nhận 10 Gem         |
+        | 991    | COIN_TO_GEM_DAILY_LIMIT         |
+
+    @R1 @unauthorized
+    Kịch bản: SC-WAL-23 — Tài khoản chưa xác thực đổi Coin → Gem
+      Cho trước tài khoản "U1" chưa xác thực SĐT, có 1,100 Coin
+      Khi U1 gửi trực tiếp tới API yêu cầu đổi 1,100 Coin sang Gem
+      Thì server từ chối với mã lỗi PHONE_VERIFICATION_REQUIRED
+
+Tính năng: NFT — rút và nạp thẻ (BR-NFT) — R2
+  Bối cảnh chung:
+    Cho trước chức năng NFT đã được bật sau gate pháp lý
+    Và P1 Verified, đã KYC, 25 tuổi, ví "0xA1…" đã liên kết
+    Và phí rút là 200 Coin hoặc 20 Gem, thời gian chờ 30 ngày
+
+  Quy tắc: BR-NFT-02 — Điều kiện rút
+
+    @R2 @happy @tichhop
+    Kịch bản: SC-NFT-01 — Rút thẻ hợp lệ
+      Cho trước P1 có "Tidemourn #121/300" từ 2026-09-01, có 1,000 Coin
+      Khi P1 yêu cầu rút "Tidemourn #121/300" về ví "0xA1…" trên website ngày 2026-10-06, trả bằng Coin
+      Thì P1 có 800 Coin và thẻ ở trạng thái "Withdrawing"
+      Và khi giao dịch mint được xác nhận trên chuỗi, thẻ ở trạng thái "In Wallet"
+      Và ví "0xA1…" sở hữu token có ID bằng serial của "Tidemourn #121/300"
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-NFT-02 — Thời gian chờ
+      Cho trước P1 có thẻ từ lúc <có thẻ>
+      Khi P1 yêu cầu rút thẻ lúc 2026-10-06 10:00:00
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | có thẻ               | kết quả                    |
+        | 2026-09-06 10:00:00  | thành công                 |
+        | 2026-09-06 10:00:01  | WITHDRAW_COOLDOWN          |
+
+    @R2 @unauthorized
+    Sơ đồ kịch bản: SC-NFT-03 — Không đủ điều kiện rút
+      Cho trước <điều kiện>
+      Khi P1 yêu cầu rút một thẻ đủ thời gian chờ
+      Thì server từ chối với mã lỗi <mã lỗi>
+
+      Ví dụ:
+        | điều kiện                                        | mã lỗi                       |
+        | P1 chưa KYC                                      | KYC_REQUIRED                 |
+        | P1 17 tuổi                                       | AGE_BELOW_MINIMUM            |
+        | yêu cầu gửi từ app mobile                        | PLATFORM_NOT_SUPPORTED       |
+        | thẻ là soulbound                                 | CARD_NOT_TRADABLE            |
+        | thẻ đang niêm yết trên chợ                       | CARD_LOCKED                  |
+        | P1 chưa liên kết ví                              | WALLET_NOT_LINKED            |
+        | ví của P1 nằm trong danh sách trừng phạt         | WALLET_SCREENING_FAILED      |
+        | chức năng rút đang bị tạm dừng do sự cố          | NFT_WITHDRAWALS_PAUSED       |
+
+    @R2 @tichhop
+    Kịch bản: SC-NFT-04 — Giao dịch mint thất bại
+      Cho trước thẻ của P1 ở trạng thái "Withdrawing"
+      Khi giao dịch mint thất bại hoặc chưa được xác nhận sau 2 giờ
+      Thì thẻ trở lại trạng thái "Owned"
+      Và phí rút được hoàn lại cho P1
+
+    @R2 @happy
+    Kịch bản: SC-NFT-05 — Thẻ từ Coin quảng cáo được rút
+      Cho trước P1 có thẻ mở từ pack mua bằng Coin kiếm từ quảng cáo, đã qua thời gian chờ
+      Khi P1 yêu cầu rút thẻ đó
+      Thì yêu cầu được chấp nhận như mọi thẻ khác
+
+  Quy tắc: BR-NFT-03 — Liên kết ví
+
+    @R2 @negative
+    Kịch bản: SC-NFT-06 — Ví đã liên kết với tài khoản khác
+      Cho trước ví "0xB2…" đã liên kết với P2
+      Khi P1 liên kết ví "0xB2…" bằng chữ ký hợp lệ
+      Thì server từ chối với mã lỗi WALLET_ALREADY_LINKED
+
+    @R2 @negative
+    Kịch bản: SC-NFT-07 — Chữ ký sai
+      Khi P1 liên kết ví "0xA1…" với chữ ký không khớp thông điệp
+      Thì server từ chối với mã lỗi SIGNATURE_INVALID
+
+  Quy tắc: BR-NFT-05 — Nạp lại
+
+    @R2 @happy @tichhop
+    Kịch bản: SC-NFT-08 — Nạp từ ví đã liên kết
+      Cho trước ví "0xA1…" của P1 sở hữu token "Tidemourn #121/300"
+      Khi ví "0xA1…" gửi token vào ví lưu ký của ANIMA và giao dịch đủ số xác nhận
+      Thì "Tidemourn #121/300" ở trạng thái "Owned" trong tài khoản P1
+
+    @R2 @tichhop
+    Kịch bản: SC-NFT-09 — Người mua ở sàn ngoài nạp vào tài khoản của mình
+      Cho trước P2 mua token "Tidemourn #121/300" ở sàn ngoài bằng ví "0xC3…" đã liên kết với P2
+      Khi ví "0xC3…" gửi token vào ví lưu ký và đủ số xác nhận
+      Thì "Tidemourn #121/300" thuộc P2 ở trạng thái "Owned"
+
+    @R2 @negative @tichhop
+    Kịch bản: SC-NFT-10 — Nạp từ ví chưa liên kết
+      Khi ví "0xD4…" chưa liên kết tài khoản nào gửi một token ANIMA vào ví lưu ký
+      Thì token được giữ ở trạng thái "Chờ liên kết"
+      Và không tài khoản nào nhận thẻ cho đến khi chủ ví liên kết ví bằng chữ ký hợp lệ
+
+    @R2 @idempotency @tichhop
+    Kịch bản: SC-NFT-11 — Sự kiện chuỗi xử lý trùng
+      Cho trước sự kiện chuyển token với tx hash "0x9f…01" đã được xử lý
+      Khi bộ lắng nghe chuỗi nhận lại sự kiện "0x9f…01"
+      Thì trạng thái thẻ không đổi
+
+  Quy tắc: BR-NFT-08 — Công ty không thu hồi NFT
+
+    @R2 @unauthorized
+    Kịch bản: SC-NFT-12 — Admin cố thu hồi NFT trong ví người chơi
+      Cho trước token "Tidemourn #121/300" nằm trong ví "0xA1…"
+      Khi Super Admin gửi yêu cầu thu hồi hoặc hủy token đó
+      Thì server từ chối với mã lỗi NFT_NOT_IN_CUSTODY
+      Và smart contract không có hàm cho phép công ty chuyển token khỏi ví người chơi
+
+  Quy tắc: BR-ECO-01 — Không mua lại bằng tiền
+
+    @R1 @negative
+    Kịch bản: SC-ECO-06 — Không tồn tại chức năng bán thẻ cho công ty
+      Cho trước P1 sở hữu "Seraphel #12/300"
+      Khi P1 gửi yêu cầu bán "Seraphel #12/300" cho nền tảng để nhận tiền
+      Thì server trả mã lỗi NOT_SUPPORTED
+```
+
+---
+
 ## 13. Rà soát edge case
 
 | Nhóm | Kịch bản phủ | Ghi chú |
@@ -1653,7 +1987,8 @@ Tính năng: Website người chơi — đa nền tảng
 | BR-WAL-02 | SC-WAL-06, SC-WAL-09 | SC-WAL-08 | SC-WAL-01, SC-WAL-07 |
 | BR-WAL-03 | SC-PACK-07 | SC-PACK-07 | SC-PACK-06, SC-WAL-10 |
 | BR-WAL-04 | SC-WAL-11, SC-WAL-13 | SC-WAL-12, SC-WAL-14 | SC-WAL-02, SC-WAL-15 |
-| BR-WAL-05 | SC-WAL-16 | SC-WAL-17 | SC-WAL-18, SC-WAL-19 |
+| BR-WAL-05 | SC-WAL-16, SC-WAL-19, SC-WAL-20 | SC-WAL-17 | SC-WAL-18, SC-WAL-21 |
+| BR-WAL-06 | SC-WAL-22 | SC-WAL-22 | SC-WAL-22, SC-WAL-23 |
 | BR-ECO-01 | — (chỉ có hành vi chặn) | — | SC-ECO-01 |
 | BR-ECO-02 | — (chỉ có hành vi chặn) | — | SC-ECO-02 |
 | BR-ECO-03 | SC-ECO-03 | SC-ECO-03 | SC-ECO-04 |
@@ -1708,12 +2043,39 @@ Tính năng: Website người chơi — đa nền tảng
 | BR-WEB-05 | Viết khi chốt Q-33, Q-34 | — | — |
 | BR-WEB-06 | SC-WEB-12 | SC-WEB-12 | — |
 | BR-WEB-07 | Dùng chung SC-ACC-04 trên kênh web | — | SC-ACC-04 |
+| BR-ECO-01 (sửa CR-002) | — (rule cấm) | — | SC-ECO-01, SC-ECO-06 |
+| BR-SUP-01/02 | SC-SUP-01 | SC-SUP-01 | — |
+| BR-SUP-03 | SC-SUP-02 | SC-SUP-01 | — |
+| BR-SUP-04 | — | — | SC-SUP-03 |
+| BR-SUP-05 | SC-SUP-04 | — | SC-SUP-04 |
+| BR-SUP-06 | SC-FRG-01 | — | — |
+| BR-PF-01/02 | SC-PF-01 | — | — |
+| BR-PF-03 | SC-PF-02 | — | SC-PF-04 |
+| BR-PF-04 | SC-PF-03 | SC-PF-05 | SC-PF-04 |
+| BR-PF-05 | SC-FRG-05 | — | — |
+| BR-PF-06 | Viết khi chốt chuỗi (T-09) | — | — |
+| BR-FRG-01 | SC-FRG-01 | SC-FRG-09 | SC-FRG-04, SC-FRG-09 |
+| BR-FRG-02 | SC-FRG-01, SC-FRG-02 | — | SC-FRG-03 |
+| BR-FRG-03 | SC-FRG-06 | SC-FRG-05 | SC-FRG-05 |
+| BR-FRG-04 | SC-SUP-04 | — | — |
+| BR-FRG-05 | — | — | SC-FRG-04 |
+| BR-FRG-06 | — | — | SC-FRG-07 |
+| BR-FRG-07 | SC-FRG-08 | SC-FRG-08 | SC-FRG-08 |
+| BR-NFT-01 | — | — | SC-NFT-03 (nền tảng, tạm dừng) |
+| BR-NFT-02 | SC-NFT-01 | SC-NFT-02 | SC-NFT-03 |
+| BR-NFT-03 | SC-NFT-01 | — | SC-NFT-06, SC-NFT-07 |
+| BR-NFT-04 | SC-NFT-01 | SC-NFT-04 | — |
+| BR-NFT-05 | SC-NFT-08, SC-NFT-09 | SC-NFT-11 | SC-NFT-10 |
+| BR-NFT-06, 07 | Kiểm tra trong audit smart contract (không phải hành vi API) | — | — |
+| BR-NFT-08 | — | — | SC-NFT-12 |
+| BR-NFT-09 | SC-NFT-05 | — | — |
+| BR-NFT-10 | — | — | SC-NFT-03 |
 
 Ô "—" ở cột Happy/Biên nghĩa là rule đó chỉ mô tả hành vi chặn hoặc không có giá trị ngưỡng; lý do được ghi trong ô. Các rule chỉ có cột Negative (BR-CHK-04, BR-REF-03, BR-MKT-02/03/10, BR-FRD-03, BR-ADM-03) là rule cấm; hành vi hợp lệ tương ứng đã nằm trong kịch bản happy của rule khác.
 
 ## 15. Số liệu
 
-- 13 tính năng, 150 kịch bản đơn và 22 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
+- 18 tính năng, 180 kịch bản đơn và 27 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
 - 23 kịch bản/sơ đồ có tag `@cho-*` và 2 dòng ví dụ được đánh dấu `@cho-*`, sẽ cập nhật khi PO trả lời câu hỏi mở trong BRD.
 
 ## 16. Bước tiếp theo

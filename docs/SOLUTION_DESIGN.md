@@ -3,9 +3,9 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | SAD-ANIMA-001 |
-| Phiên bản | 0.1 (Draft) |
+| Phiên bản | 0.2 (Draft) — thêm commit–reveal, số lượng phát hành, Lò rèn, NFT (CR-002) |
 | Ngày | 2026-10-06 |
-| Đầu vào | [BRD](BRD_ANIMA.md) v0.3, [PRD](PRD_ANIMA.md) v0.2, [BDD](BDD_ANIMA.md) v0.2, [Tech Stack](TECH_STACK.md) v0.3 |
+| Đầu vào | [BRD](BRD_ANIMA.md) v0.4, [PRD](PRD_ANIMA.md) v0.3, [BDD](BDD_ANIMA.md) v0.3, [Tech Stack](TECH_STACK.md) v0.4 |
 | Trạng thái | Chờ Tech Lead review |
 
 Tài liệu mô tả **cách xây** hệ thống. Quy tắc nghiệp vụ nằm ở BRD, lựa chọn công nghệ và lý do nằm ở Tech Stack; ở đây chỉ dẫn chiếu ID.
@@ -30,6 +30,7 @@ Tài liệu mô tả **cách xây** hệ thống. Quy tắc nghiệp vụ nằm 
 14. [Môi trường, CI/CD và Git contract](#14-môi-trường-cicd-và-git-contract)
 15. [Chiến lược kiểm thử](#15-chiến-lược-kiểm-thử)
 16. [Rủi ro kỹ thuật, spike và ADR](#16-rủi-ro-kỹ-thuật-spike-và-adr)
+17. [Blockchain và NFT (CR-002)](#17-blockchain-và-nft-cr-002)
 
 ---
 
@@ -127,6 +128,7 @@ Monorepo, mỗi thư mục gốc có một owner chính. Đây là cơ sở cho 
 │  │  └─ Modules/
 │  │     ├─ Identity/  Wallet/  Catalog/  Gacha/  Collection/
 │  │     ├─ Rewards/   Payments/ Fraud/   Admin/  Analytics/
+│  │     ├─ Fairness/  Forge/   (R2) Chain/
 │  │     └─ (R2) Marketplace/  Social/
 │  └─ tests/
 │     ├─ Anima.UnitTests/  Anima.IntegrationTests/  Anima.Bdd/  Anima.ArchTests/
@@ -142,6 +144,7 @@ Monorepo, mỗi thư mục gốc có một owner chính. Đây là cơ sở cho 
 │  ├─ docker-compose.yml             # PostgreSQL, Redis, mock store/gateway cho dev
 │  └─ terraform/                     # khi chốt cloud (T-02)
 ├─ contracts/openapi/anima.v1.yaml   # contract nguồn, sinh client cho web và kiểm tra Unity
+├─ chain/                            # (R2) smart contract Solidity + Foundry test, script deploy
 ├─ docs/   prototype/   .vibe/   .github/workflows/
 ```
 
@@ -173,8 +176,11 @@ Modules/Gacha/
 | Identity | Tài khoản, ngày sinh/đồng ý giám hộ, thiết bị mobile, phiên web, trạng thái + lý do hạn chế, xóa tài khoản | BR-ACC-*, BR-WEB-02 |
 | Wallet | Ledger Gem/Coin, số dư, giữ tiền (hold) cho đấu giá R2, đổi Gem→Coin | BR-WAL-*, BR-ECO-01/02 |
 | Payments | Xác thực receipt IAP, thông báo hoàn tiền store, đơn nạp web + IPN | BR-WAL-02/04, BR-WEB-04/05/07 |
-| Catalog | Set, Card Definition, Story, Pack Definition, version tỷ lệ, maker-checker | BR-ADM-02/03, BR-PACK-01/04 |
-| Gacha | Mua pack, quay, pity, bản ghi mở pack | BR-PACK-* |
+| Catalog | Mùa, Set, Card Definition, số lượng phát hành, Story, Pack Definition, version tỷ lệ (pack và rèn), maker-checker | BR-ADM-02/03, BR-PACK-01/04, BR-SUP-01/05 |
+| Gacha | Mua pack, quay, pity, bản ghi mở pack, chọn thẻ theo số bản còn lại | BR-PACK-*, BR-SUP-03/04 |
+| Fairness | Server seed / client seed / nonce, công bố mã băm, công bố seed cũ, công cụ kiểm tra | BR-PF-* |
+| Forge | Lò rèn: hủy 2 thẻ, thu phí, tạo và lật thẻ chưa lật | BR-FRG-* |
+| Chain (R2) | Liên kết ví, mint, theo dõi nạp, neo Merkle root, KYC/sàng lọc ví | BR-NFT-*, BR-PF-06 |
 | Collection | Card Instance, tiến độ set, quyền đọc story | US-05.* |
 | Rewards | Điểm danh, streak, Freeze, rewarded ads (SSV), tham số thưởng có version | BR-CHK-*, BR-ADS-*, BR-ECO-03/04 |
 | Fraud | Cờ thiết bị (Play Integrity/App Attest), điểm rủi ro, captcha, quy tắc gắn cờ | BR-FRD-* |
@@ -232,6 +238,12 @@ erDiagram
 | `gacha.pack_instance` | id, account_id, pack_definition_id, odds_version_id, purchase_ledger_entry_id, status | status ∈ Unopened/Opened/Revoked |
 | `gacha.pack_opening` | pack_instance_id (PK), results (jsonb), pity_before, pity_after, pity_triggered, rng_trace, opened_at | PK chống mở hai lần (SC-PACK-13) |
 | `gacha.pity_counter` | account_id, pack_definition_id, count | PK(account_id, pack_definition_id) |
+| `catalog.edition` | card_definition_id, season_id, max_supply, issued, burned | CHECK(issued ≤ max_supply); `max_supply` khóa khi mùa mở bán; cập nhật `issued` bằng `UPDATE … WHERE issued < max_supply` |
+| `fairness.seed` | id, account_id, server_seed (mã hóa), server_seed_hash, client_seed, next_nonce, status (active/revealed), revealed_at | Một seed `active` mỗi tài khoản |
+| `forge.forge_record` | id, account_id, input_card_ids[2], fee_currency, fee_amount, sealed_card_id, created_at | Hai thẻ đầu vào cập nhật `Burned` trong cùng transaction |
+| `forge.sealed_card` | id, account_id, forge_odds_version_id, status (Sealed/Revealed), result_card_instance_id, seed_id, nonce | |
+| `chain.wallet_link` | account_id, address, chain_id, signed_message, linked_at, screening_result | UNIQUE(address) |
+| `chain.nft_transfer` | card_instance_id, direction (withdraw/deposit), tx_hash, block, confirmations, status | UNIQUE(tx_hash, log_index) |
 | `collection.card_instance` | id, serial, card_definition_id, owner_id, status, soulbound, origin_type, origin_id | status ∈ Owned/Listed/InAuction/Locked |
 | `rewards.checkin` | account_id, local_date, streak_after, coin, freeze_used | PK(account_id, local_date) |
 | `rewards.ad_reward` | ad_txn_id, network, account_id, local_date, seq_in_day, reward, status | UNIQUE(network, ad_txn_id) |
@@ -277,6 +289,15 @@ erDiagram
 | POST | `/pack-instances/{id}/open` | Mở pack, trả kết quả + thứ tự lật + cờ climax | Trả lại kết quả nếu đã mở |
 | GET | `/collection`, `/collection/sets/{id}` | Bộ sưu tập, tiến độ | |
 | GET | `/cards/{id}/story` | Story Fragment | CARD_NOT_COLLECTED |
+| GET | `/fairness/seed` | Mã băm server seed hiện tại, client seed, nonce | Không trả server seed đang dùng |
+| POST | `/fairness/seed/rotate` | Đổi seed; trả server seed cũ | BR-PF-04 |
+| GET | `/fairness/verify/{openingId}` | Dữ liệu để tự tính lại một lần quay | Công khai sau khi seed đã công bố |
+| POST | `/forge` | Rèn 2 thẻ + phí (Coin hoặc Gem) | Idempotent; SC-FRG-* |
+| POST | `/forge/sealed/{id}/reveal` | Lật thẻ chưa lật | |
+| POST | `/wallet/convert` | Đổi Gem ↔ Coin | BR-WAL-05/06 |
+| GET | `/editions?season=` | Số lượng tối đa, đã phát hành, đã hủy | Công khai |
+| POST | `/nft/wallets` | Liên kết ví (EIP-4361) | R2, chỉ web |
+| POST | `/nft/withdrawals` | Rút thẻ về ví | R2, chỉ web |
 | POST | `/rewards/checkin` | Điểm danh | Chỉ mobile |
 | POST | `/rewards/freeze` | Mua/nhận Streak Freeze | |
 | POST | `/rewards/ads/session` | Xin phiên xem ad (kiểm cooldown, giới hạn) | Chỉ mobile |
@@ -373,16 +394,41 @@ sequenceDiagram
 
 ---
 
-## 8. Thuật toán quay pack
+## 8. Thuật toán quay pack và Lò rèn
 
-1. Lấy `odds_version` từ Pack Instance (snapshot, BR-PACK-04).
-2. Với mỗi slot (5 slot): quay rarity theo trọng số của version (`IRandomSource.NextInt(0, 1_000_000)` so với bảng cộng dồn, đơn vị phần triệu), rồi quay **đều** một Card Definition trong nhóm rarity đó thuộc set của pack.
-3. **Pity (BR-PACK-05):** nếu `pity_counter = 49` và cả 5 slot không có Legendary+, quay lại **slot có rarity thấp nhất** trong nhóm Legendary. **[Cần PO xác nhận]** cách thay slot này, bổ sung vào Q-09.
-4. Cập nhật pity: có Legendary+ → 0, ngược lại +1.
-5. Sắp xếp thứ tự lật theo rarity tăng dần (BR-PACK-06); `climax = max_rarity ≥ Epic` (BR-PACK-07).
-6. Ghi `rng_trace` (các giá trị ngẫu nhiên đã dùng) để audit và tái hiện khi có khiếu nại.
+### 8.1. Sinh số ngẫu nhiên có thể kiểm chứng (BR-PF)
 
-Kiểm định: test thống kê 1,000,000 slot cho mỗi version trong CI (SC-PACK-16, NFR-12).
+```
+digest   = HMAC-SHA256(key = server_seed, message = "{client_seed}:{nonce}:{slot}")
+LIMIT    = floor(2^32 / 1,000,000) × 1,000,000 = 4,294,000,000
+for i in 0, 4, 8, … 28:                       # 8 khối 4 byte
+    u = uint32_big_endian(digest[i : i+4])
+    if u < LIMIT: return u mod 1,000,000      # loại bỏ thiên lệch modulo
+nếu cả 8 khối bị loại: dùng message "{client_seed}:{nonce}:{slot}:1" và lặp lại
+```
+
+- `slot` là số thứ tự `0..4` cho rarity; giá trị chọn Card Definition dùng message `"{client_seed}:{nonce}:{slot}:c"`.
+- Vector kiểm thử chuẩn: SC-PF-01 (server seed `anima-demo-server-seed-001`, client seed `keeper2049`, nonce 1 → 457142, 594361, 140124, 227524, 278885).
+- Server seed sinh bằng CSPRNG 32 byte, lưu mã hóa; chỉ mã băm SHA-256 được trả cho client cho tới khi người chơi đổi seed.
+- Mỗi lần mở pack hoặc lật thẻ rèn dùng **một** nonce rồi tăng 1; mở pack và đổi seed khóa cùng dòng `fairness.seed` để không trộn seed (SC-PF-05).
+
+### 8.2. Mở pack
+
+1. Lấy `odds_version` từ Pack Instance (snapshot, BR-PACK-04) và seed đang `active` của tài khoản.
+2. Với mỗi slot 0..4: tra giá trị quay vào bảng cộng dồn phần triệu để ra rarity.
+3. **Pity (BR-PACK-05):** nếu `pity_counter = 49` và không slot nào ra Legendary+, slot có rarity thấp nhất (slot nhỏ nhất nếu bằng nhau) được đổi thành Legendary. **[Cần PO xác nhận — Q-09]**
+4. **Chọn thẻ (BR-SUP-03):** với mỗi slot, lấy danh sách Card Definition còn bản của rarity đó, sắp theo `card_definition_id`; chỉ số = giá trị quay `:c` mod số phần tử. Khóa dòng `catalog.edition`, tăng `issued`, gán số thứ tự edition và serial.
+5. Nếu một rarity hết sạch giữa chừng (do đồng thời): giao dịch quay lại bước 4 với danh sách mới; nếu rarity đã rỗng hoàn toàn thì tạm ngừng bán pack (BR-SUP-04) và vẫn hoàn tất lần mở bằng rarity thấp hơn gần nhất còn bản, ghi rõ lý do trong bản ghi. **[Cần PO xác nhận cách xử lý này — bổ sung vào Q-39]**
+6. Cập nhật pity; sắp thứ tự lật (BR-PACK-06); `climax = max_rarity ≥ Epic`.
+7. Ghi bản ghi mở pack: seed_id, nonce, các giá trị quay, danh sách Card Definition đủ điều kiện ở mỗi slot, pity trước/sau. Đây là dữ liệu mà công cụ kiểm chứng công khai dùng để tính lại.
+
+### 8.3. Lò rèn (BR-FRG)
+
+1. Kiểm tra hai thẻ: khác nhau, thuộc người chơi, trạng thái `Owned`, không soulbound (SC-FRG-04).
+2. Trong một transaction: khóa hai dòng thẻ (`FOR UPDATE`), trừ phí (ledger), đặt hai thẻ `Burned`, tăng `burned` của edition, tạo `sealed_card`. Thiếu tiền thì rollback toàn bộ (SC-FRG-03).
+3. Lật: như 8.2 bước 2 và 4 với **một** slot, dùng `forge_odds_version` và kho số lượng của mùa hiện tại; **không** áp pity hay bất kỳ hệ số nào (BR-FRG-03).
+
+Kiểm định: test thống kê 1,000,000 lượt cho mỗi version tỷ lệ pack và tỷ lệ rèn trong CI (SC-PACK-16, NFR-12).
 
 ---
 
@@ -528,6 +574,8 @@ Kiểm định: test thống kê 1,000,000 slot cho mỗi version trong CI (SC-P
 | TR-04 | Đồng thời tiêu tiền từ app và web | Khóa dòng `balance` + `CHECK`; test SC-WEB-03 | S02 |
 | TR-05 | Cổng thanh toán chưa chọn | Lớp adapter + mock để không chặn tiến độ | S06 |
 | TR-06 | Unity và .NET dùng chung contract | Build `Anima.Contracts` netstandard2.1 và import vào Unity ở S00 | S00 |
+| TR-07 | Lỗi smart contract hoặc lộ khóa ví lưu ký (CR-002) | Dùng OpenZeppelin, audit độc lập trước mainnet, multisig cho quyền admin, KMS/HSM cho khóa minter, giới hạn mint theo giờ | R2 |
+| TR-08 | Chọn thẻ theo số bản còn lại khi nhiều người mở đồng thời | Khóa dòng `edition`, test tải tập trung vào thẻ sắp hết bản | S004 |
 
 ### 16.2. ADR cần ghi
 
@@ -539,6 +587,82 @@ Kiểm định: test thống kê 1,000,000 slot cho mỗi version trong CI (SC-P
 | ADR-004 | Unity Web cho mở pack trên website + LiteReveal | Chờ spike T009 |
 | ADR-005 | OpenAPI là nguồn contract; `Anima.Contracts` dùng chung với Unity | Đề xuất |
 | ADR-006 | Cloud provider | Hoãn (T-02) |
+| ADR-007 | Commit–reveal theo tài khoản (HMAC-SHA256, server/client seed, nonce) | Đề xuất (CR-002) |
+| ADR-008 | Thẻ nằm trong cơ sở dữ liệu cho tới khi rút; mint khi rút; neo Merkle root hằng ngày | Đề xuất (CR-002) |
+| ADR-009 | Chọn blockchain (EVM L2) và nhà cung cấp KYC, sàng lọc ví | Chờ quyết định (T-09, T-10) |
+
+---
+
+## 17. Blockchain và NFT (CR-002)
+
+Chỉ triển khai ở R2 và chỉ sau gate pháp lý (BR-NFT-01). Phần R1 (commit–reveal, số lượng phát hành, Lò rèn) không cần blockchain.
+
+### 17.1. Nguyên tắc
+
+| Nguyên tắc | Lý do |
+|---|---|
+| Thẻ nằm trong cơ sở dữ liệu cho tới khi người chơi rút (mint khi rút) | Chơi, rèn, giao dịch trong app không tốn phí gas; chỉ tốn khi rút |
+| Hằng ngày neo Merkle root của mọi Card Instance mới và mọi mã băm server seed lên chuỗi (BR-PF-06) | Mọi thẻ, kể cả chưa rút, đều chứng minh được là duy nhất và tồn tại từ ngày nào, chỉ tốn 1 giao dịch/ngày |
+| Smart contract là nơi thực thi số lượng tối đa và token ID = serial | Không ai, kể cả công ty, mint vượt giới hạn hay mint trùng |
+| Công ty không có quyền chuyển, sửa, hủy token trong ví người chơi | BR-NFT-08 |
+| Gem/Coin không lên chuỗi | Giữ kinh tế khép kín, giảm rủi ro pháp lý |
+
+### 17.2. Thành phần
+
+```mermaid
+flowchart LR
+    Web[Website: kết nối ví, ký thông điệp] -->|REST| API
+    API --> Chain[Module Chain]
+    Chain --> KMS[KMS/HSM: khóa minter]
+    Chain -->|mint, neo Merkle root| L2[(EVM L2)]
+    L2 -->|sự kiện Transfer| Indexer[Bộ lắng nghe chuỗi]
+    Indexer --> API
+    Chain --> IPFS[(IPFS + Arweave: ảnh, metadata)]
+    Chain --> KYC[Nhà cung cấp KYC]
+    Chain --> Screen[Sàng lọc ví AML]
+    Vault[Ví lưu ký multisig] --- L2
+```
+
+| Thành phần | Thiết kế |
+|---|---|
+| `AnimaCards` (ERC-721 + ERC-2981) | `maxSupply[definitionId]` đặt một lần trước khi mùa mở bán; `mint(to, serial, definitionId)` chỉ cho role MINTER; royalty mặc định 5%; tạm dừng được mint, **không** tạm dừng được chuyển nhượng |
+| `AnimaCommitments` | Hàm `commit(day, merkleRootCards, merkleRootSeeds)` chỉ cho role COMMITTER; chỉ ghi, không sửa |
+| Quyền admin contract | Multisig (ví dụ 2/3 người); không có hàm chuyển token của người khác |
+| Ví lưu ký | Địa chỉ multisig nhận NFT nạp vào; đốt token khi thẻ đã nạp được đưa vào Lò rèn |
+| Module Chain (.NET) | Nethereum: dựng và gửi giao dịch, quản lý nonce, thử lại; outbox cho job mint; idempotent theo serial |
+| Bộ lắng nghe | Đọc sự kiện `Transfer` của contract, chờ đủ số xác nhận, ghi `chain.nft_transfer` (UNIQUE tx_hash + log_index — SC-NFT-11) |
+| Metadata | JSON theo chuẩn ERC-721 metadata: tên, mô tả, `image: ipfs://CID`, thuộc tính hệ, rarity, mùa, edition `#n/N`; pin trên IPFS, bản sao Arweave |
+| Website | wagmi + viem + WalletConnect để kết nối ví; liên kết ví bằng thông điệp chuẩn Sign-In with Ethereum (EIP-4361) |
+
+### 17.3. Luồng rút thẻ về ví
+
+```mermaid
+sequenceDiagram
+    participant W as Website
+    participant API
+    participant C as Module Chain
+    participant L2 as Blockchain
+    W->>API: POST /nft/withdrawals (cardId, Idempotency-Key)
+    API->>API: kiểm KYC, tuổi, thời gian chờ, trạng thái thẻ, sàng lọc ví (BR-NFT-02, 10)
+    API->>API: trừ phí (ledger), thẻ → Withdrawing, outbox mint
+    C->>L2: mint(walletĐãLiênKết, serial, definitionId)
+    L2-->>C: tx hash
+    C->>C: chờ đủ xác nhận
+    C->>API: thẻ → In Wallet (thất bại/quá 2 giờ → Owned + hoàn phí, SC-NFT-04)
+```
+
+### 17.4. Luồng nạp lại
+
+1. Người chơi chuyển token từ ví đã liên kết tới ví lưu ký.
+2. Bộ lắng nghe thấy sự kiện `Transfer(from, vault, tokenId)`, chờ đủ xác nhận.
+3. Nếu `from` đã liên kết với tài khoản X: Card Instance (serial = tokenId) chuyển về X, trạng thái `Owned`. Nếu chưa liên kết: giữ "Chờ liên kết" (SC-NFT-10).
+
+### 17.5. Việc cần làm trước khi lên mainnet
+
+- Audit smart contract bởi đơn vị độc lập.
+- Chạy toàn bộ luồng trên testnet ít nhất một mùa beta.
+- Runbook sự cố: tạm dừng mint, xoay khóa minter, liên lạc người chơi.
+- Ý kiến pháp lý (Q-41), chọn chuỗi (T-09), KYC và sàng lọc ví (T-10).
 
 ---
 

@@ -1,9 +1,9 @@
 # ANIMA: Echoes of the Heart
 ## Master Document — Dự án App Thẻ bài Số hóa
 
-**Version:** 1.1
+**Version:** 1.2
 **Ngày tạo:** 2026-10-05
-**Cập nhật:** 2026-10-06 — thêm mục 9 Kiến trúc & Tech Stack; cập nhật mục 8.3 theo quyết định công nghệ
+**Cập nhật:** 2026-10-06 — v1.1: thêm mục 9 Kiến trúc & Tech Stack. v1.2: mô hình tài sản số (mục 2.4, 5.7) theo CR-002
 **Trạng thái:** Concept & Design Phase
 
 ---
@@ -54,6 +54,8 @@ Nền tảng mobile cho phép người dùng mua, mở, sưu tầm và giao dị
 | Quảng cáo | Rewarded video | 25% |
 | Phí giao dịch | 5-10% mỗi giao dịch | 10% |
 | Battle Pass | Theo mùa | 5% |
+| Phí rèn (CR-002) | 2 thẻ + phí → 1 thẻ chưa lật | Chưa ước tính |
+| Royalty bán lại NFT, phí rút NFT (CR-002, R2) | 5% mỗi lần NFT đổi chủ ở sàn hỗ trợ ERC-2981; phí khi rút | Chưa ước tính |
 
 ## 2.2. Chia sẻ doanh thu quảng cáo
 - 40-50% cho user (dưới dạng tiền trong app)
@@ -63,6 +65,20 @@ Nền tảng mobile cho phép người dùng mua, mở, sưu tầm và giao dị
 - User **không thể rút tiền ra** — tránh bị coi là cờ bạc
 - Tiền trong app chỉ dùng để mua pack
 - Công khai tỷ lệ rơi thẻ (minh bạch)
+- (CR-002) **Công ty không mua lại thẻ** bằng tiền thật hay tiền mã hóa, không cam kết giá, không hứa lợi nhuận
+
+## 2.4. Mô hình tài sản số (CR-002)
+
+| Thành phần | Mô tả | Release |
+|---|---|---|
+| Thẻ là tài sản duy nhất | Mỗi thẻ có serial duy nhất và số thứ tự trong edition (`#37/100`) | R1 |
+| Số lượng phát hành giới hạn theo mùa | Độ hiếm đến từ số bản có hạn; mùa đóng thì set đóng vĩnh viễn; không hạ tỷ lệ ngầm | R1 |
+| Kiểm chứng công bằng (commit–reveal) | Người chơi tự tính lại được kết quả mở pack và lật thẻ rèn | R1 |
+| Lò rèn | 2 thẻ bất kỳ + phí (Coin hoặc Gem) → 1 thẻ chưa lật, tỷ lệ công khai, không có yếu tố tác động | R1 |
+| Quy đổi Gem ↔ Coin | Hai chiều, có phí và hạn mức | R1 |
+| NFT | Rút thẻ về ví riêng (ERC-721), bán ở sàn ngoài, công ty nhận royalty; nạp lại để chơi | R2, sau gate pháp lý |
+
+Giá: **1 pack 5 thẻ = $1** (100 Gem hoặc 1,000 Coin). Chi tiết quy tắc ở BRD mục 10.12 → 10.15.
 
 ---
 
@@ -506,6 +522,18 @@ Chỉ kích hoạt nếu có Epic trở lên.
 | Auto-click check-in | Random hóa vị trí nút, captcha |
 | Farm ads bằng script | Cooldown, giới hạn ngày |
 | Referral fraud | Chỉ thưởng khi referral đạt level |
+| Farm Coin quảng cáo → rèn → rút thẻ hiếm (CR-002) | Giới hạn lượt rèn, hạn mức đổi Coin → Gem, KYC và thời gian chờ khi rút NFT |
+
+## 5.7. Vòng lặp kinh tế sau CR-002
+
+```
+Nạp tiền ──► Gem ──┐                       ┌──► Giữ, đọc story
+Xem quảng cáo ──► Coin ──┤ (đổi qua lại) ├──► Mở pack (commit–reveal) ──► Thẻ #n/N ──┼──► Chợ trong app (phí 5–10%)
+                                                                                     ├──► Lò rèn: 2 thẻ + phí → 1 thẻ chưa lật (thẻ cũ bị hủy)
+                                                                                     └──► Rút về ví NFT (R2) ──► sàn ngoài (royalty 5%) ──► nạp lại
+```
+
+Ví dụ con số: 1 slot thẻ ≈ 200 Coin. Rèn tốn 2 thẻ + 50 Coin, nên thẻ thường có giá sàn tự nhiên khoảng (200 − 50) ÷ 2 ≈ 75 Coin trên chợ.
 
 ---
 
@@ -999,6 +1027,7 @@ Tài liệu này là **bản thiết kế tổng thể** cho dự án ANIMA: Ech
 - Tổng hợp BRD
 - Thiết kế IP & câu chuyện
 - Kiến trúc & tech stack
+- Mô hình tài sản số: NFT, Lò rèn, kiểm chứng công bằng (CR-002)
 
 **Tài liệu chi tiết đi kèm:**
 - [PRD_ANIMA.md](PRD_ANIMA.md) — yêu cầu sản phẩm, phạm vi MVP, đo lường, kế hoạch phát hành

@@ -4,7 +4,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | PRD-ANIMA-001 |
-| Phiên bản | 0.2 (Draft) — thêm website người chơi (CR-001) |
+| Phiên bản | 0.3 (Draft) — thêm tài sản số: Lò rèn, kiểm chứng công bằng, NFT (CR-002) |
 | Ngày | 2026-10-06 |
 | Phạm vi | Release 1 (MVP), định hướng Release 2–3 |
 | Tài liệu liên quan | [Master Document](ANIMA_Master_Document.md), [BRD](BRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md), [Solution Design](SOLUTION_DESIGN.md), [Sprint Plan](SPRINT_PLAN.md), [Prototype](../prototype/index.html) |
@@ -28,6 +28,7 @@ ANIMA là nền tảng sưu tầm thẻ bài số trên **app mobile và website
 1. **Mở pack như một màn trình diễn**, với hình, tiếng và rung được dàn dựng theo độ hiếm.
 2. **Thẻ có chiều sâu**: mỗi thẻ có một Story Fragment; sưu tầm đủ bộ để ghép lại bí ẩn về The Fracture.
 3. **Công bằng với người chơi free**: chơi đều đặn mỗi ngày kiếm được khoảng 1 pack/tuần, tỷ lệ rơi được công khai.
+4. **Thẻ là tài sản thật sự của người chơi** (CR-002): mỗi thẻ là duy nhất, số lượng có hạn, kết quả kiểm chứng được; từ R2 người chơi rút được thẻ về ví riêng dưới dạng NFT.
 
 ## 2. Vấn đề cần giải quyết
 
@@ -98,6 +99,7 @@ Chỉ số soft launch là **[Đề xuất]**; chỉ số 6 và 12 tháng lấy 
 | Khiếu nại về tỷ lệ rơi / tính minh bạch | ≤ 1% ticket hỗ trợ |
 | Tài khoản bị phát hiện gian lận | ≤ 5% DAU |
 | Tỷ lệ skip animation | Theo dõi; nếu > 70% sau tuần đầu thì xem lại thời lượng animation |
+| Tỷ lệ mua pack bị "ăn mòn" bởi Lò rèn (CR-002) | Nếu doanh thu pack/DAU giảm > 15% sau khi mở Lò rèn, xem lại phí rèn |
 
 ---
 
@@ -105,7 +107,8 @@ Chỉ số soft launch là **[Đề xuất]**; chỉ số 6 và 12 tháng lấy 
 
 1. **Kết quả là thật, animation là trình diễn.** Kết quả do server quyết định trước; người chơi skip lúc nào cũng được mà không thiệt (BR-PACK-02, BR-PACK-08).
 2. **Minh bạch trước khi trả tiền.** Tỷ lệ rơi, bộ đếm pity và giá luôn xem được trước khi xác nhận mua (BR-PACK-01).
-3. **Không bao giờ rút được tiền.** Không có tính năng, khuyến mãi hay câu chữ nào gợi ý đổi Coin/Gem/thẻ ra tiền thật (BR-ECO-01).
+3. **Không bao giờ rút được Gem/Coin, công ty không mua lại thẻ.** Không có tính năng, khuyến mãi hay câu chữ nào hứa giá, hứa lợi nhuận, hay dùng từ "đầu tư", "sinh lời" (BR-ECO-01 sửa theo CR-002).
+3b. **Kiểm chứng được, không chỉ hứa.** Người chơi tự tính lại được mọi kết quả mở pack và rèn (BR-PF).
 4. **Tôn trọng thời gian người chơi free.** Các mức thưởng phải được đưa ra sao cho chơi đều đặn kiếm khoảng 1 pack/tuần, không bắt xem ads vô hạn (BR-ADS-01).
 5. **An toàn cho mọi người.** Có chế độ giảm chuyển động để tắt flash và rung màn hình; không dùng nhịp flash dễ gây hại cho người nhạy cảm ánh sáng (NFR-09).
 6. **Câu chuyện là phần thưởng.** Thẻ hiếm hơn mở ra câu chuyện sâu hơn (Master Document §7.8).
@@ -159,6 +162,10 @@ flowchart LR
 | 21 | Chế độ giảm chuyển động | Must | An toàn, accessibility | NFR-09 |
 | 22 | Admin: người dùng, thẻ, pack/tỷ lệ, cấu hình kinh tế, dashboard | Must | Vận hành | EP-10 |
 | 23 | **Website người chơi**: đăng nhập, ví, nạp Gem qua cổng thanh toán, cửa hàng, mở pack, bộ sưu tập, story | Must | Dùng trên máy tính; nạp với phí thấp hơn store; chia sẻ link | BRD 4.4, BR-WEB |
+| 24 | **Lò rèn**: 2 thẻ + phí (Coin hoặc Gem) → 1 thẻ chưa lật | Must | Không còn thẻ "vô giá trị"; giảm tổng cung | BR-FRG |
+| 25 | **Kiểm chứng công bằng** (commit–reveal) | Must | Niềm tin vào tỷ lệ | BR-PF |
+| 26 | **Số lượng phát hành và số thứ tự** `#n/N` | Must | Độ hiếm minh bạch | BR-SUP |
+| 27 | Quy đổi Gem ↔ Coin hai chiều | Must | Linh hoạt trả phí rèn, mua pack | BR-WAL-05/06 |
 
 ### 6.2A. Nền tảng (CR-001)
 
@@ -177,7 +184,7 @@ Ma trận chi tiết tính năng theo nền tảng ở BRD mục 4.4. Ở R1, đ
 | Chợ P2P, đấu giá | R2 | Cần hệ thống chống gian lận và dữ liệu giá; rủi ro RMT cao |
 | Nhiệm vụ hàng ngày, referral, thành tựu | R2 | Tập trung vào core loop trước |
 | Feed, follow, chat, leaderboard | R2 | Cần lượng người dùng đủ lớn |
-| Đổi Gem → Coin | R2 | Chờ quyết định BRD Q-05 |
+| NFT: liên kết ví, rút/nạp thẻ, royalty (CR-002) | R2 | Cần gate pháp lý (BRD Q-41), audit smart contract, KYC |
 | Livestream mở pack | R2 | Cần BRD riêng |
 | Battle Pass, AR/3D, game đối kháng | R3 | Ngoài MVP |
 
@@ -299,6 +306,9 @@ Mọi sự kiện có thuộc tính chung: `account_id`, `device_id` (mobile) ho
 | `card_collected` | Mỗi thẻ mới | `card_definition_id`, `rarity`, `is_duplicate` | Bộ sưu tập |
 | `set_completed` | Hoàn thành set | `set_id` | Retention |
 | `story_read` | Mở Story Fragment | `card_definition_id`, `read_sec` | H-03 |
+| `forge_completed` | Rèn thành công (server) | `fee_currency`, `fee_amount`, `input_rarities` | Kinh tế, tổng cung |
+| `sealed_card_revealed` | Lật thẻ rèn (server) | `rarity` | Kinh tế |
+| `fairness_seed_rotated` / `fairness_verified` | Đổi seed / dùng công cụ kiểm chứng | — | Niềm tin |
 | `checkin_completed` | Điểm danh | `streak`, `coin`, `freeze_used` | Retention |
 | `streak_broken` | Streak reset | `streak_before` | Retention |
 | `ad_requested` / `ad_rewarded` / `ad_failed` | Vòng đời một lượt ads | `network`, `ad_type`, `reward`, `daily_count` | H-02, H-05 |
