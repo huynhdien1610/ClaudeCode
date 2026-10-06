@@ -5,18 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ANIMA — Prototype admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Playfair+Display:wght@700&display=swap&subset=vietnamese" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:wght@700&display=swap&subset=vietnamese" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css">
 <style>
   body { background: var(--bg); }
   .layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-  .side { background: var(--bg-2); border-right: 1px solid var(--line); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
-  .side .logo { font-family: var(--font-display); font-size: 20px; letter-spacing: 2px; padding: 4px 10px 14px; color: #fde68a; }
+  .side { background: var(--surface); border-right: 1px solid var(--line); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .side .logo { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: 3px; padding: 4px 10px 14px; color: var(--ink); }
+  .side .logo small { display: block; font-family: var(--font); letter-spacing: 0; font-size: 12px; font-weight: 500; color: var(--text-3); }
   .side a { text-decoration: none; color: var(--text-2); padding: 9px 12px; border-radius: 10px; font-weight: 600; font-size: 14px; }
-  .side a.on { background: var(--surface-2); color: var(--text); }
+  .side a.on { background: var(--surface-2); color: var(--text); box-shadow: inset 3px 0 0 var(--accent); }
   .side a.locked { opacity: .45; }
   .main { padding: 0; min-width: 0; }
-  .top { display: flex; gap: 10px; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .top { display: flex; gap: 10px; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; background: var(--surface); }
   .page { padding: 20px 24px 40px; display: grid; gap: 16px; }
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
   .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
@@ -29,7 +30,7 @@
   .status.Restricted, .status.pending { color: var(--warn); border-color: rgba(251,191,36,.4); }
   .status.Banned, .status.rejected { color: var(--danger); border-color: rgba(248,113,113,.4); }
   .status.Unverified, .status.draft { color: var(--text-2); }
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; place-items: center; z-index: 60; padding: 16px; }
+  .modal { position: fixed; inset: 0; background: rgba(28,26,23,.35); display: none; place-items: center; z-index: 60; padding: 16px; }
   .modal.on { display: grid; }
   .modal .panel { width: min(480px, 100%); display: grid; gap: 12px; }
   .diff-up { color: var(--ok); } .diff-down { color: var(--danger); }
@@ -129,7 +130,7 @@
     ["odds", "Pack & Tỷ lệ", null], ["economy", "Tham số kinh tế", null], ["comp", "Bồi thường", null], ["audit", "Audit log", "audit"],
   ];
   function side(cur) {
-    $("#side").innerHTML = `<div class="logo">ANIMA Admin</div>` + MENU.map(([k, l, p]) => `<a href="#${k}" class="${k === cur ? "on" : ""} ${p && !can(p) ? "locked" : ""}">${l}${p && !can(p) ? " 🔒" : ""}</a>`).join("");
+    $("#side").innerHTML = `<div class="logo">ANIMA<small>Quản trị vận hành</small></div>` + MENU.map(([k, l, p]) => `<a href="#${k}" class="${k === cur ? "on" : ""} ${p && !can(p) ? "locked" : ""}">${l}${p && !can(p) ? "  · khóa" : ""}</a>`).join("");
   }
   const denied = (p, label) => `<div class="forbidden"><h3>Không có quyền</h3><p>Vai trò <b>${USERS[me].role}</b> không được ${label}. Server trả <code class="err">FORBIDDEN</code> nếu gọi thẳng API.</p></div>`;
   const sum = (o) => Math.round(Object.values(o).reduce((a, b) => a + +b, 0) * 100) / 100;
@@ -150,7 +151,7 @@
           <div class="bar"><i style="width:${cost}%;background:var(--ok)"></i><span class="mark" style="left:45%"></span><span class="mark" style="left:50%;background:var(--danger)"></span></div>
           <small>Vạch 45%: cảnh báo Economy Manager · vạch 50%: tự chuyển sang bảng thưởng "giảm" (BR-ECO-04)</small></div>
         <div class="panel"><h3>Pack đã mở hôm nay theo rarity cao nhất</h3>
-          <table><tbody>${[["common", 1210], ["uncommon", 2875], ["rare", 3020], ["epic", 1544], ["legendary", 862], ["secret", 97]].map(([k, n]) => `<tr class="rarity-${k}"><td style="width:140px"><span class="rarity-text${k === "secret" ? " secret" : ""}">${A.RARITIES[A.rarityIndex(k)].name}</span></td><td><div class="bar"><i style="width:${n / 32}%;background:${k === "secret" ? "var(--r-secret)" : "var(--rc)"}"></i></div></td><td style="width:70px;text-align:right">${n.toLocaleString("vi-VN")}</td></tr>`).join("")}</tbody></table>
+          <table><tbody>${[["common", 1210], ["uncommon", 2875], ["rare", 3020], ["epic", 1544], ["legendary", 862], ["secret", 97]].map(([k, n]) => `<tr class="rarity-${k}"><td style="width:140px"><span class="rarity-text">${A.RARITIES[A.rarityIndex(k)].name}</span></td><td><div class="bar"><i style="width:${n / 32}%;background:var(--rc)"></i></div></td><td style="width:70px;text-align:right">${n.toLocaleString("vi-VN")}</td></tr>`).join("")}</tbody></table>
           <small>Pity kích hoạt hôm nay: 3 lần · Đối soát IAP và cổng web hôm qua: lệch 0</small></div>`;
     },
     accounts() {
@@ -161,7 +162,7 @@
           <td>${revealed.has(a.id) ? a.email + "<br>" + (a.phone || "—") : maskEmail(a.email) + "<br>" + maskPhone(a.phone)}
             ${can("revealPII") && !revealed.has(a.id) ? `<br><button class="btn sm ghost" data-reveal="${a.id}">Xem đầy đủ</button>` : ""}</td>
           <td><span class="status ${a.status}">${a.status}</span>${a.reason ? `<br><small>${a.reason}</small>` : ""}</td>
-          <td>◆ ${a.gem}<br>● ${a.coin.toLocaleString("vi-VN")}</td><td>${a.platform}</td>
+          <td><span class="cur gem">${a.gem}</span> Gem<br><span class="cur coin">${a.coin.toLocaleString("vi-VN")}</span> Coin</td><td>${a.platform}</td>
           <td class="row wrap">${a.status === "Banned" ? `<button class="btn sm" data-unban="${a.id}">Gỡ ban</button>` : `<button class="btn sm" data-restrict="${a.id}">Hạn chế</button><button class="btn sm danger" data-ban="${a.id}">Ban</button>`}</td></tr>`).join("")}
         </tbody></table></div>
         <small>Mỗi lần xem PII đầy đủ được ghi audit. Restricted vì NEGATIVE_GEM tự gỡ khi người chơi nạp bù.</small>`;
@@ -172,7 +173,7 @@
         <div class="row wrap"><span class="chip">Set Awakening · ${A.cards.length} thẻ mẫu / 100 dự kiến</span><span class="chip">8 hệ cảm xúc</span></div>
         <div class="panel table-wrap"><table><thead><tr><th>Thẻ</th><th>Hệ</th><th>Rarity</th><th>Bản đã phát hành</th><th>Trạng thái</th><th></th></tr></thead><tbody>
         ${cardStats.map((c) => `<tr class="rarity-${c.rarity}"><td><b>${c.name}</b><br><small>#${c.id}</small></td><td>${A.ELEMENTS[c.element].glyph} ${c.element}</td>
-          <td><span class="rarity-text${c.rarity === "secret" ? " secret" : ""}">${A.RARITIES[A.rarityIndex(c.rarity)].name}</span></td><td>${c.instances.toLocaleString("vi-VN")}</td>
+          <td><span class="rarity-text">${A.RARITIES[A.rarityIndex(c.rarity)].name}</span></td><td>${c.instances.toLocaleString("vi-VN")}</td>
           <td><span class="status ${c.active ? "active" : "draft"}">${c.active ? "Đang phát hành" : "Ngừng phát hành"}</span></td>
           <td class="row wrap"><button class="btn sm" data-story="${c.id}">Story</button>${c.active ? `<button class="btn sm" data-retire="${c.id}">Ngừng phát hành</button>` : ""}<button class="btn sm danger" data-delcard="${c.id}">Xóa</button></td></tr>`).join("")}
         </tbody></table></div>`;
@@ -182,7 +183,7 @@
       const keys = Object.keys(active.odds);
       const draftRows = keys.map((k) => {
         const d = Math.round((v.odds[k] - active.odds[k]) * 100) / 100;
-        return `<tr class="rarity-${k}"><td><span class="rarity-text${k === "secret" ? " secret" : ""}">${A.RARITIES[A.rarityIndex(k)].name}</span></td><td>${active.odds[k]}%</td>
+        return `<tr class="rarity-${k}"><td><span class="rarity-text">${A.RARITIES[A.rarityIndex(k)].name}</span></td><td>${active.odds[k]}%</td>
           <td><input type="number" step="0.01" min="0" data-odd="${k}" value="${v.odds[k]}" style="width:100px" ${v.status !== "draft" || !can("oddsMake") ? "disabled" : ""}></td>
           <td class="${d > 0 ? "diff-up" : d < 0 ? "diff-down" : ""}">${d > 0 ? "+" : ""}${d || ""}</td></tr>`;
       }).join("");

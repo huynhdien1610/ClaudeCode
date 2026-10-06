@@ -11,11 +11,11 @@ window.ANIMA = (function () {
     Nihilum: { glyph: "∅", hue: 0, label: "Tuyệt vọng · Trống rỗng" },
   };
   const RARITIES = [
-    { key: "common", name: "Common", vi: "Thường", color: "#9CA3AF", odds: 45, flip: 0.4 },
-    { key: "uncommon", name: "Uncommon", vi: "Ít gặp", color: "#22C55E", odds: 25, flip: 0.6 },
-    { key: "rare", name: "Rare", vi: "Hiếm", color: "#3B82F6", odds: 18, flip: 1.0 },
-    { key: "epic", name: "Epic", vi: "Sử thi", color: "#A855F7", odds: 7, flip: 1.5 },
-    { key: "legendary", name: "Legendary", vi: "Huyền thoại", color: "#F59E0B", odds: 4, flip: 3.0 },
+    { key: "common", name: "Common", vi: "Thường", color: "#6b7280", odds: 45, flip: 0.4 },
+    { key: "uncommon", name: "Uncommon", vi: "Ít gặp", color: "#15803d", odds: 25, flip: 0.6 },
+    { key: "rare", name: "Rare", vi: "Hiếm", color: "#1d4ed8", odds: 18, flip: 1.0 },
+    { key: "epic", name: "Epic", vi: "Sử thi", color: "#7e22ce", odds: 7, flip: 1.5 },
+    { key: "legendary", name: "Legendary", vi: "Huyền thoại", color: "#b45309", odds: 4, flip: 3.0 },
     { key: "secret", name: "Secret Rare", vi: "Bí ẩn", color: "rainbow", odds: 1, flip: 5.0 },
   ];
   const named = [
