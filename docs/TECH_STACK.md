@@ -3,12 +3,22 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | TECH-ANIMA-001 |
-| Phiên bản | 0.1 (Đề xuất) |
+| Phiên bản | 0.2 |
 | Ngày | 2026-10-06 |
 | Đầu vào | [Master Document](ANIMA_Master_Document.md) v1.0, [BRD](BRD_ANIMA.md) v0.1 |
-| Trạng thái | Chờ Tech Lead và PO xác nhận |
+| Trạng thái | Đã chốt client và backend; cloud chưa chốt |
 
 ---
+
+## Quyết định đã chốt
+
+| Ngày | Quyết định | Ghi chú |
+|---|---|---|
+| 2026-10-06 | **Unity cho toàn bộ app** (iOS và Android), không kết hợp Flutter/React Native | T-00 |
+| 2026-10-06 | **Backend dùng .NET** (ASP.NET Core, .NET 10 LTS) | T-01 |
+| 2026-10-06 | **Cloud chưa chốt**, quyết định sau | T-02, T-03 vẫn mở |
+
+Vì chưa chốt cloud, backend được thiết kế **không phụ thuộc nhà cung cấp cloud**: chạy trong container, dùng PostgreSQL và Redis chuẩn, đo lường bằng OpenTelemetry, hạ tầng viết bằng Terraform. Các dịch vụ cloud ở mục 6 chỉ là phương án tham khảo.
 
 ## 1. Tóm tắt khuyến nghị
 
@@ -24,9 +34,9 @@
 | Thanh toán | Unity IAP + xác thực server với App Store Server API và Google Play Developer API | Chống gian lận receipt, idempotency theo transaction ID |
 | Quảng cáo | AppLovin MAX (mediation) với AdMob và Unity Ads là network con; bật SSV | Mediation bidding, có callback xác nhận server-side |
 | Chống gian lận thiết bị | Play Integrity API (Android), App Attest/DeviceCheck (iOS) | Phát hiện root, emulator, app bị sửa |
-| Hạ tầng | **Google Cloud, region asia-southeast1 (Singapore)**: Cloud Run, Cloud SQL, Memorystore, Cloud Storage + Cloud CDN | Gần người dùng VN; tích hợp sẵn Firebase và BigQuery |
+| Hạ tầng | **Chưa chốt.** Phương án tham khảo: GCP hoặc AWS, region Singapore (mục 6) | Backend chạy container, chuyển cloud được |
 | Analytics | Firebase Analytics → BigQuery | Miễn phí ở quy mô MVP; phân tích cohort, retention, kinh tế |
-| Giám sát | Firebase Crashlytics (app), OpenTelemetry → Cloud Monitoring/Cloud Trace (backend), Sentry (lỗi backend và admin) | Đo NFR crash rate, uptime, cảnh báo |
+| Giám sát | Firebase Crashlytics (app), OpenTelemetry → công cụ giám sát của cloud được chọn (backend), Sentry (lỗi backend và admin) | Đo NFR crash rate, uptime, cảnh báo |
 | CI/CD | GitHub Actions + GameCI (build Unity) + fastlane (đẩy lên store) | Cùng nơi với repo hiện tại |
 
 ---
@@ -98,12 +108,12 @@ flowchart LR
     Ads[AppLovin MAX / AdMob / Unity Ads] -->|SSV callback| API
     API --> PG[(PostgreSQL)]
     API --> RD[(Redis)]
-    API --> OB[Outbox] --> WK[Worker - Cloud Run Jobs]
+    API --> OB[Outbox] --> WK[Worker]
     WK --> BQ[(BigQuery)]
     WK --> FCM[Firebase Cloud Messaging]
     App -->|Analytics, Crashlytics| FB[Firebase]
     FB --> BQ
-    App -->|Asset| CDN[Cloud CDN + Cloud Storage]
+    App -->|Asset| CDN[CDN + Object Storage]
 ```
 
 | Module | Trách nhiệm | BRD |
@@ -179,16 +189,23 @@ Firebase Analytics xuất sang BigQuery hằng ngày; worker đẩy thêm sự k
 
 ## 6. Hạ tầng và vận hành
 
-| Thành phần | Dịch vụ GCP | Ghi chú |
-|---|---|---|
-| API | Cloud Run (tự scale, hỗ trợ WebSocket) | Tối thiểu 2 instance để đạt 99.9% |
-| Worker | Cloud Run Jobs / Cloud Scheduler | Đối soát, kết thúc đấu giá, xuất BigQuery |
-| PostgreSQL | Cloud SQL for PostgreSQL, High Availability, PITR | Hướng tới RPO ≤ 5 phút, RTO ≤ 1 giờ (NFR-13) |
-| Redis | Memorystore for Redis | |
-| Asset | Cloud Storage + Cloud CDN | Addressables của Unity |
-| Admin web | Firebase Hosting | Truy cập qua Identity-Aware Proxy hoặc SSO công ty |
-| Secret | Secret Manager | Khóa store, khóa SSV, chuỗi kết nối DB |
-| WAF, chống DDoS | Cloud Armor | |
+> **Chưa chốt cloud.** Bảng dưới liệt kê dịch vụ tương đương trên GCP và AWS để so sánh khi quyết định. Code backend không gọi trực tiếp dịch vụ riêng của cloud, trừ lớp lưu file và secret được bọc qua interface.
+
+| Thành phần | Yêu cầu | GCP | AWS |
+|---|---|---|---|
+| API | Container tự scale, hỗ trợ WebSocket, tối thiểu 2 instance | Cloud Run | ECS Fargate + ALB |
+| Worker | Job định kỳ: đối soát, kết thúc đấu giá, xuất analytics | Cloud Run Jobs + Cloud Scheduler | ECS Scheduled Tasks / EventBridge |
+| PostgreSQL | HA, phục hồi theo thời điểm, RPO ≤ 5 phút, RTO ≤ 1 giờ (NFR-13) | Cloud SQL for PostgreSQL | RDS for PostgreSQL / Aurora |
+| Redis | Managed | Memorystore | ElastiCache |
+| Asset | Object storage + CDN cho Addressables | Cloud Storage + Cloud CDN | S3 + CloudFront |
+| Admin web | Host tĩnh, chỉ truy cập nội bộ | Firebase Hosting + IAP | S3 + CloudFront + SSO |
+| Secret | Khóa store, khóa SSV, chuỗi kết nối DB | Secret Manager | Secrets Manager |
+| WAF, chống DDoS | | Cloud Armor | AWS WAF + Shield |
+| Analytics kho dữ liệu | Nhận dữ liệu Firebase Analytics | BigQuery (export có sẵn) | Cần pipeline xuất từ BigQuery hoặc đổi sang công cụ analytics khác |
+| Giám sát | Nhận OpenTelemetry | Cloud Monitoring / Cloud Trace | CloudWatch / X-Ray |
+
+Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghiệm của đội DevOps, tín dụng khởi nghiệp nhận được, và yêu cầu lưu dữ liệu trong nước (T-03). Firebase (đăng nhập, analytics, Crashlytics, push) dùng được với cả hai cloud.
+
 | Môi trường | dev, staging, production tách project | Staging dùng sandbox IAP và ad test mode |
 
 **Lưu ý pháp lý:** quy định về lưu trữ dữ liệu người dùng tại Việt Nam có thể yêu cầu đặt một phần dữ liệu trong nước. Cần Legal xác nhận trước khi chốt region Singapore. Câu hỏi này bổ sung vào BRD Q-24.
@@ -197,10 +214,10 @@ Firebase Analytics xuất sang BigQuery hằng ngày; worker đẩy thêm sự k
 
 | Luồng | Công cụ |
 |---|---|
-| Backend: build, test, scan, deploy | GitHub Actions → Artifact Registry → Cloud Run (staging tự động, production cần duyệt) |
+| Backend: build, test, scan, deploy | GitHub Actions → container registry → dịch vụ chạy container của cloud được chọn (staging tự động, production cần duyệt) |
 | App: build iOS/Android | GitHub Actions + GameCI (cần license Unity); runner macOS cho iOS |
 | Đẩy lên store | fastlane → TestFlight, Google Play Internal Testing |
-| Admin web | GitHub Actions → Firebase Hosting |
+| Admin web | GitHub Actions → host tĩnh của cloud được chọn |
 | Hạ tầng | Terraform |
 
 ### 6.2. Kiểm thử
@@ -223,16 +240,16 @@ Firebase Analytics xuất sang BigQuery hằng ngày; worker đẩy thêm sự k
 |---|---|
 | NFR-01 60/120fps | URP + profile chất lượng + pooling particle |
 | NFR-02 khởi động < 3s, mở pack < 1s | Addressables, preload, API mở pack chỉ đọc/ghi vài bảng |
-| NFR-03 bảo mật | TLS, mã hóa Cloud SQL, Secret Manager, mã hóa cột PII |
-| NFR-04 100k CCU | Cloud Run auto-scale, Redis, đo bằng k6 |
-| NFR-05 99.9% | Cloud SQL HA, Cloud Run nhiều instance |
+| NFR-03 bảo mật | TLS, mã hóa DB managed, dịch vụ quản lý secret, mã hóa cột PII |
+| NFR-04 100k CCU | Container auto-scale, Redis, đo bằng k6 |
+| NFR-05 99.9% | PostgreSQL HA, API nhiều instance |
 | NFR-06 iOS 14+, Android 8+ | Kiểm tra mức hỗ trợ tối thiểu của Unity 6 trước khi chốt (có thể phải nâng iOS tối thiểu) |
 | NFR-07 < 200MB | Addressables tải art sau |
 | NFR-09 accessibility | Unity Accessibility API + chế độ giảm chuyển động |
 | NFR-10 offline | Cache bộ sưu tập mã hóa |
 | NFR-11 ledger | Ràng buộc DB + job đối soát |
 | NFR-12 RNG | CSPRNG + test thống kê trong CI |
-| NFR-14 observability | OpenTelemetry, Cloud Monitoring alert, Crashlytics |
+| NFR-14 observability | OpenTelemetry, cảnh báo trên công cụ giám sát của cloud, Crashlytics |
 
 ---
 
@@ -255,19 +272,20 @@ Firebase Analytics xuất sang BigQuery hằng ngày; worker đẩy thêm sự k
 | Technical artist | 1 | Shader Graph, particle, Timeline |
 | Backend developer | 2 | .NET, PostgreSQL, tích hợp IAP/ads |
 | Frontend (admin web) | 1 (bán thời gian) | React, TypeScript |
-| DevOps | 1 (bán thời gian) | GCP, Terraform, CI cho Unity |
+| DevOps | 1 (bán thời gian) | Cloud được chọn, Terraform, CI cho Unity |
 | QA | 1 | Thiết bị thật, kiểm thử kinh tế |
 
 ## 10. Điểm cần quyết định
 
-| # | Quyết định | Đề xuất | Người quyết |
-|---|---|---|---|
-| T-01 | Ngôn ngữ backend: .NET hay Node.js/Go | .NET, trừ khi đội hiện có mạnh Go/Node | Tech Lead |
-| T-02 | Cloud: GCP hay AWS | GCP (đi cùng Firebase, BigQuery) | Tech Lead + Finance |
-| T-03 | Region dữ liệu: Singapore hay trong nước | Chờ Legal | Legal |
-| T-04 | Mediation: AppLovin MAX, Unity LevelPlay hay AdMob | AppLovin MAX; thử A/B eCPM sau launch | PO |
-| T-05 | Phiên bản iOS tối thiểu | Theo yêu cầu tối thiểu của Unity 6 | Mobile Lead |
-| T-06 | Mua license Unity/FMOD/DOTween Pro | Kiểm tra điều kiện theo doanh thu dự kiến | PO + Finance |
+| # | Quyết định | Đề xuất | Người quyết | Trạng thái |
+|---|---|---|---|---|
+| T-00 | App: Unity toàn bộ hay kết hợp | Unity toàn bộ | PO | **Đã chốt: Unity** (2026-10-06) |
+| T-01 | Ngôn ngữ backend: .NET hay Node.js/Go | .NET, trừ khi đội hiện có mạnh Go/Node | Tech Lead | **Đã chốt: .NET** (2026-10-06) |
+| T-02 | Cloud: GCP hay AWS | GCP (đi cùng Firebase, BigQuery) | Tech Lead + Finance | Hoãn, quyết định sau |
+| T-03 | Region dữ liệu: Singapore hay trong nước | Chờ Legal | Legal | Mở |
+| T-04 | Mediation: AppLovin MAX, Unity LevelPlay hay AdMob | AppLovin MAX; thử A/B eCPM sau launch | PO | Mở |
+| T-05 | Phiên bản iOS tối thiểu | Theo yêu cầu tối thiểu của Unity 6 | Mobile Lead | Mở |
+| T-06 | Mua license Unity/FMOD/DOTween Pro | Kiểm tra điều kiện theo doanh thu dự kiến | PO + Finance | Mở |
 
 ---
 
