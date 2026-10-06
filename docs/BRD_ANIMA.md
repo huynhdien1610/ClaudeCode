@@ -4,17 +4,19 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BRD-ANIMA-001 |
-| Phiên bản | 0.2 (Draft) |
+| Phiên bản | 0.3 (Draft) |
 | Ngày | 2026-10-06 |
 | Nguồn | [ANIMA_Master_Document.md](ANIMA_Master_Document.md) v1.0 (2026-10-05) |
 | Trạng thái | **DRAFT — Chờ Product Owner xác nhận** |
 | Business owner | Product Owner (chưa định danh — xem Q-01) |
 | Người soạn | Business Analyst |
-| Tài liệu liên quan | [PRD](PRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md) |
+| Tài liệu liên quan | [PRD](PRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md), [Solution Design](SOLUTION_DESIGN.md), [Sprint Plan](SPRINT_PLAN.md) |
+
+**Thay đổi v0.3 (2026-10-06) — CR-001:** người chơi dùng được cả **website** lẫn app mobile; admin vẫn là website nội bộ. Thêm mục 4.4 (ma trận tính năng theo nền tảng), nhóm quy tắc BR-WEB (mục 10.11), tích hợp cổng thanh toán web, câu hỏi Q-31 → Q-35 và rủi ro RK-12. Bỏ giả định AS-10 "chỉ có app mobile".
 
 **Thay đổi v0.2 (2026-10-06):** tách lý do hạn chế tài khoản thành `FRAUD` và `NEGATIVE_GEM`. Tài khoản bị hạn chế vì số dư Gem âm được nạp bù và tự gỡ hạn chế khi số dư ≥ 0. Bản v0.1 chặn nạp với mọi tài khoản Restricted nên người chơi bị âm Gem không có cách thoát. Bộ kịch bản BDD đầy đủ chuyển sang [BDD_ANIMA.md](BDD_ANIMA.md).
 
-> **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn và mục 16 có 30 câu hỏi mở cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
+> **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn và mục 16 có 35 câu hỏi mở cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
 
 ### Quy ước ký hiệu
 
@@ -161,11 +163,34 @@ Master Document có mâu thuẫn giữa "In Scope" (§6.2) và Roadmap (§8.1) �
 - Hợp tác thương hiệu bên thứ ba
 - **Rút tiền ra tiền thật dưới mọi hình thức** (BR-ECO-01)
 - **Bán Gem/Coin/thẻ lấy tiền thật bên ngoài app** — cấm theo điều khoản sử dụng [BA]
-- Phiên bản web/desktop [BA — AS-10]
+- Ứng dụng desktop cài đặt (Windows/macOS). Website chạy trên trình duyệt **nằm trong phạm vi** (CR-001, mục 4.4)
 
-## 4.3. Ràng buộc thiết kế UI
+## 4.3. Ràng buộc thiết kế UI (xem thêm 4.4)
 
 `ui_required = true`. Toàn bộ EP-01 → EP-09 đều có giao diện người dùng; EP-10 (Admin) có giao diện web nội bộ. BA chỉ quy định ràng buộc nghiệp vụ; bố cục, component và interaction do Product Designer quyết định. Riêng animation mở pack, Master Document §4 đã có spec chi tiết đến từng frame — đây là **design input đã có**, Designer kế thừa và được điều chỉnh, ngoại trừ các ràng buộc nghiệp vụ tại BR-PACK-05 → BR-PACK-08.
+
+## 4.4. Nền tảng và ma trận tính năng (CR-001)
+
+| Nền tảng | Người dùng | Công nghệ (Solution Design) |
+|---|---|---|
+| App mobile iOS/Android | Người chơi | Unity |
+| Website người chơi | Người chơi | Web app trên trình duyệt desktop và mobile; phần mở pack chạy bản Unity Web nhúng |
+| Website admin | Nhân viên vận hành | Web nội bộ |
+
+Một tài khoản dùng chung trên cả app và web (BR-WEB-01).
+
+| Tính năng (R1 trừ khi ghi khác) | App mobile | Website người chơi |
+|---|---|---|
+| Đăng ký, đăng nhập, xác thực SĐT, xóa tài khoản | ✔ | ✔ |
+| Ví, lịch sử giao dịch | ✔ | ✔ |
+| Nạp Gem | IAP App Store / Google Play | Cổng thanh toán web (BR-WEB-04, Q-31) |
+| Mua pack, xem tỷ lệ rơi, pity | ✔ | ✔ |
+| Mở pack | Animation đầy đủ | Animation đầy đủ qua Unity Web; chế độ rút gọn nếu trình duyệt không hỗ trợ (BR-WEB-06) |
+| Bộ sưu tập, Story Fragment | ✔ | ✔ |
+| Điểm danh, rewarded ads | ✔ | ✘ ở R1 (BR-WEB-03, Q-32) |
+| Profile công khai (R2) | ✔ | ✔ — link chia sẻ mở trên web |
+| Chợ, đấu giá (R2) | ✔ | ✔ |
+| Feed, chat, leaderboard (R2) | ✔ | ✔ |
 
 ---
 
@@ -204,6 +229,7 @@ Master Document có mâu thuẫn giữa "In Scope" (§6.2) và Roadmap (§8.1) �
 | App Store / Google Play | Xử lý thanh toán IAP, hoàn tiền | Store transaction ID |
 | Ad Network | AdMob, Unity Ads, AppLovin | Ad transaction ID |
 | SMS/OTP Provider | Gửi OTP | Message ID |
+| Cổng thanh toán web (CR-001) | Thanh toán nạp Gem trên website, gửi IPN/webhook, hoàn tiền | Gateway transaction ID |
 
 ---
 
@@ -555,7 +581,7 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 |---|---|---|
 | BR-ACC-01 | Người dùng phải từ 13 tuổi trở lên. Dưới 18 tuổi: cần cơ chế đồng ý của cha mẹ/người giám hộ cho việc nạp tiền và xử lý dữ liệu cá nhân (phạm vi chờ Legal — Q-21). | MD BR-07 + BA |
 | BR-ACC-02 | Email và SĐT là duy nhất trong toàn hệ thống. Một SĐT chỉ xác thực cho 1 tài khoản. | MD FR-04 |
-| BR-ACC-03 | Một thiết bị chỉ gắn với 1 tài khoản. Đăng nhập tài khoản khác trên thiết bị đã gắn bị từ chối. Đổi thiết bị: tài khoản được chuyển sang thiết bị mới tối đa 2 lần/30 ngày; thiết bị cũ bị gỡ gắn. | MD BR-08 + BA (Q-06) |
+| BR-ACC-03 | Áp dụng cho **thiết bị mobile** (phiên web theo BR-WEB-02). Một thiết bị chỉ gắn với 1 tài khoản. Đăng nhập tài khoản khác trên thiết bị đã gắn bị từ chối. Đổi thiết bị: tài khoản được chuyển sang thiết bị mới tối đa 2 lần/30 ngày; thiết bị cũ bị gỡ gắn. | MD BR-08 + BA (Q-06) |
 | BR-ACC-04 | Chỉ Verified Player được: niêm yết, mua trên chợ, đấu giá, nhắn tin, nhận thưởng referral. Player chưa xác thực được: mở pack, điểm danh, xem ads (Q-07). | BA |
 | BR-ACC-05 | OTP gồm 6 chữ số, hiệu lực 5 phút, tối đa 5 lần nhập sai; vượt quá thì khóa xác thực 30 phút; tối đa 5 lần gửi OTP/SĐT/ngày. | BA |
 
@@ -671,6 +697,18 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 | BR-ADM-02 | Maker-checker: thay đổi drop rate, giá pack, tỷ lệ thưởng, phí giao dịch do một người tạo và một người khác duyệt; người tạo không tự duyệt. | BA |
 | BR-ADM-03 | Không thay đổi drop rate của Pack Definition đang bán; phải tạo version mới có thời điểm hiệu lực. | BA |
 | BR-ADM-04 | Admin không được cộng/trừ Gem trực tiếp. Bồi thường cho người chơi chỉ bằng Coin hoặc thẻ, qua maker-checker, kèm mã ticket. | BA |
+
+## 10.11. Đa nền tảng — Website người chơi (WEB) — CR-001
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-WEB-01 | Một tài khoản dùng chung cho app và web. Ví, bộ sưu tập, Pack Instance, bộ đếm pity và streak là một bản duy nhất trên server; thay đổi ở nền tảng này hiện ở nền tảng kia ngay lần tải dữ liệu kế tiếp. | CR-001 |
+| BR-WEB-02 | Phiên web không gắn thiết bị theo BR-ACC-03. Mỗi tài khoản có tối đa 3 phiên web đang hoạt động; đăng nhập phiên thứ 4 sẽ đăng xuất phiên cũ nhất. Tài khoản Verified đăng nhập từ trình duyệt chưa từng dùng phải nhập OTP gửi tới SĐT đã xác thực. | CR-001 (Q-35) |
+| BR-WEB-03 | Ở R1, điểm danh và rewarded ads chỉ có trên app mobile, vì web không có cơ chế gắn thiết bị và kiểm tra toàn vẹn thiết bị để chống farm. | CR-001 (Q-32) |
+| BR-WEB-04 | Nạp Gem trên web qua cổng thanh toán. Chỉ cộng Gem khi server nhận thông báo IPN/webhook có chữ ký hợp lệ hoặc tự truy vấn trạng thái từ cổng; trang trả về (return URL) trên trình duyệt không đủ để cộng. Mỗi gateway transaction ID chỉ được ghi nhận một lần. Hoàn tiền qua cổng xử lý như BR-WAL-04. | CR-001 (Q-31) |
+| BR-WEB-05 | Bảng giá gói Gem trên web được công khai, có thể khác giá trong app (Q-33). Gem mua ở nền tảng nào cũng dùng được ở cả hai nền tảng (Q-34). | CR-001 |
+| BR-WEB-06 | Mở pack trên web tuân theo BR-PACK-02. Nếu trình duyệt không chạy được bản Unity Web, dùng chế độ hiển thị rút gọn; kết quả và thứ tự lật không đổi. | CR-001 |
+| BR-WEB-07 | Nạp Gem trên web áp dụng cùng điều kiện tuổi và đồng ý của người giám hộ như trên app (BR-ACC-01). | CR-001 |
 
 ---
 
@@ -1086,7 +1124,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | AS-07 | Pack tiêu chuẩn có 5 thẻ | Drop rate, pity, animation timing |
 | AS-08 | Sau ngày 7, thưởng điểm danh lặp lại chu kỳ 7 ngày | BR-CHK-02 |
 | AS-09 | "5 ads liên tiếp" = lượt thứ 5 trong ngày | BR-ADS-05 |
-| AS-10 | Chỉ có app mobile, không có web | Phạm vi |
+| AS-10 | ~~Chỉ có app mobile, không có web~~ — **thay bằng CR-001**: có website người chơi và website admin | Phạm vi |
 
 ## 16.2. Câu hỏi mở
 
@@ -1122,6 +1160,11 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Q-28 | Danh sách thành tựu (FR-38)? | PO + Designer | US-07.5 |
 | Q-29 | Leaderboard xếp theo tiêu chí gì? | PO | US-08.4 |
 | Q-30 | Độ trễ chấp nhận được của dashboard admin? | PO | US-10.5 |
+| Q-31 | Dùng cổng thanh toán web nào (VNPay, MoMo, ZaloPay cho VN; Stripe cho quốc tế)? Nghĩa vụ hóa đơn, thuế khi bán vật phẩm số qua web? | PO + Finance + Legal | BR-WEB-04 |
+| Q-32 | Có mở điểm danh/ads trên web ở R2 không, và chống farm thế nào? | PO | BR-WEB-03 |
+| Q-33 | Giá Gem trên web có rẻ hơn app không? App có được nhắc người dùng về giá web không (chính sách store)? | PO + Legal | BR-WEB-05 |
+| Q-34 | Chính sách App Store/Google Play về việc dùng trong app loại tiền mua trên web? | Legal | BR-WEB-05 |
+| Q-35 | Số phiên web tối đa và yêu cầu OTP khi đăng nhập trình duyệt mới? | PO | BR-WEB-02 |
 
 ---
 
@@ -1142,6 +1185,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | RK-09 | Animation nặng gây giật/crash trên máy yếu | Trung bình | Fallback, NFR-01, test trên danh sách thiết bị | Mobile Lead |
 | RK-10 | Lộ dữ liệu cá nhân (SĐT, fingerprint) | Trung bình | Mã hóa, che dữ liệu, audit xem PII | Security |
 | RK-11 | Flash/shake gây hại cho người nhạy cảm ánh sáng | Trung bình | Chế độ giảm chuyển động (NFR-09); giới hạn tần suất flash | Designer |
+| RK-12 | Chính sách store về tiền tệ mua trên web; gian lận thanh toán web (thẻ ăn cắp, chargeback) | Cao | Legal xác nhận Q-34; chỉ cộng Gem qua IPN đã xác thực; giới hạn hạn mức nạp web theo ngày cho tài khoản mới | Legal + Fraud |
 
 ## 17.2. Ràng buộc
 
@@ -1184,7 +1228,8 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | FR-36 → FR-39 | US-07.3 → US-07.6 | BR-REF-01 → BR-REF-03 | Viết ở FRD | Nhiệm vụ, Referral |
 | FR-40 → FR-44 | US-08.1 → US-08.5 | — | Viết ở FRD | Feed, Chat, Leaderboard |
 | FR-45, FR-47 → FR-49 | US-09.1, US-09.3 → US-09.5 | BR-ECO-04 | Viết ở FRD | Dashboard doanh thu |
-| FR-50 → FR-55 | US-10.1 → US-10.6 | BR-ADM-01 → BR-ADM-04 | SC-ADM-01 → SC-ADM-03 | Admin |
+| FR-50 → FR-55 | US-10.1 → US-10.6 | BR-ADM-01 → BR-ADM-04 | SC-ADM-01 → SC-ADM-14 | Admin |
+| CR-001 (web) | US-01.x, US-02.2, US-03.1, US-04.x, US-05.x trên web | BR-WEB-01 → BR-WEB-07 | SC-WEB-01 → SC-WEB-12 | Toàn bộ màn hình người chơi trên web |
 
 ## 18.2. Analysis Ready checklist
 

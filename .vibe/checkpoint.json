@@ -1,0 +1,74 @@
+{
+  "version": "1.1",
+  "project_id": "anima",
+  "project_name": "ANIMA: Echoes of the Heart",
+  "updated_at": "2026-10-06T00:00:00Z",
+  "phase": "INTAKE",
+  "current_sprint": "S001",
+  "gates": {
+    "intake": {
+      "status": "PENDING",
+      "owner": "Product Owner",
+      "missing": [
+        "BRD Q-01",
+        "BRD Q-03"
+      ]
+    },
+    "analysis": {
+      "status": "PENDING",
+      "owner": "senior-business-analyst",
+      "missing": [
+        "BRD 18.2 checklist",
+        "FRD chưa có"
+      ]
+    },
+    "design": {
+      "status": "NOT_STARTED",
+      "owner": "product-designer",
+      "missing": [
+        "Handoff theo FRD"
+      ]
+    },
+    "technical_planning": {
+      "status": "DRAFT",
+      "owner": "Tech Lead",
+      "missing": [
+        "Review docs/SOLUTION_DESIGN.md"
+      ]
+    }
+  },
+  "active_tasks": [],
+  "next_tasks": [
+    "T001",
+    "T003",
+    "T005",
+    "T009",
+    "T018"
+  ],
+  "blockers": [
+    {
+      "id": "B-01",
+      "summary": "Chưa định danh PO và chưa duyệt phạm vi MVP",
+      "blocks": [
+        "T002",
+        "T020",
+        "T040",
+        "T049"
+      ],
+      "owner": "Ban dự án",
+      "next_action": "Chạy T001"
+    },
+    {
+      "id": "B-02",
+      "summary": "Chưa chốt cloud (T-02)",
+      "blocks": [
+        "T091"
+      ],
+      "owner": "Tech Lead + Finance",
+      "next_action": "Quyết định trước S011; T035 dùng staging tạm"
+    }
+  ],
+  "open_change_requests": [
+    "CR-001"
+  ]
+}

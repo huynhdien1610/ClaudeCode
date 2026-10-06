@@ -1,0 +1,18 @@
+{
+  "id": "CR-001",
+  "title": "Người chơi dùng được cả website ngoài app mobile; admin là website",
+  "requested_by": "Product owner (người dùng phiên làm việc)",
+  "requested_at": "2026-10-06",
+  "stage_at_request": "BACKLOG (trước READY_FOR_DEV)",
+  "description": "Bổ sung website người chơi dùng chung tài khoản, ví, bộ sưu tập với app. Admin vận hành qua website nội bộ.",
+  "impact": {
+    "documents": ["BRD v0.3 mục 4.2, 4.4, 10.11, 13.2, 16, 17", "PRD v0.2 mục 6.2, 6.2A, 9, 10.1", "BDD v0.2 mục 12A", "TECH_STACK v0.3 mục 2.4", "Master Document mục 9"],
+    "business_rules_added": ["BR-WEB-01", "BR-WEB-02", "BR-WEB-03", "BR-WEB-04", "BR-WEB-05", "BR-WEB-06", "BR-WEB-07"],
+    "open_questions_added": ["Q-31", "Q-32", "Q-33", "Q-34", "Q-35"],
+    "risks_added": ["RK-12", "TR-01"],
+    "schedule": "Thêm sprint S006 (Website người chơi) và các task web ở S001, S002, S004, S008"
+  },
+  "decision_owner": "Product Owner",
+  "decision": "PENDING_PO_CONFIRMATION",
+  "invalidated_gates": []
+}

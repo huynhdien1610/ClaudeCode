@@ -910,7 +910,7 @@ Bảng gợi ý ban đầu đã được thay bằng quyết định công ngh�
 
 # 9. KIẾN TRÚC & TECH STACK
 
-Chi tiết đầy đủ (thư viện, tích hợp, CI/CD, kiểm thử, ánh xạ NFR, đội ngũ) nằm ở [TECH_STACK.md](TECH_STACK.md). Mục này tóm tắt các quyết định và nguyên tắc để mọi tài liệu dự án dùng chung một nguồn.
+Chi tiết đầy đủ nằm ở [TECH_STACK.md](TECH_STACK.md) và [SOLUTION_DESIGN.md](SOLUTION_DESIGN.md); kế hoạch sprint ở [SPRINT_PLAN.md](SPRINT_PLAN.md). Mục này tóm tắt các quyết định và nguyên tắc để mọi tài liệu dự án dùng chung một nguồn.
 
 ## 9.1. Quyết định đã chốt
 
@@ -919,6 +919,7 @@ Chi tiết đầy đủ (thư viện, tích hợp, CI/CD, kiểm thử, ánh x�
 | 2026-10-06 | Unity cho toàn bộ app iOS và Android | Đã chốt |
 | 2026-10-06 | Backend .NET (ASP.NET Core, .NET 10 LTS) | Đã chốt |
 | 2026-10-06 | Nhà cung cấp cloud và region dữ liệu | Hoãn, quyết định sau |
+| 2026-10-06 | Người chơi dùng cả website và app mobile; admin là website nội bộ (CR-001) | Đã chốt |
 
 ## 9.2. Tech stack theo lớp
 
@@ -930,6 +931,7 @@ Chi tiết đầy đủ (thư viện, tích hợp, CI/CD, kiểm thử, ánh x�
 | Backend | ASP.NET Core (.NET 10), modular monolith, EF Core + Npgsql | Cùng C# với Unity, dùng chung contract; kiểu `decimal` cho tiền |
 | Dữ liệu | PostgreSQL (ledger, thẻ, pack, chợ), Redis (cooldown, rate limit, leaderboard) | Giao dịch ACID cho tiền và chuyển thẻ |
 | Realtime (R2) | SignalR + Redis backplane | Đấu giá, chat, feed |
+| Website người chơi | Next.js + TypeScript; mở pack bằng Unity Web nhúng, có chế độ rút gọn | Cùng tài khoản, ví, bộ sưu tập với app |
 | Admin web | React + TypeScript + Vite + Refine + Ant Design | Nhiều màn quản trị |
 | Đăng nhập, OTP | Firebase Authentication | Email, SĐT, Google, Apple, Facebook |
 | Thanh toán | Unity IAP + xác thực server với App Store và Google Play | Chỉ cộng Gem sau khi server xác thực |
@@ -945,6 +947,8 @@ Chi tiết đầy đủ (thư viện, tích hợp, CI/CD, kiểm thử, ánh x�
 ```mermaid
 flowchart LR
     App[Unity App] -->|HTTPS / JSON| API[ASP.NET Core API]
+    Web[Website người chơi - Next.js + Unity Web] -->|HTTPS / JSON| API
+    Pay[Cổng thanh toán web] -->|IPN| API
     Admin[Admin Web] -->|HTTPS| API
     Store[App Store / Google Play] -->|Thông báo giao dịch, hoàn tiền| API
     Ads[Ad networks] -->|Xác nhận server-side| API
@@ -971,7 +975,7 @@ Backend gồm các module: Identity, Wallet (ledger), Catalog (thẻ, pack, tỷ
 
 ## 9.5. Đội ngũ tối thiểu cho MVP
 
-2 Unity developer, 1 technical artist, 2 backend .NET developer, 1 frontend admin web (bán thời gian), 1 DevOps (bán thời gian), 1 QA.
+2 Unity developer, 1 technical artist, 2 backend .NET developer, 2 frontend web (website người chơi + admin), 1 DevOps (bán thời gian), 1 QA.
 
 ## 9.6. Quyết định kỹ thuật còn mở
 

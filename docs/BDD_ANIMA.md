@@ -4,9 +4,9 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BDD-ANIMA-001 |
-| Phiên bản | 0.1 (Draft) |
+| Phiên bản | 0.2 (Draft) — thêm mục 12A website người chơi (CR-001) |
 | Ngày | 2026-10-06 |
-| Nguồn | [BRD](BRD_ANIMA.md) v0.2, [PRD](PRD_ANIMA.md) v0.1 |
+| Nguồn | [BRD](BRD_ANIMA.md) v0.3, [PRD](PRD_ANIMA.md) v0.2 |
 | Trạng thái | **DRAFT — một số kịch bản phụ thuộc quyết định của PO** |
 
 Tài liệu này là bộ kịch bản đầy đủ. Mục 11 của BRD chỉ là trích đoạn; khi hai bên khác nhau, tài liệu này là bản chuẩn. Các ID kịch bản trong BRD được giữ nguyên.
@@ -1517,6 +1517,113 @@ Tính năng: EP-10 — Admin
 
 ---
 
+## 12A. Tính năng: Website người chơi (CR-001)
+
+```gherkin
+Tính năng: Website người chơi — đa nền tảng
+  Bối cảnh chung:
+    Cho trước tài khoản "P1" ở trạng thái Verified, dùng cả app mobile và website
+
+  Quy tắc: BR-WEB-01 — Một tài khoản, dữ liệu dùng chung
+
+    @R1 @happy
+    Kịch bản: SC-WEB-01 — Mua pack trên web, mở trên app
+      Cho trước P1 có 2,000 Coin
+      Khi P1 mua 1 pack "Awakening Standard" bằng Coin trên website
+      Thì lần tải dữ liệu kế tiếp trên app, P1 có 1,000 Coin và 1 Pack Instance "Unopened"
+
+    @R1 @dongthoi
+    Kịch bản: SC-WEB-02 — Mở cùng một pack đồng thời trên app và web
+      Cho trước P1 có Pack Instance "PI-90" ở trạng thái "Unopened"
+      Khi app và website cùng gửi yêu cầu mở PI-90
+      Thì chỉ một lần quay được thực hiện
+      Và cả hai nền tảng nhận cùng một kết quả
+
+    @R1 @dongthoi
+    Kịch bản: SC-WEB-03 — Tiêu Coin đồng thời trên hai nền tảng
+      Cho trước P1 có 1,500 Coin
+      Khi app và website cùng gửi yêu cầu mua pack giá 1,000 Coin với hai idempotency key khác nhau
+      Thì đúng một yêu cầu thành công
+      Và yêu cầu còn lại nhận mã lỗi INSUFFICIENT_BALANCE
+      Và số dư Coin của P1 là 500
+
+  Quy tắc: BR-WEB-02 — Phiên web
+
+    @R1 @bien @cho-Q35
+    Kịch bản: SC-WEB-04 — Đăng nhập phiên web thứ 4
+      Cho trước P1 có 3 phiên web đang hoạt động, phiên cũ nhất tạo lúc 2026-10-01 08:00
+      Khi P1 đăng nhập website trên một trình duyệt đã từng dùng
+      Thì phiên tạo lúc 2026-10-01 08:00 bị đăng xuất
+      Và P1 có đúng 3 phiên web đang hoạt động
+
+    @R1 @negative @cho-Q35
+    Kịch bản: SC-WEB-05 — Trình duyệt mới không nhập OTP
+      Cho trước P1 chưa từng đăng nhập trên trình duyệt "B-NEW"
+      Khi P1 đăng nhập đúng mật khẩu trên B-NEW nhưng không hoàn tất OTP
+      Thì server không cấp phiên web với mã lỗi OTP_REQUIRED
+
+    @R1 @happy
+    Kịch bản: SC-WEB-06 — Phiên web không chiếm thiết bị mobile
+      Cho trước điện thoại "D1" đang gắn với tài khoản P1
+      Khi tài khoản "P2" đăng nhập website trên trình duyệt của điện thoại D1
+      Thì đăng nhập web của P2 thành công
+      Và D1 vẫn gắn với P1
+
+  Quy tắc: BR-WEB-03 — Điểm danh và ads chỉ trên app ở R1
+
+    @R1 @unauthorized @cho-Q32
+    Sơ đồ kịch bản: SC-WEB-07 — Hành động kiếm Coin gửi từ phiên web
+      Khi P1 gửi trực tiếp tới API yêu cầu <hành động> bằng phiên web
+      Thì server từ chối với mã lỗi PLATFORM_NOT_SUPPORTED
+      Và không có Coin nào được cộng
+
+      Ví dụ:
+        | hành động                    |
+        | điểm danh                    |
+        | nhận thưởng rewarded ad      |
+        | lấy Streak Freeze bằng ads   |
+
+  Quy tắc: BR-WEB-04 — Nạp Gem qua cổng thanh toán web
+
+    @R1 @happy @tichhop @cho-Q31
+    Kịch bản: SC-WEB-08 — IPN hợp lệ
+      Cho trước P1 tạo đơn nạp "WO-100" gói 550 Gem trên website
+      Khi cổng thanh toán gửi IPN có chữ ký hợp lệ báo "WO-100" thanh toán thành công với gateway transaction "GW-7001"
+      Thì số dư Gem của P1 tăng 550
+      Và ledger có bút toán tham chiếu "GW-7001"
+
+    @R1 @negative @tichhop
+    Kịch bản: SC-WEB-09 — Chỉ có return URL, không có IPN
+      Cho trước P1 tạo đơn nạp "WO-101" gói 550 Gem
+      Khi trình duyệt của P1 quay về trang kết quả với tham số "thành công" nhưng server chưa nhận IPN và truy vấn cổng trả "đang xử lý"
+      Thì số dư Gem của P1 không đổi
+      Và đơn "WO-101" ở trạng thái "Chờ xác nhận"
+
+    @R1 @idempotency @tichhop
+    Kịch bản: SC-WEB-10 — IPN gửi trùng
+      Cho trước IPN cho "GW-7001" đã được xử lý và cộng 550 Gem
+      Khi cổng thanh toán gửi lại IPN cho "GW-7001"
+      Thì số dư Gem của P1 không đổi
+
+    @R1 @negative @tichhop
+    Kịch bản: SC-WEB-11 — Chữ ký IPN sai
+      Khi server nhận IPN cho đơn "WO-102" có chữ ký không hợp lệ
+      Thì server từ chối với mã lỗi SIGNATURE_INVALID
+      Và sự kiện được ghi vào log gian lận
+
+  Quy tắc: BR-WEB-06 — Mở pack trên trình duyệt không hỗ trợ Unity Web
+
+    @R1 @bien
+    Kịch bản: SC-WEB-12 — Chế độ rút gọn
+      Cho trước trình duyệt của P1 không chạy được bản Unity Web
+      Và server quay được Epic, Common, Rare, Common, Legendary khi P1 mở pack
+      Khi P1 mở pack trên website
+      Thì website hiển thị chế độ rút gọn với thứ tự lật Common, Common, Rare, Epic, Legendary
+      Và bộ sưu tập của P1 có đúng 5 thẻ đó
+```
+
+---
+
 ## 13. Rà soát edge case
 
 | Nhóm | Kịch bản phủ | Ghi chú |
@@ -1594,13 +1701,20 @@ Tính năng: EP-10 — Admin
 | BR-ADM-02 | SC-ADM-08 | SC-ADM-02 | SC-ADM-01, SC-ADM-03 |
 | BR-ADM-03 | — | — | SC-ADM-09 |
 | BR-ADM-04 | SC-ADM-12 | — | SC-ADM-10, SC-ADM-11 |
+| BR-WEB-01 | SC-WEB-01 | SC-WEB-02, SC-WEB-03 | SC-WEB-03 |
+| BR-WEB-02 | SC-WEB-06 | SC-WEB-04 | SC-WEB-05 |
+| BR-WEB-03 | — (rule cấm) | — | SC-WEB-07 |
+| BR-WEB-04 | SC-WEB-08 | SC-WEB-09 | SC-WEB-10, SC-WEB-11 |
+| BR-WEB-05 | Viết khi chốt Q-33, Q-34 | — | — |
+| BR-WEB-06 | SC-WEB-12 | SC-WEB-12 | — |
+| BR-WEB-07 | Dùng chung SC-ACC-04 trên kênh web | — | SC-ACC-04 |
 
 Ô "—" ở cột Happy/Biên nghĩa là rule đó chỉ mô tả hành vi chặn hoặc không có giá trị ngưỡng; lý do được ghi trong ô. Các rule chỉ có cột Negative (BR-CHK-04, BR-REF-03, BR-MKT-02/03/10, BR-FRD-03, BR-ADM-03) là rule cấm; hành vi hợp lệ tương ứng đã nằm trong kịch bản happy của rule khác.
 
 ## 15. Số liệu
 
-- 12 tính năng, 139 kịch bản đơn và 21 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
-- 19 kịch bản/sơ đồ có tag `@cho-*` và 2 dòng ví dụ được đánh dấu `@cho-*`, sẽ cập nhật khi PO trả lời câu hỏi mở trong BRD.
+- 13 tính năng, 150 kịch bản đơn và 22 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
+- 23 kịch bản/sơ đồ có tag `@cho-*` và 2 dòng ví dụ được đánh dấu `@cho-*`, sẽ cập nhật khi PO trả lời câu hỏi mở trong BRD.
 
 ## 16. Bước tiếp theo
 

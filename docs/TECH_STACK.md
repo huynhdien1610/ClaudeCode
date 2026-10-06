@@ -3,7 +3,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | TECH-ANIMA-001 |
-| Phiên bản | 0.2 |
+| Phiên bản | 0.3 — thêm website người chơi (CR-001) |
 | Ngày | 2026-10-06 |
 | Đầu vào | [Master Document](ANIMA_Master_Document.md) v1.1, [BRD](BRD_ANIMA.md) v0.2, [PRD](PRD_ANIMA.md) v0.1 |
 | Tóm tắt trong | Master Document mục 9 |
@@ -18,6 +18,7 @@
 | 2026-10-06 | **Unity cho toàn bộ app** (iOS và Android), không kết hợp Flutter/React Native | T-00 |
 | 2026-10-06 | **Backend dùng .NET** (ASP.NET Core, .NET 10 LTS) | T-01 |
 | 2026-10-06 | **Cloud chưa chốt**, quyết định sau | T-02, T-03 vẫn mở |
+| 2026-10-06 | **Người chơi dùng được cả website** ngoài app mobile (CR-001) | Thêm mục 2.4 |
 
 Vì chưa chốt cloud, backend được thiết kế **không phụ thuộc nhà cung cấp cloud**: chạy trong container, dùng PostgreSQL và Redis chuẩn, đo lường bằng OpenTelemetry, hạ tầng viết bằng Terraform. Các dịch vụ cloud ở mục 6 chỉ là phương án tham khảo.
 
@@ -30,7 +31,10 @@ Vì chưa chốt cloud, backend được thiết kế **không phụ thuộc nh�
 | Backend | **ASP.NET Core trên .NET 10 LTS (C#)**, kiến trúc modular monolith | Cùng ngôn ngữ với Unity, dùng chung contract; hiệu năng cao; kiểu dữ liệu chặt cho tiền |
 | Cơ sở dữ liệu | **PostgreSQL 17** (ledger, thẻ, chợ) + **Redis** (cooldown, rate limit, leaderboard, realtime) | Giao dịch ACID cho tiền và chuyển thẻ |
 | Realtime | SignalR (Redis backplane) | Đấu giá, chat, feed ở R2 |
+| Website người chơi | **Next.js + TypeScript**; mở pack bằng bản **Unity Web** nhúng, có chế độ rút gọn | Dùng lại asset/timeline mở pack của app; SSR cho link chia sẻ bộ sưu tập |
 | Admin web | React + TypeScript + Vite + Refine + Ant Design | Nhiều màn CRUD, dựng nhanh |
+| Frontend monorepo | pnpm workspace + Turborepo: `apps/player`, `apps/admin`, `packages/api-client` (sinh từ OpenAPI), `packages/ui` | Dùng chung client API và design token |
+| Thanh toán web | Cổng thanh toán qua lớp adapter (VNPay/MoMo/ZaloPay/Stripe — chờ Q-31) | Chỉ cộng Gem khi nhận IPN đã xác thực |
 | Xác thực | Firebase Authentication (email, SĐT OTP, Google, Apple, Facebook) | Có sẵn OTP và social login; backend tự quản lý tài khoản và trạng thái |
 | Thanh toán | Unity IAP + xác thực server với App Store Server API và Google Play Developer API | Chống gian lận receipt, idempotency theo transaction ID |
 | Quảng cáo | AppLovin MAX (mediation) với AdMob và Unity Ads là network con; bật SSV | Mediation bidding, có callback xác nhận server-side |
@@ -80,6 +84,21 @@ Trải nghiệm mở pack là điểm khác biệt, còn các màn form chỉ ph
 - Client **không bao giờ** quyết định kết quả pack, số dư hay phần thưởng. Client nhận kết quả từ server rồi phát animation (BR-PACK-02).
 - Preload toàn bộ asset của lần mở pack trước giai đoạn 0 (Master Document §4.4).
 - Chọn profile chất lượng theo GPU/RAM khi khởi động; người dùng chỉnh lại được.
+
+### 2.4. Website người chơi (CR-001)
+
+| Nhu cầu | Giải pháp | Ghi chú |
+|---|---|---|
+| Framework | Next.js (App Router) + TypeScript | Trang công khai (profile, bộ sưu tập chia sẻ) render phía server cho xem trước link và SEO |
+| Đăng nhập | Firebase Authentication Web SDK | Cùng tài khoản với app |
+| Gọi API | `packages/api-client` sinh từ OpenAPI của backend | Một nguồn contract cho app, web, admin |
+| Mở pack | Bản build Unity Web của riêng scene PackOpening, nhúng qua `react-unity-webgl`, tải lười khi người chơi mở pack lần đầu và được cache | Cùng Timeline/asset với app; cần đo dung lượng tải (mục tiêu < 25MB nén) |
+| Chế độ rút gọn | Hiệu ứng lật thẻ bằng CSS/Canvas khi không có WebGL2, máy yếu hoặc bật giảm chuyển động | BR-WEB-06 |
+| Thanh toán | Trang thanh toán của cổng (redirect/hosted) + webhook IPN về backend | Không lưu thông tin thẻ; BR-WEB-04 |
+| Chống bot | Cloudflare Turnstile hoặc reCAPTCHA cho đăng nhập/nạp; rate limit | Web không có kiểm tra toàn vẹn thiết bị |
+| Responsive | Desktop và trình duyệt mobile | |
+
+**Rủi ro kỹ thuật:** Unity Web trên trình duyệt mobile có giới hạn bộ nhớ, đặc biệt Safari iOS. Spike ở Sprint 0 (T009) phải đo dung lượng, thời gian tải và FPS trước khi chốt; nếu không đạt, website dùng chế độ rút gọn làm mặc định trên trình duyệt mobile.
 
 ---
 
@@ -199,6 +218,7 @@ Firebase Analytics xuất sang BigQuery hằng ngày; worker đẩy thêm sự k
 | PostgreSQL | HA, phục hồi theo thời điểm, RPO ≤ 5 phút, RTO ≤ 1 giờ (NFR-13) | Cloud SQL for PostgreSQL | RDS for PostgreSQL / Aurora |
 | Redis | Managed | Memorystore | ElastiCache |
 | Asset | Object storage + CDN cho Addressables | Cloud Storage + Cloud CDN | S3 + CloudFront |
+| Website người chơi | Next.js cần server render; bản Unity Web là file tĩnh | Cloud Run + Cloud CDN | ECS Fargate + CloudFront |
 | Admin web | Host tĩnh, chỉ truy cập nội bộ | Firebase Hosting + IAP | S3 + CloudFront + SSO |
 | Secret | Khóa store, khóa SSV, chuỗi kết nối DB | Secret Manager | Secrets Manager |
 | WAF, chống DDoS | | Cloud Armor | AWS WAF + Shield |
@@ -218,6 +238,7 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 | Backend: build, test, scan, deploy | GitHub Actions → container registry → dịch vụ chạy container của cloud được chọn (staging tự động, production cần duyệt) |
 | App: build iOS/Android | GitHub Actions + GameCI (cần license Unity); runner macOS cho iOS |
 | Đẩy lên store | fastlane → TestFlight, Google Play Internal Testing |
+| Website người chơi | GitHub Actions → container Next.js; bản Unity Web build bằng GameCI rồi đẩy lên CDN |
 | Admin web | GitHub Actions → host tĩnh của cloud được chọn |
 | Hạ tầng | Terraform |
 
@@ -260,6 +281,7 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 |---|---|---|---|
 | Unity app: tài khoản, ví, pack, bộ sưu tập, điểm danh, ads | ✔ | | |
 | Backend modules: Identity, Wallet, Catalog, Gacha, Collection, Rewards, Fraud, Admin | ✔ | | |
+| Website người chơi | ✔ (không có điểm danh/ads) | Chợ, đấu giá, profile công khai | |
 | Admin web | ✔ | Tranh chấp chợ | |
 | Marketplace, đấu giá, SignalR | | ✔ | |
 | Social, chat, leaderboard | | ✔ | |
@@ -272,7 +294,7 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 | Unity developer | 2 | C#, UI Toolkit, Timeline, tối ưu mobile |
 | Technical artist | 1 | Shader Graph, particle, Timeline |
 | Backend developer | 2 | .NET, PostgreSQL, tích hợp IAP/ads |
-| Frontend (admin web) | 1 (bán thời gian) | React, TypeScript |
+| Frontend web (website người chơi + admin) | 2 | React, Next.js, TypeScript, nhúng Unity Web |
 | DevOps | 1 (bán thời gian) | Cloud được chọn, Terraform, CI cho Unity |
 | QA | 1 | Thiết bị thật, kiểm thử kinh tế |
 
@@ -287,6 +309,8 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 | T-04 | Mediation: AppLovin MAX, Unity LevelPlay hay AdMob | AppLovin MAX; thử A/B eCPM sau launch | PO | Mở |
 | T-05 | Phiên bản iOS tối thiểu | Theo yêu cầu tối thiểu của Unity 6 | Mobile Lead | Mở |
 | T-06 | Mua license Unity/FMOD/DOTween Pro | Kiểm tra điều kiện theo doanh thu dự kiến | PO + Finance | Mở |
+| T-07 | Mở pack trên web: Unity Web hay làm lại bằng công nghệ web | Unity Web + chế độ rút gọn; chốt sau spike T009 | Tech Lead | Mở |
+| T-08 | Cổng thanh toán web | Chờ Q-31 | PO + Finance | Mở |
 
 ---
 

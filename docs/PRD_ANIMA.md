@@ -4,10 +4,10 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | PRD-ANIMA-001 |
-| Phiên bản | 0.1 (Draft) |
+| Phiên bản | 0.2 (Draft) — thêm website người chơi (CR-001) |
 | Ngày | 2026-10-06 |
 | Phạm vi | Release 1 (MVP), định hướng Release 2–3 |
-| Tài liệu liên quan | [Master Document](ANIMA_Master_Document.md), [BRD](BRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md) |
+| Tài liệu liên quan | [Master Document](ANIMA_Master_Document.md), [BRD](BRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md), [Solution Design](SOLUTION_DESIGN.md), [Sprint Plan](SPRINT_PLAN.md), [Prototype](../prototype/index.html) |
 | Trạng thái | **DRAFT — chờ Product Owner duyệt** |
 
 ### Cách đọc tài liệu này
@@ -23,7 +23,7 @@
 
 > Mỗi lần mở pack là một khoảnh khắc đáng nhớ; mỗi tấm thẻ là một mảnh cảm xúc có câu chuyện riêng.
 
-ANIMA là app sưu tầm thẻ bài số trên mobile, xây trên IP gốc về thế giới nơi cảm xúc con người kết tinh thành sinh thể sống (Anima). Sản phẩm cạnh tranh bằng ba điều:
+ANIMA là nền tảng sưu tầm thẻ bài số trên **app mobile và website**, xây trên IP gốc về thế giới nơi cảm xúc con người kết tinh thành sinh thể sống (Anima). Sản phẩm cạnh tranh bằng ba điều:
 
 1. **Mở pack như một màn trình diễn**, với hình, tiếng và rung được dàn dựng theo độ hiếm.
 2. **Thẻ có chiều sâu**: mỗi thẻ có một Story Fragment; sưu tầm đủ bộ để ghép lại bí ẩn về The Fracture.
@@ -158,6 +158,17 @@ flowchart LR
 | 20 | Tiếng Việt, tiếng Anh | Must | Hai thị trường đầu tiên | NFR-08 |
 | 21 | Chế độ giảm chuyển động | Must | An toàn, accessibility | NFR-09 |
 | 22 | Admin: người dùng, thẻ, pack/tỷ lệ, cấu hình kinh tế, dashboard | Must | Vận hành | EP-10 |
+| 23 | **Website người chơi**: đăng nhập, ví, nạp Gem qua cổng thanh toán, cửa hàng, mở pack, bộ sưu tập, story | Must | Dùng trên máy tính; nạp với phí thấp hơn store; chia sẻ link | BRD 4.4, BR-WEB |
+
+### 6.2A. Nền tảng (CR-001)
+
+| Nền tảng | Vai trò trong sản phẩm |
+|---|---|
+| App mobile (iOS, Android) | Kênh chính: vòng lặp hằng ngày (điểm danh, ads), mở pack đầy đủ, push |
+| Website người chơi | Kênh bổ sung: mở pack, bộ sưu tập, nạp Gem qua cổng thanh toán, sau này là chợ giao dịch (R2) vì thao tác mua bán trên màn hình lớn tiện hơn |
+| Website admin | Vận hành nội bộ |
+
+Ma trận chi tiết tính năng theo nền tảng ở BRD mục 4.4. Ở R1, điểm danh và rewarded ads chỉ có trên app (BR-WEB-03).
 
 ### 6.3. Không làm ở R1
 
@@ -271,7 +282,7 @@ Các mục dưới đây mô tả **trải nghiệm cần đạt**. Quy tắc ng
 
 ## 9. Kế hoạch đo lường (analytics)
 
-Mọi sự kiện có thuộc tính chung: `account_id`, `device_id`, `app_version`, `platform`, `country_tier`, `session_id`.
+Mọi sự kiện có thuộc tính chung: `account_id`, `device_id` (mobile) hoặc `web_session_id` (web), `app_version`, `platform` (`ios`/`android`/`web`), `country_tier`, `session_id`.
 
 | Sự kiện | Khi nào | Thuộc tính riêng | Dùng cho |
 |---|---|---|---|
@@ -329,6 +340,7 @@ Mốc tháng tính từ khi bắt đầu phát triển, khớp với Roadmap MVP
 - [ ] Đủ 100 thẻ set "Awakening" với story VI/EN.
 - [ ] Chế độ giảm chuyển động được kiểm tra.
 - [ ] Quy trình hỗ trợ khách hàng và xử lý gian lận sẵn sàng.
+- [ ] Website người chơi: cổng thanh toán chạy production, đối soát hằng ngày lệch = 0, ý kiến Legal về Q-31, Q-33, Q-34.
 
 ---
 

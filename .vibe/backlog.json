@@ -1,0 +1,2817 @@
+{
+  "version": "1.1",
+  "project_id": "anima",
+  "generated": "2026-10-06",
+  "sprint_length_weeks": 2,
+  "sprints": [
+    {
+      "id": "S001",
+      "name": "Nền tảng dự án & chốt quyết định",
+      "weeks": "Tuần 1–2",
+      "goal": "Repo, khung backend/Unity/web chạy được, CI xanh; PO chốt các câu hỏi chặn R1; FRD Identity sẵn sàng.",
+      "exit_criteria": "CI xanh trên `main` với khung 3 client + backend; DEC-001 có quyết định PO; FRD-01 và wireframe Identity được duyệt; báo cáo spike Unity Web."
+    },
+    {
+      "id": "S002",
+      "name": "Tài khoản, xác thực, phiên đa nền tảng",
+      "weeks": "Tuần 3–4",
+      "goal": "Người chơi đăng ký/đăng nhập trên app và web, xác thực SĐT, gắn thiết bị, phiên web; admin đăng nhập SSO và xem danh sách tài khoản.",
+      "exit_criteria": "Kịch bản SC-ACC-*, SC-PERM-01, SC-WEB-04→06 đạt trên staging."
+    },
+    {
+      "id": "S003",
+      "name": "Ví/Ledger & Catalog",
+      "weeks": "Tuần 5–6",
+      "goal": "Ledger bất biến, số dư, lịch sử; admin quản lý set, thẻ, story, pack, version tỷ lệ với maker-checker.",
+      "exit_criteria": "SC-WAL-03→05, SC-ADM-01/02/08/09/13/14 đạt; seed set Awakening (tạm) có trong staging."
+    },
+    {
+      "id": "S004",
+      "name": "Gacha: mua và mở pack (server + cửa hàng)",
+      "weeks": "Tuần 7–8",
+      "goal": "Mua pack idempotent, quay theo version, pity, bộ sưu tập; cửa hàng trên app và web.",
+      "exit_criteria": "SC-PACK-*, SC-COL-01→05 đạt; test thống kê RNG chạy trong CI."
+    },
+    {
+      "id": "S005",
+      "name": "Trình diễn mở pack trên app & Bộ sưu tập",
+      "weeks": "Tuần 9–10",
+      "goal": "Animation 6 giai đoạn bản 1 theo rarity, skip/fast mode, album, story, xem offline.",
+      "exit_criteria": "Đạt 60fps trên thiết bị tầm trung chuẩn; SC-COL-06 đạt."
+    },
+    {
+      "id": "S006",
+      "name": "Website người chơi",
+      "weeks": "Tuần 11–12",
+      "goal": "Mở pack trên web bằng Unity Web + chế độ rút gọn; bộ sưu tập và story trên web.",
+      "exit_criteria": "SC-WEB-01→03, SC-WEB-12 đạt; e2e Playwright xanh."
+    },
+    {
+      "id": "S007",
+      "name": "Điểm danh, quảng cáo, chống gian lận",
+      "weeks": "Tuần 13–14",
+      "goal": "Streak, Freeze, mốc thưởng; rewarded ads với SSV; kiểm tra toàn vẹn thiết bị; tham số kinh tế có version và trần chi phí.",
+      "exit_criteria": "SC-CHK-*, SC-ADS-*, SC-FRD-01/02, SC-ECO-03→05, SC-WEB-07 đạt."
+    },
+    {
+      "id": "S008",
+      "name": "Thanh toán: IAP, cổng web, hoàn tiền",
+      "weeks": "Tuần 15–16",
+      "goal": "Nạp Gem qua IAP và cổng web, xử lý hoàn tiền, đối soát hằng ngày.",
+      "exit_criteria": "SC-WAL-01/02/06→15, SC-WEB-08→11, SC-PACK-25, SC-ACC-04 đạt trên sandbox; đối soát lệch = 0."
+    },
+    {
+      "id": "S009",
+      "name": "Admin vận hành & Analytics",
+      "weeks": "Tuần 17–18",
+      "goal": "Quản lý tài khoản, bồi thường, tham số kinh tế; sự kiện analytics và dashboard.",
+      "exit_criteria": "SC-ACC-19, SC-ADM-03/06/07/10→12 đạt; 5 dashboard của PRD mục 9 có số liệu staging."
+    },
+    {
+      "id": "S010",
+      "name": "Hoàn thiện trải nghiệm",
+      "weeks": "Tuần 19–20",
+      "goal": "Cinematic Legendary/Secret, âm thanh, rung, FTUE, đa ngôn ngữ, accessibility, push.",
+      "exit_criteria": "Kiểm thử người dùng đạt tiêu chí PRD 8.1; FTUE < 2 phút."
+    },
+    {
+      "id": "S011",
+      "name": "Hardening",
+      "weeks": "Tuần 21–22",
+      "goal": "Tải 100k CCU, bảo mật, quan sát, backup, hồi quy BDD toàn bộ R1.",
+      "exit_criteria": "k6 đạt NFR-04; không còn lỗi bảo mật mức cao; mọi kịch bản `@R1` đạt."
+    },
+    {
+      "id": "S012",
+      "name": "Closed beta & sẵn sàng soft launch",
+      "weeks": "Tuần 23–24",
+      "goal": "Phát hành beta, nộp store, pháp lý, sửa lỗi, quyết định go/no-go.",
+      "exit_criteria": "Đủ launch checklist PRD 10.1."
+    }
+  ],
+  "r2_epics": [
+    {
+      "id": "R2-E1",
+      "name": "Chợ P2P giá cố định",
+      "refs": "EP-06, BR-MKT-01..06, BR-MKT-11"
+    },
+    {
+      "id": "R2-E2",
+      "name": "Đấu giá + SignalR",
+      "refs": "BR-MKT-07..10"
+    },
+    {
+      "id": "R2-E3",
+      "name": "Profile công khai (SSR trên web)",
+      "refs": "US-05.5"
+    },
+    {
+      "id": "R2-E4",
+      "name": "Nhiệm vụ hằng ngày, referral, thành tựu",
+      "refs": "US-07.3..07.5, BR-REF-*"
+    },
+    {
+      "id": "R2-E5",
+      "name": "Feed, follow, chat, leaderboard",
+      "refs": "EP-08"
+    },
+    {
+      "id": "R2-E6",
+      "name": "Đổi Gem → Coin",
+      "refs": "BR-WAL-05"
+    },
+    {
+      "id": "R2-E7",
+      "name": "Điểm danh/ads trên web (nếu PO duyệt Q-32)",
+      "refs": "BR-WEB-03"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T001",
+      "sprint": "S001",
+      "title": "Workshop PO chốt câu hỏi chặn R1",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "BRD Q-01,Q-03,Q-04,Q-07,Q-08,Q-09,Q-31,Q-32,Q-35",
+        "BRD CF-01,CF-04,CF-06",
+        "PRD PQ-01..PQ-07"
+      ],
+      "dependencies": [],
+      "allowed_files": [
+        "docs/decisions/DEC-001.md"
+      ],
+      "expected_outputs": [
+        "Biên bản quyết định có người quyết và ngày"
+      ],
+      "acceptance": [
+        "Mỗi câu hỏi có quyết định hoặc ngày hẹn quyết"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": [
+        "docs/BRD_ANIMA.md#16",
+        "docs/PRD_ANIMA.md#12"
+      ]
+    },
+    {
+      "id": "T002",
+      "sprint": "S001",
+      "title": "FRD Identity: đăng ký, đăng nhập, tuổi, OTP, phiên web, xóa tài khoản",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "EP-01",
+        "BR-ACC-01..05",
+        "BR-WEB-02"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/frd/FRD-01-identity.md"
+      ],
+      "expected_outputs": [
+        "Screen spec, field table, ma trận quyền, API nghiệp vụ"
+      ],
+      "acceptance": [
+        "Đạt FRD coverage checklist"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": [
+        "docs/BRD_ANIMA.md#10.1",
+        "docs/BDD_ANIMA.md#1"
+      ]
+    },
+    {
+      "id": "T003",
+      "sprint": "S001",
+      "title": "Design system: token màu rarity, typography, component cơ bản",
+      "workstream": "design",
+      "owner_skill": "product-designer",
+      "source_refs": [
+        "Master §4.3",
+        "prototype/"
+      ],
+      "dependencies": [],
+      "allowed_files": [
+        "design/system/**"
+      ],
+      "expected_outputs": [
+        "Token, component spec cho app/web/admin"
+      ],
+      "acceptance": [
+        "Đủ token rarity 6 bậc; tương phản AA"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": [
+        "prototype/assets/styles.css"
+      ]
+    },
+    {
+      "id": "T004",
+      "sprint": "S001",
+      "title": "User flow + wireframe Identity (app + web)",
+      "workstream": "design",
+      "owner_skill": "product-designer",
+      "source_refs": [
+        "FRD-01"
+      ],
+      "dependencies": [
+        "T002",
+        "T003"
+      ],
+      "allowed_files": [
+        "design/identity/**"
+      ],
+      "expected_outputs": [
+        "Flow, wireframe, state lỗi"
+      ],
+      "acceptance": [
+        "Phủ mọi trạng thái và mã lỗi của FRD-01"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T005",
+      "sprint": "S001",
+      "title": "Khung monorepo: thư mục, .editorconfig, .gitignore, CODEOWNERS, hướng dẫn dev",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "SAD §3"
+      ],
+      "dependencies": [],
+      "allowed_files": [
+        ".editorconfig",
+        ".gitignore",
+        ".github/CODEOWNERS",
+        "CONTRIBUTING.md"
+      ],
+      "expected_outputs": [
+        "Cấu trúc thư mục theo SAD §3"
+      ],
+      "acceptance": [
+        "Clone mới và đọc CONTRIBUTING là chạy được"
+      ],
+      "risk_tier": "low",
+      "estimate": "2h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T006",
+      "sprint": "S001",
+      "title": "Khung solution .NET: Api, Worker, SharedKernel, Contracts (netstandard2.1), test projects",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §3, §4"
+      ],
+      "dependencies": [
+        "T005"
+      ],
+      "allowed_files": [
+        "backend/**/*.csproj",
+        "backend/Anima.sln",
+        "backend/Directory.Build.props",
+        "backend/Directory.Packages.props",
+        "backend/src/Anima.Api/Program.cs"
+      ],
+      "expected_outputs": [
+        "Solution build và test rỗng chạy được"
+      ],
+      "acceptance": [
+        "`dotnet build` và `dotnet test` xanh"
+      ],
+      "risk_tier": "low",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T007",
+      "sprint": "S001",
+      "title": "docker-compose: PostgreSQL 17, Redis, healthcheck",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "SAD §14.1"
+      ],
+      "dependencies": [
+        "T005"
+      ],
+      "allowed_files": [
+        "infra/docker-compose.yml",
+        "infra/README.md"
+      ],
+      "expected_outputs": [
+        "Hạ tầng local"
+      ],
+      "acceptance": [
+        "`docker compose up` healthy"
+      ],
+      "risk_tier": "low",
+      "estimate": "1h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T008",
+      "sprint": "S001",
+      "title": "SharedKernel: Result/Error, Money, IClock, IRandomSource, idempotency, outbox",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §4.3, §5.2",
+        "BR-WAL-02"
+      ],
+      "dependencies": [
+        "T006",
+        "T007"
+      ],
+      "allowed_files": [
+        "backend/src/Anima.SharedKernel/**",
+        "backend/tests/Anima.UnitTests/SharedKernel/**"
+      ],
+      "expected_outputs": [
+        "Thư viện dùng chung + migration bảng idempotency, outbox"
+      ],
+      "acceptance": [
+        "Unit test Money không cho số âm sai, idempotency trả lại response cũ"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T009",
+      "sprint": "S001",
+      "title": "Spike: Unity Web cho PackOpening (dung lượng, tải, FPS trên Chrome, Safari iOS, Android)",
+      "workstream": "spike",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "TR-01",
+        "T-07",
+        "BR-WEB-06"
+      ],
+      "dependencies": [],
+      "allowed_files": [
+        "spikes/unity-web/**",
+        "docs/spikes/SPIKE-T009.md"
+      ],
+      "expected_outputs": [
+        "Báo cáo số liệu + khuyến nghị ADR-004"
+      ],
+      "acceptance": [
+        "Có số đo trên ≥ 3 trình duyệt/thiết bị"
+      ],
+      "risk_tier": "low",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T010",
+      "sprint": "S001",
+      "title": "Khung Unity 6 LTS: URP, asmdef, scene Boot, import Anima.Contracts",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §9",
+        "TR-06"
+      ],
+      "dependencies": [
+        "T006"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/**"
+      ],
+      "expected_outputs": [
+        "Project Unity build được iOS/Android"
+      ],
+      "acceptance": [
+        "Build Android dev chạy được; dùng được DTO từ Anima.Contracts"
+      ],
+      "risk_tier": "low",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T011",
+      "sprint": "S001",
+      "title": "Khung web: pnpm + Turborepo, apps/player (Next.js), apps/admin (Vite + Refine), packages/ui, packages/config",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §10, §11"
+      ],
+      "dependencies": [
+        "T005"
+      ],
+      "allowed_files": [
+        "web/**"
+      ],
+      "expected_outputs": [
+        "Workspace build/lint/test chạy được"
+      ],
+      "acceptance": [
+        "`pnpm -C web turbo run build lint test` xanh"
+      ],
+      "risk_tier": "low",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T012",
+      "sprint": "S001",
+      "title": "Pipeline contract: OpenAPI v1 baseline, kiểm tra breaking change, sinh packages/api-client",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §6.1",
+        "ADR-005"
+      ],
+      "dependencies": [
+        "T006",
+        "T011"
+      ],
+      "allowed_files": [
+        "contracts/openapi/**",
+        "web/packages/api-client/**",
+        "backend/src/Anima.Api/OpenApi/**"
+      ],
+      "expected_outputs": [
+        "Contract nguồn + client sinh tự động"
+      ],
+      "acceptance": [
+        "CI đỏ khi xóa field khỏi contract"
+      ],
+      "risk_tier": "standard",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T013",
+      "sprint": "S001",
+      "title": "GitHub Actions: backend, web, gitleaks",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "SAD §14.2"
+      ],
+      "dependencies": [
+        "T006",
+        "T011"
+      ],
+      "allowed_files": [
+        ".github/workflows/backend.yml",
+        ".github/workflows/web.yml",
+        ".github/workflows/security.yml"
+      ],
+      "expected_outputs": [
+        "CI bắt buộc trên PR"
+      ],
+      "acceptance": [
+        "PR mẫu chạy đủ job"
+      ],
+      "risk_tier": "low",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T014",
+      "sprint": "S001",
+      "title": "GameCI: build + test Unity trên CI",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "TECH_STACK §6.1"
+      ],
+      "dependencies": [
+        "T010"
+      ],
+      "allowed_files": [
+        ".github/workflows/unity.yml"
+      ],
+      "expected_outputs": [
+        "Build Android và chạy EditMode test"
+      ],
+      "acceptance": [
+        "Job xanh với license secret"
+      ],
+      "risk_tier": "low",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T015",
+      "sprint": "S001",
+      "title": "ArchTests ranh giới module + module mẫu Health",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §3, §4.1"
+      ],
+      "dependencies": [
+        "T006"
+      ],
+      "allowed_files": [
+        "backend/tests/Anima.ArchTests/**",
+        "backend/src/Modules/Health/**"
+      ],
+      "expected_outputs": [
+        "Mẫu module 5 project"
+      ],
+      "acceptance": [
+        "ArchTests đỏ khi module truy cập DbContext module khác"
+      ],
+      "risk_tier": "low",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T016",
+      "sprint": "S001",
+      "title": "Quan sát cơ bản: log JSON, OpenTelemetry, /healthz /readyz",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §13"
+      ],
+      "dependencies": [
+        "T006"
+      ],
+      "allowed_files": [
+        "backend/src/Anima.Api/Observability/**"
+      ],
+      "expected_outputs": [
+        "Log, trace, health"
+      ],
+      "acceptance": [
+        "Trace có traceId xuyên request"
+      ],
+      "risk_tier": "low",
+      "estimate": "2h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T017",
+      "sprint": "S001",
+      "title": "Reqnroll: project Anima.Bdd chạy 1 kịch bản mẫu",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SAD §15",
+        "BDD §16"
+      ],
+      "dependencies": [
+        "T006"
+      ],
+      "allowed_files": [
+        "backend/tests/Anima.Bdd/**"
+      ],
+      "expected_outputs": [
+        "Khung BDD + chốt từ khóa tiếng Việt"
+      ],
+      "acceptance": [
+        "Kịch bản mẫu chạy trong CI"
+      ],
+      "risk_tier": "low",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T018",
+      "sprint": "S001",
+      "title": "Ghi ADR-001 → ADR-005",
+      "workstream": "release",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "SAD §16.2"
+      ],
+      "dependencies": [],
+      "allowed_files": [
+        "docs/adr/**"
+      ],
+      "expected_outputs": [
+        "5 ADR"
+      ],
+      "acceptance": [
+        "Tech Lead duyệt"
+      ],
+      "risk_tier": "low",
+      "estimate": "2h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T019",
+      "sprint": "S001",
+      "title": "Điền và kiểm chứng lệnh thật vào .vibe/project-context.md",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "SAD §14.3"
+      ],
+      "dependencies": [
+        "T013"
+      ],
+      "allowed_files": [
+        ".vibe/project-context.md"
+      ],
+      "expected_outputs": [
+        "Lệnh đã chạy thử"
+      ],
+      "acceptance": [
+        "Mọi lệnh trong mục Commands đã chạy thành công"
+      ],
+      "risk_tier": "low",
+      "estimate": "1h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T020",
+      "sprint": "S002",
+      "title": "FRD Ví/lịch sử + Catalog admin (chuẩn bị S003)",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "EP-02",
+        "EP-10",
+        "BR-WAL-*",
+        "BR-ADM-*"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/frd/FRD-02-wallet.md",
+        "docs/frd/FRD-10-admin-catalog.md"
+      ],
+      "expected_outputs": [
+        "Screen spec, field table, quyền"
+      ],
+      "acceptance": [
+        "Đạt FRD coverage checklist"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T021",
+      "sprint": "S002",
+      "title": "Wireframe Ví, Cửa hàng, Chi tiết pack (app + web)",
+      "workstream": "design",
+      "owner_skill": "product-designer",
+      "source_refs": [
+        "FRD-02",
+        "PRD 8.2"
+      ],
+      "dependencies": [
+        "T020",
+        "T003"
+      ],
+      "allowed_files": [
+        "design/wallet/**",
+        "design/store/**"
+      ],
+      "expected_outputs": [
+        "Wireframe + trạng thái"
+      ],
+      "acceptance": [
+        "Tỷ lệ rơi và pity hiện trước nút mua"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T022",
+      "sprint": "S002",
+      "title": "Schema Identity: account, device_binding, web_session; mã hóa PII + HMAC",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §5.2",
+        "BRD 13.1"
+      ],
+      "dependencies": [
+        "T008",
+        "T002"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Identity/Identity.Infrastructure/**",
+        "backend/src/Modules/Identity/Identity.Domain/**"
+      ],
+      "expected_outputs": [
+        "Migration + entity"
+      ],
+      "acceptance": [
+        "UNIQUE email/SĐT trên giá trị chuẩn hóa"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T023",
+      "sprint": "S002",
+      "title": "Xác minh Firebase ID token, map account, header nền tảng",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §6.1"
+      ],
+      "dependencies": [
+        "T022"
+      ],
+      "allowed_files": [
+        "backend/src/Anima.Api/Auth/**",
+        "backend/src/Modules/Identity/Identity.Application/Auth/**"
+      ],
+      "expected_outputs": [
+        "Middleware auth"
+      ],
+      "acceptance": [
+        "Token sai/hết hạn → 401"
+      ],
+      "risk_tier": "high",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T024",
+      "sprint": "S002",
+      "title": "POST /accounts: tuổi, email/SĐT duy nhất",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ACC-01",
+        "BR-ACC-02"
+      ],
+      "dependencies": [
+        "T023"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Identity/Identity.Application/Register/**",
+        "backend/tests/Anima.Bdd/Features/Identity/Register*",
+        "backend/src/Modules/Identity/Identity.Endpoints/Register*"
+      ],
+      "expected_outputs": [
+        "Endpoint + BDD"
+      ],
+      "acceptance": [
+        "SC-ACC-01→07 đạt"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T025",
+      "sprint": "S002",
+      "title": "Gắn thiết bị và hạn mức chuyển thiết bị",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ACC-03"
+      ],
+      "dependencies": [
+        "T024"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Identity/Identity.Application/Devices/**",
+        "backend/tests/Anima.Bdd/Features/Identity/Device*",
+        "backend/src/Modules/Identity/Identity.Endpoints/Devices*"
+      ],
+      "expected_outputs": [
+        "Logic + BDD"
+      ],
+      "acceptance": [
+        "SC-ACC-08→11 đạt"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T026",
+      "sprint": "S002",
+      "title": "OTP xác thực SĐT (adapter nhà cung cấp)",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ACC-05",
+        "TR-03"
+      ],
+      "dependencies": [
+        "T024"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Identity/Identity.Application/Phone/**",
+        "backend/tests/Anima.Bdd/Features/Identity/Otp*",
+        "backend/src/Modules/Identity/Identity.Endpoints/Phone*"
+      ],
+      "expected_outputs": [
+        "OTP + giới hạn"
+      ],
+      "acceptance": [
+        "SC-ACC-12→16 đạt"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T027",
+      "sprint": "S002",
+      "title": "Phiên web: tối đa 3, OTP trình duyệt mới",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WEB-02"
+      ],
+      "dependencies": [
+        "T024",
+        "T026"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Identity/Identity.Application/WebSessions/**",
+        "backend/tests/Anima.Bdd/Features/Identity/WebSession*",
+        "backend/src/Modules/Identity/Identity.Endpoints/WebSessions*"
+      ],
+      "expected_outputs": [
+        "Endpoint + BDD"
+      ],
+      "acceptance": [
+        "SC-WEB-04→06 đạt"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T028",
+      "sprint": "S002",
+      "title": "Vòng đời tài khoản, xóa sau 30 ngày, policy quyền theo trạng thái",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BRD 8.1",
+        "SC-PERM-01"
+      ],
+      "dependencies": [
+        "T024"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Identity/Identity.Application/Lifecycle/**",
+        "backend/src/Anima.Worker/Jobs/AccountDeletion*",
+        "backend/tests/Anima.Bdd/Features/Identity/Lifecycle*",
+        "backend/src/Modules/Identity/Identity.Endpoints/Lifecycle*"
+      ],
+      "expected_outputs": [
+        "Lifecycle + job + policy"
+      ],
+      "acceptance": [
+        "SC-ACC-17→21, SC-PERM-01 (phần đã có module) đạt"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T029",
+      "sprint": "S002",
+      "title": "App: Firebase Auth (Google, Apple, email) + Net client + /me",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD §9"
+      ],
+      "dependencies": [
+        "T010",
+        "T024"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Net/**",
+        "mobile/AnimaUnity/Assets/Anima/Core/Auth/**"
+      ],
+      "expected_outputs": [
+        "Đăng nhập + gọi API"
+      ],
+      "acceptance": [
+        "Đăng nhập Google/Apple trên thiết bị thật"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T030",
+      "sprint": "S002",
+      "title": "App: màn tuổi, đăng ký, OTP theo wireframe",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "FRD-01"
+      ],
+      "dependencies": [
+        "T029",
+        "T026",
+        "T004"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/UI/Identity/**"
+      ],
+      "expected_outputs": [
+        "Màn hình + xử lý mã lỗi"
+      ],
+      "acceptance": [
+        "Hiển thị đúng mọi mã lỗi FRD-01"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T031",
+      "sprint": "S002",
+      "title": "Web: đăng nhập Firebase, phiên web, OTP trình duyệt mới",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WEB-02"
+      ],
+      "dependencies": [
+        "T011",
+        "T027"
+      ],
+      "allowed_files": [
+        "web/apps/player/src/app/(auth)/**",
+        "web/apps/player/src/lib/auth/**"
+      ],
+      "expected_outputs": [
+        "Luồng đăng nhập web"
+      ],
+      "acceptance": [
+        "SC-WEB-05 qua giao diện"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T032",
+      "sprint": "S002",
+      "title": "Web: trang tài khoản (hồ sơ, xác thực SĐT, xóa tài khoản)",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-01.4",
+        "US-01.7"
+      ],
+      "dependencies": [
+        "T031",
+        "T028"
+      ],
+      "allowed_files": [
+        "web/apps/player/src/app/account/**"
+      ],
+      "expected_outputs": [
+        "Trang tài khoản"
+      ],
+      "acceptance": [
+        "Yêu cầu/hủy xóa tài khoản hoạt động"
+      ],
+      "risk_tier": "standard",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T033",
+      "sprint": "S002",
+      "title": "Admin: SSO + map vai trò + danh sách tài khoản (PII che)",
+      "workstream": "web-admin",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BRD 12.2",
+        "SC-ADM-07"
+      ],
+      "dependencies": [
+        "T011",
+        "T022"
+      ],
+      "allowed_files": [
+        "web/apps/admin/src/auth/**",
+        "web/apps/admin/src/resources/accounts/**",
+        "backend/src/Modules/Admin/Admin.Application/Auth/**"
+      ],
+      "expected_outputs": [
+        "Đăng nhập admin + màn danh sách"
+      ],
+      "acceptance": [
+        "CS Agent thấy SĐT dạng 090****123"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T034",
+      "sprint": "S002",
+      "title": "QA Identity trên staging",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-ACC-*",
+        "SC-PERM-01",
+        "SC-WEB-04..06"
+      ],
+      "dependencies": [
+        "T024",
+        "T025",
+        "T026",
+        "T027",
+        "T028"
+      ],
+      "allowed_files": [
+        "docs/qa/S002/**"
+      ],
+      "expected_outputs": [
+        "Test report"
+      ],
+      "acceptance": [
+        "QA_PASSED hoặc danh sách defect"
+      ],
+      "risk_tier": "high",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T035",
+      "sprint": "S002",
+      "title": "Môi trường staging tạm (container trên 1 VM) chờ chốt cloud",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "T-02",
+        "SAD §14.1"
+      ],
+      "dependencies": [
+        "T013"
+      ],
+      "allowed_files": [
+        "infra/staging/**",
+        ".github/workflows/deploy-staging.yml"
+      ],
+      "expected_outputs": [
+        "Staging chạy backend + web"
+      ],
+      "acceptance": [
+        "Deploy tự động từ main"
+      ],
+      "risk_tier": "low",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T036",
+      "sprint": "S003",
+      "title": "Wallet: ledger append-only, balance, lịch sử",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WAL-01",
+        "BR-WAL-03"
+      ],
+      "dependencies": [
+        "T008",
+        "T020"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Wallet/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WAL-03→05"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T037",
+      "sprint": "S003",
+      "title": "Catalog: set, thẻ, story, pack, version tỷ lệ, maker-checker",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ADM-02",
+        "BR-ADM-03",
+        "BR-PACK-01"
+      ],
+      "dependencies": [
+        "T020"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Catalog/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-ADM-01/02/08/09/13/14"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T038",
+      "sprint": "S003",
+      "title": "Admin: màn Catalog + trình sửa tỷ lệ có diff và duyệt",
+      "workstream": "web-admin",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-10.2",
+        "US-10.3"
+      ],
+      "dependencies": [
+        "T037",
+        "T033"
+      ],
+      "allowed_files": [
+        "web/apps/admin/src/resources/catalog/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Luồng tạo → gửi duyệt → duyệt"
+      ],
+      "risk_tier": "standard",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T039",
+      "sprint": "S003",
+      "title": "Audit log dùng chung",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ADM-01"
+      ],
+      "dependencies": [
+        "T008"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Admin/Admin.Application/Audit/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-ADM-04, SC-ADM-05"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T040",
+      "sprint": "S003",
+      "title": "FRD Gacha (cửa hàng, chi tiết pack, mở pack) + Collection",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "EP-03",
+        "EP-04",
+        "EP-05"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/frd/FRD-03-gacha.md",
+        "docs/frd/FRD-05-collection.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đạt FRD checklist"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T041",
+      "sprint": "S003",
+      "title": "Storyboard mở pack + màn Collection (handoff)",
+      "workstream": "design",
+      "owner_skill": "product-designer",
+      "source_refs": [
+        "Master §4",
+        "FRD-03"
+      ],
+      "dependencies": [
+        "T040"
+      ],
+      "allowed_files": [
+        "design/pack-opening/**",
+        "design/collection/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Handoff 6 giai đoạn x 6 rarity"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T042",
+      "sprint": "S003",
+      "title": "Dữ liệu seed set Awakening (bản tạm 100 thẻ)",
+      "workstream": "content",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "Master §7.8",
+        "CF-06"
+      ],
+      "dependencies": [
+        "T037"
+      ],
+      "allowed_files": [
+        "backend/seed/awakening/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đủ 100 Card Definition có story tạm"
+      ],
+      "risk_tier": "low",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T043",
+      "sprint": "S003",
+      "title": "QA Wallet + Catalog",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-WAL-03..05",
+        "SC-ADM-*"
+      ],
+      "dependencies": [
+        "T036",
+        "T037",
+        "T038"
+      ],
+      "allowed_files": [
+        "docs/qa/S003/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Test report"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T044",
+      "sprint": "S004",
+      "title": "Mua pack: idempotency, kiểm version tỷ lệ",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-PACK-01",
+        "BR-PACK-04",
+        "US-03.1"
+      ],
+      "dependencies": [
+        "T036",
+        "T037"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Gacha/Gacha.Application/Purchase/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-PACK-05/06/07/10/11/14/15/17"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T045",
+      "sprint": "S004",
+      "title": "Mở pack: thuật toán quay, pity, rng_trace, test thống kê",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-PACK-02..09",
+        "SAD §8"
+      ],
+      "dependencies": [
+        "T044"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Gacha/Gacha.Application/Open/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-PACK-01→04/08/09/12/13/16/18→24"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T046",
+      "sprint": "S004",
+      "title": "Collection API: tiến độ set, quyền đọc story",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-05.2",
+        "US-05.4"
+      ],
+      "dependencies": [
+        "T045"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Collection/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-COL-01→05"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T047",
+      "sprint": "S004",
+      "title": "App: cửa hàng, chi tiết pack (tỷ lệ, pity), mua",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-03.*"
+      ],
+      "dependencies": [
+        "T044",
+        "T021"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/UI/Store/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Mua pack trên thiết bị"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T048",
+      "sprint": "S004",
+      "title": "Web: cửa hàng, chi tiết pack, mua",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-03.*"
+      ],
+      "dependencies": [
+        "T044",
+        "T021"
+      ],
+      "allowed_files": [
+        "web/apps/player/src/app/store/**",
+        "web/apps/player/src/app/packs/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WEB-01"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T049",
+      "sprint": "S004",
+      "title": "FRD Rewards (điểm danh, ads) + Payments (IAP, web)",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "EP-07",
+        "EP-09",
+        "BR-WEB-04"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/frd/FRD-07-rewards.md",
+        "docs/frd/FRD-08-payments.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đạt FRD checklist"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T050",
+      "sprint": "S004",
+      "title": "QA Gacha gồm test đồng thời",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-PACK-*",
+        "SC-WEB-02/03"
+      ],
+      "dependencies": [
+        "T045",
+        "T046"
+      ],
+      "allowed_files": [
+        "docs/qa/S004/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Test report"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T051",
+      "sprint": "S005",
+      "title": "App: PackOpeningDirector + timeline v1 theo rarity + skip/fast",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-04.1..04.5",
+        "US-04.8"
+      ],
+      "dependencies": [
+        "T045",
+        "T041"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/PackOpening/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-PACK-21/22/23 qua giao diện"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T052",
+      "sprint": "S005",
+      "title": "App: album, lọc, chi tiết thẻ, story, cache offline",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-05.*",
+        "NFR-10"
+      ],
+      "dependencies": [
+        "T046",
+        "T041"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Collection/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-COL-06"
+      ],
+      "risk_tier": "standard",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T053",
+      "sprint": "S005",
+      "title": "App: quality profile + giảm chuyển động",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "NFR-01",
+        "NFR-09"
+      ],
+      "dependencies": [
+        "T051"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Core/Quality/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Tắt flash/shake khi bật giảm chuyển động"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T054",
+      "sprint": "S005",
+      "title": "Wireframe Điểm danh, Ads, Nạp Gem (app + web)",
+      "workstream": "design",
+      "owner_skill": "product-designer",
+      "source_refs": [
+        "FRD-07",
+        "FRD-08"
+      ],
+      "dependencies": [
+        "T049"
+      ],
+      "allowed_files": [
+        "design/rewards/**",
+        "design/topup/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Handoff"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T055",
+      "sprint": "S005",
+      "title": "QA hiệu năng trên ma trận thiết bị",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "NFR-01",
+        "NFR-02"
+      ],
+      "dependencies": [
+        "T051",
+        "T053"
+      ],
+      "allowed_files": [
+        "docs/qa/S005/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Báo cáo FPS, thời gian chờ"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T056",
+      "sprint": "S006",
+      "title": "Web: nhúng Unity Web PackOpening + bridge + LiteReveal",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WEB-06",
+        "ADR-004"
+      ],
+      "dependencies": [
+        "T009",
+        "T051"
+      ],
+      "allowed_files": [
+        "web/apps/player/src/components/pack-opening/**",
+        "mobile/AnimaUnity/Assets/Anima/PackOpening/WebBridge/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WEB-12"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T057",
+      "sprint": "S006",
+      "title": "Web: bộ sưu tập, chi tiết thẻ, story (vi/en)",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-05.*"
+      ],
+      "dependencies": [
+        "T046"
+      ],
+      "allowed_files": [
+        "web/apps/player/src/app/collection/**",
+        "web/apps/player/src/app/cards/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Hiển thị đúng tiến độ set"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T058",
+      "sprint": "S006",
+      "title": "Pipeline build Unity Web + đẩy lên CDN",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "TECH_STACK §6.1"
+      ],
+      "dependencies": [
+        "T014",
+        "T056"
+      ],
+      "allowed_files": [
+        ".github/workflows/unity-web.yml"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Build tự động khi đổi PackOpening"
+      ],
+      "risk_tier": "low",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T059",
+      "sprint": "S006",
+      "title": "E2E Playwright: mua → mở → xem bộ sưu tập trên web",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "PRD 7.3"
+      ],
+      "dependencies": [
+        "T048",
+        "T056",
+        "T057"
+      ],
+      "allowed_files": [
+        "web/apps/player/e2e/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "E2E xanh trong CI"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T060",
+      "sprint": "S006",
+      "title": "QA đa nền tảng app ↔ web",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-WEB-01..03"
+      ],
+      "dependencies": [
+        "T048",
+        "T057"
+      ],
+      "allowed_files": [
+        "docs/qa/S006/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Test report"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T061",
+      "sprint": "S007",
+      "title": "Điểm danh, streak, Freeze, mốc thưởng",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-CHK-*"
+      ],
+      "dependencies": [
+        "T036",
+        "T049"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Rewards/Rewards.Application/Checkin/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-CHK-*"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T062",
+      "sprint": "S007",
+      "title": "Ads: phiên xem, SSV webhook, bonus, tier",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ADS-*",
+        "BR-FRD-02"
+      ],
+      "dependencies": [
+        "T036",
+        "T049"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Rewards/Rewards.Application/Ads/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-ADS-*"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T063",
+      "sprint": "S007",
+      "title": "Fraud: Play Integrity/App Attest, cờ thiết bị, captcha",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-FRD-01",
+        "BR-FRD-03"
+      ],
+      "dependencies": [
+        "T025"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Fraud/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-FRD-01, SC-FRD-02"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T064",
+      "sprint": "S007",
+      "title": "Tham số kinh tế có version + job trần chi phí ads",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ECO-03",
+        "BR-ECO-04"
+      ],
+      "dependencies": [
+        "T037"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Rewards/Rewards.Application/Economy/**",
+        "backend/src/Anima.Worker/Jobs/EconomyCap*"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-ECO-03→05"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T065",
+      "sprint": "S007",
+      "title": "App: màn điểm danh, lịch streak, Freeze; tích hợp AppLovin MAX",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-07.1",
+        "US-07.2"
+      ],
+      "dependencies": [
+        "T061",
+        "T062",
+        "T054"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Rewards/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Điểm danh và xem ad trên thiết bị"
+      ],
+      "risk_tier": "standard",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T066",
+      "sprint": "S007",
+      "title": "Chính sách nền tảng: chặn kiếm Coin từ phiên web",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WEB-03"
+      ],
+      "dependencies": [
+        "T061",
+        "T062"
+      ],
+      "allowed_files": [
+        "backend/src/Anima.Api/Policies/Platform*"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WEB-07"
+      ],
+      "risk_tier": "standard",
+      "estimate": "0.5d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T067",
+      "sprint": "S007",
+      "title": "QA Rewards + Fraud",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-CHK-*",
+        "SC-ADS-*",
+        "SC-FRD-*"
+      ],
+      "dependencies": [
+        "T061",
+        "T062",
+        "T063",
+        "T064"
+      ],
+      "allowed_files": [
+        "docs/qa/S007/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Test report"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T068",
+      "sprint": "S008",
+      "title": "IAP: xác thực App Store/Google Play, trạng thái chờ và thử lại",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WAL-02"
+      ],
+      "dependencies": [
+        "T036",
+        "T049"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Payments/Payments.Application/Iap/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WAL-01/06→09"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T069",
+      "sprint": "S008",
+      "title": "Thông báo hoàn tiền store + hạn chế NEGATIVE_GEM",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WAL-04"
+      ],
+      "dependencies": [
+        "T068"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Payments/Payments.Application/Refunds/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WAL-02/10→15, SC-PACK-25"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T070",
+      "sprint": "S008",
+      "title": "Cổng thanh toán web: adapter, đơn nạp, IPN, điều kiện tuổi",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WEB-04",
+        "BR-WEB-07"
+      ],
+      "dependencies": [
+        "T036",
+        "T049"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Payments/Payments.Application/Web/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-WEB-08→11, SC-ACC-04"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T071",
+      "sprint": "S008",
+      "title": "App: luồng mua Unity IAP + trạng thái chờ",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-02.2"
+      ],
+      "dependencies": [
+        "T068",
+        "T054"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Wallet/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Mua sandbox thành công"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T072",
+      "sprint": "S008",
+      "title": "Web: trang nạp Gem + trang kết quả",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-WEB-04"
+      ],
+      "dependencies": [
+        "T070",
+        "T054"
+      ],
+      "allowed_files": [
+        "web/apps/player/src/app/wallet/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Không cộng Gem dựa trên return URL"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T073",
+      "sprint": "S008",
+      "title": "Đối soát hằng ngày IAP + cổng web + kiểm ledger",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "NFR-11"
+      ],
+      "dependencies": [
+        "T068",
+        "T070"
+      ],
+      "allowed_files": [
+        "backend/src/Anima.Worker/Jobs/Reconciliation*"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Báo lệch về 0 trên sandbox"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T074",
+      "sprint": "S008",
+      "title": "QA thanh toán trên sandbox",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-WAL-*",
+        "SC-WEB-08..11"
+      ],
+      "dependencies": [
+        "T068",
+        "T069",
+        "T070",
+        "T071",
+        "T072"
+      ],
+      "allowed_files": [
+        "docs/qa/S008/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Test report"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T075",
+      "sprint": "S009",
+      "title": "Admin: hạn chế/ban/gỡ ban, xem PII có audit",
+      "workstream": "web-admin",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-10.1",
+        "SC-ACC-19"
+      ],
+      "dependencies": [
+        "T033",
+        "T039"
+      ],
+      "allowed_files": [
+        "web/apps/admin/src/resources/accounts/**",
+        "backend/src/Modules/Admin/Admin.Application/Accounts/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-ACC-19, SC-ADM-06/07"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T076",
+      "sprint": "S009",
+      "title": "Admin: bồi thường Coin maker-checker",
+      "workstream": "web-admin",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-ADM-04"
+      ],
+      "dependencies": [
+        "T039"
+      ],
+      "allowed_files": [
+        "web/apps/admin/src/resources/compensations/**",
+        "backend/src/Modules/Admin/Admin.Application/Compensation/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-ADM-10→12"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T077",
+      "sprint": "S009",
+      "title": "Admin: màn tham số kinh tế + duyệt",
+      "workstream": "web-admin",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-10.6"
+      ],
+      "dependencies": [
+        "T064"
+      ],
+      "allowed_files": [
+        "web/apps/admin/src/resources/economy/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Thay đổi có hiệu lực theo thời điểm"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T078",
+      "sprint": "S009",
+      "title": "Analytics server-side: outbox → BigQuery",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "PRD §9"
+      ],
+      "dependencies": [
+        "T008"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Analytics/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Sự kiện kinh tế ghi từ server"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T079",
+      "sprint": "S009",
+      "title": "Sự kiện analytics trên app và web",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "PRD §9"
+      ],
+      "dependencies": [
+        "T078"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Core/Analytics/**",
+        "web/apps/player/src/lib/analytics/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đủ sự kiện client PRD §9"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T080",
+      "sprint": "S009",
+      "title": "5 dashboard (FTUE, retention, kinh tế, doanh thu, animation)",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "PRD §9"
+      ],
+      "dependencies": [
+        "T078",
+        "T079"
+      ],
+      "allowed_files": [
+        "docs/dashboards/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Dashboard có số liệu staging"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T081",
+      "sprint": "S009",
+      "title": "Test phân quyền admin toàn bộ ma trận",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SC-ADM-03",
+        "BRD 12.2"
+      ],
+      "dependencies": [
+        "T075",
+        "T076",
+        "T077"
+      ],
+      "allowed_files": [
+        "backend/tests/Anima.Bdd/Features/Admin/Permissions*"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-ADM-03 đạt"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T082",
+      "sprint": "S010",
+      "title": "Cinematic Legendary/Secret theo timeline từng frame",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "Master §4.5"
+      ],
+      "dependencies": [
+        "T051"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/PackOpening/Cinematic/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Khớp 5 peak moment"
+      ],
+      "risk_tier": "standard",
+      "estimate": "4d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T083",
+      "sprint": "S010",
+      "title": "Âm thanh FMOD 5 layer + haptic",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "Master §4.6, §4.7"
+      ],
+      "dependencies": [
+        "T051"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Audio/**",
+        "mobile/AnimaUnity/Assets/Anima/Haptics/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Sidechain khi DING/BOOM"
+      ],
+      "risk_tier": "standard",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T084",
+      "sprint": "S010",
+      "title": "FTUE + pack tutorial",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "PRD 7.1",
+        "PQ-02"
+      ],
+      "dependencies": [
+        "T051",
+        "T061"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/UI/Ftue/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Mở pack đầu tiên < 2 phút"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T085",
+      "sprint": "S010",
+      "title": "Đa ngôn ngữ vi/en toàn bộ client",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "NFR-08"
+      ],
+      "dependencies": [
+        "T057",
+        "T065"
+      ],
+      "allowed_files": [
+        "web/apps/player/messages/**",
+        "mobile/AnimaUnity/Assets/Anima/Localization/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Không còn chuỗi cứng"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T086",
+      "sprint": "S010",
+      "title": "Accessibility: screen reader, cỡ chữ, giảm chuyển động",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "NFR-09"
+      ],
+      "dependencies": [
+        "T053"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/UI/Accessibility/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đi qua luồng chính bằng screen reader"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T087",
+      "sprint": "S010",
+      "title": "Push nhắc điểm danh",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "PRD 6.2 #17"
+      ],
+      "dependencies": [
+        "T061"
+      ],
+      "allowed_files": [
+        "backend/src/Anima.Worker/Jobs/CheckinReminder*"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Không gửi khi đã điểm danh"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T088",
+      "sprint": "S011",
+      "title": "Load test k6 100k CCU",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "NFR-04"
+      ],
+      "dependencies": [
+        "T045",
+        "T062"
+      ],
+      "allowed_files": [
+        "tests/load/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đạt NFR-04"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T089",
+      "sprint": "S011",
+      "title": "Đánh giá bảo mật: ZAP, MobSF, authz",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "SAD §12"
+      ],
+      "dependencies": [
+        "T074",
+        "T081"
+      ],
+      "allowed_files": [
+        "docs/security/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Không còn lỗi mức cao"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T090",
+      "sprint": "S011",
+      "title": "Dashboard giám sát + cảnh báo",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "SAD §13"
+      ],
+      "dependencies": [
+        "T016"
+      ],
+      "allowed_files": [
+        "infra/observability/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đủ cảnh báo SAD §13"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T091",
+      "sprint": "S011",
+      "title": "Diễn tập backup/restore (cần chốt cloud)",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "NFR-13",
+        "T-02"
+      ],
+      "dependencies": [
+        "T035"
+      ],
+      "allowed_files": [
+        "docs/runbooks/backup-restore.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đạt RPO/RTO"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T092",
+      "sprint": "S011",
+      "title": "Kiểm định thống kê RNG mọi version tỷ lệ trong CI",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "NFR-12"
+      ],
+      "dependencies": [
+        "T045"
+      ],
+      "allowed_files": [
+        "backend/tests/Anima.IntegrationTests/Gacha/Statistics*"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-PACK-16"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T093",
+      "sprint": "S011",
+      "title": "Hồi quy toàn bộ BDD @R1",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "BDD"
+      ],
+      "dependencies": [
+        "T088"
+      ],
+      "allowed_files": [
+        "docs/qa/S011/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Mọi kịch bản @R1 đạt"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T094",
+      "sprint": "S012",
+      "title": "Phát hành closed beta (TestFlight, Play internal, web beta)",
+      "workstream": "release",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "PRD 10"
+      ],
+      "dependencies": [
+        "T093"
+      ],
+      "allowed_files": [
+        "docs/release/beta.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "500–1,000 người dùng beta"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T095",
+      "sprint": "S012",
+      "title": "Hồ sơ store: ảnh, mô tả, nhãn quyền riêng tư, độ tuổi, công khai tỷ lệ",
+      "workstream": "release",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "RK-05"
+      ],
+      "dependencies": [
+        "T094"
+      ],
+      "allowed_files": [
+        "docs/release/store-listing/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Store chấp thuận"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T096",
+      "sprint": "S012",
+      "title": "Checklist pháp lý (Q-20, Q-21, Q-24, Q-31, Q-33, Q-34)",
+      "workstream": "release",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "PRD 10.1"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/release/legal-signoff.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Legal ký xác nhận"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T097",
+      "sprint": "S012",
+      "title": "Sửa lỗi beta (buffer)",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "PRD 10"
+      ],
+      "dependencies": [
+        "T094"
+      ],
+      "allowed_files": [
+        "backend/**",
+        "mobile/**",
+        "web/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Không còn lỗi chặn"
+      ],
+      "risk_tier": "standard",
+      "estimate": "5d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    },
+    {
+      "id": "T098",
+      "sprint": "S012",
+      "title": "Họp go/no-go soft launch",
+      "workstream": "release",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "PRD 10.1"
+      ],
+      "dependencies": [
+        "T095",
+        "T096",
+        "T097"
+      ],
+      "allowed_files": [
+        "docs/release/go-no-go.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đủ launch checklist"
+      ],
+      "risk_tier": "standard",
+      "estimate": "0.5d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": []
+    }
+  ]
+}
