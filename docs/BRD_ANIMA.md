@@ -4,7 +4,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BRD-ANIMA-001 |
-| Phiên bản | 0.4 (Draft) |
+| Phiên bản | 0.5 (Draft) |
 | Ngày | 2026-10-06 |
 | Nguồn | [ANIMA_Master_Document.md](ANIMA_Master_Document.md) v1.0 (2026-10-05) |
 | Trạng thái | **DRAFT — Chờ Product Owner xác nhận** |
@@ -12,13 +12,15 @@
 | Người soạn | Business Analyst |
 | Tài liệu liên quan | [PRD](PRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md), [Solution Design](SOLUTION_DESIGN.md), [Sprint Plan](SPRINT_PLAN.md) |
 
+**Thay đổi v0.5 (2026-10-06) — CR-003:** phát hành toàn cầu với 3 ngôn ngữ: tiếng Việt, tiếng Anh, tiếng Trung (đề xuất cả giản thể và phồn thể). Thêm mục 4.5 (thị trường, đợt phát hành, ngôn ngữ), nhóm quy tắc theo quốc gia BR-GEO và đa ngôn ngữ BR-I18N (mục 10.16, 10.17), sửa NFR-08, NFR-15, thêm NFR-17 → 19, câu hỏi Q-43 → Q-50, rủi ro RK-17 → RK-21.
+
 **Thay đổi v0.4 (2026-10-06) — CR-002:** mô hình tài sản số. Thẻ là tài sản duy nhất, có thể rút về ví riêng dưới dạng NFT (R2, sau gate pháp lý). Thêm: số lượng phát hành giới hạn theo mùa (BR-SUP), mở pack và rèn có thể kiểm chứng bằng commit–reveal (BR-PF), Lò rèn 2 thẻ → 1 thẻ chưa lật (BR-FRG), NFT (BR-NFT), quy đổi Gem ↔ Coin hai chiều (BR-WAL-05 sửa). Sửa BR-ECO-01: Gem/Coin vẫn không rút ra tiền; **công ty không bao giờ mua lại thẻ bằng tiền thật hay tiền mã hóa**. Câu hỏi mới Q-36 → Q-42, rủi ro RK-13 → RK-16.
 
 **Thay đổi v0.3 (2026-10-06) — CR-001:** người chơi dùng được cả **website** lẫn app mobile; admin vẫn là website nội bộ. Thêm mục 4.4 (ma trận tính năng theo nền tảng), nhóm quy tắc BR-WEB (mục 10.11), tích hợp cổng thanh toán web, câu hỏi Q-31 → Q-35 và rủi ro RK-12. Bỏ giả định AS-10 "chỉ có app mobile".
 
 **Thay đổi v0.2 (2026-10-06):** tách lý do hạn chế tài khoản thành `FRAUD` và `NEGATIVE_GEM`. Tài khoản bị hạn chế vì số dư Gem âm được nạp bù và tự gỡ hạn chế khi số dư ≥ 0. Bản v0.1 chặn nạp với mọi tài khoản Restricted nên người chơi bị âm Gem không có cách thoát. Bộ kịch bản BDD đầy đủ chuyển sang [BDD_ANIMA.md](BDD_ANIMA.md).
 
-> **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn và mục 16 có 42 câu hỏi mở cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
+> **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn và mục 16 có 50 câu hỏi mở cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
 
 ### Quy ước ký hiệu
 
@@ -200,6 +202,31 @@ Một tài khoản dùng chung trên cả app và web (BR-WEB-01).
 | Profile công khai (R2) | ✔ | ✔ — link chia sẻ mở trên web |
 | Chợ, đấu giá (R2) | ✔ | ✔ |
 | Feed, chat, leaderboard (R2) | ✔ | ✔ |
+
+## 4.5. Thị trường và ngôn ngữ (CR-003)
+
+### 4.5.1. Ngôn ngữ
+
+| Mã | Ngôn ngữ | Dùng cho | Trạng thái |
+|---|---|---|---|
+| `vi` | Tiếng Việt | Việt Nam | Bắt buộc từ R1 |
+| `en` | Tiếng Anh | Mặc định quốc tế, ngôn ngữ dự phòng | Bắt buộc từ R1 |
+| `zh-Hans` | Tiếng Trung giản thể | Singapore, Malaysia, cộng đồng Hoa ngữ | Bắt buộc từ R1 (Q-43) |
+| `zh-Hant` | Tiếng Trung phồn thể | Đài Loan, Hồng Kông, Ma Cao | Đề xuất bắt buộc từ R1 (Q-43) |
+
+### 4.5.2. Đợt phát hành đề xuất (Q-45)
+
+| Đợt | Thị trường | Ngôn ngữ chính | Ghi chú |
+|---|---|---|---|
+| Soft launch | Việt Nam | vi | Như kế hoạch PRD mục 10 |
+| Đợt 1 toàn cầu | Đông Nam Á (Singapore, Malaysia, Philippines, Thái Lan, Indonesia), Đài Loan, Hồng Kông | en, zh-Hans, zh-Hant | Thị trường gần, eCPM quảng cáo tốt hơn VN, cộng đồng Hoa ngữ lớn |
+| Đợt 2 | Bắc Mỹ, châu Âu, Úc, Nhật, Hàn | en (+ ngôn ngữ mới nếu PO duyệt) | Cần rà luật loot box và tài sản số từng nước |
+| Không phát hành (đề xuất) | Trung Quốc đại lục | — | Cần giấy phép phát hành game (ISBN), dịch vụ Google/Firebase không hoạt động, cấm giao dịch tài sản mã hóa (Q-44) |
+| Chặn hoàn toàn | Quốc gia thuộc danh sách trừng phạt | — | BR-GEO-03 |
+
+### 4.5.3. Tính năng có thể tắt theo quốc gia
+
+Mua pack bằng tiền, Lò rèn, chợ P2P, NFT, rewarded ads, nạp qua web, quy đổi Coin → Gem. Bật/tắt theo ma trận Legal duyệt cho từng thị trường (BR-GEO-02).
 
 ---
 
@@ -619,7 +646,7 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-ACC-01 | Người dùng phải từ 13 tuổi trở lên. Dưới 18 tuổi: cần cơ chế đồng ý của cha mẹ/người giám hộ cho việc nạp tiền và xử lý dữ liệu cá nhân (phạm vi chờ Legal — Q-21). | MD BR-07 + BA |
+| BR-ACC-01 | (Theo BR-GEO-04 từ CR-003: tuổi lấy theo ma trận quốc gia, mặc định như sau.) Người dùng phải từ 13 tuổi trở lên. Dưới 18 tuổi: cần cơ chế đồng ý của cha mẹ/người giám hộ cho việc nạp tiền và xử lý dữ liệu cá nhân (phạm vi chờ Legal — Q-21). | MD BR-07 + BA |
 | BR-ACC-02 | Email và SĐT là duy nhất trong toàn hệ thống. Một SĐT chỉ xác thực cho 1 tài khoản. | MD FR-04 |
 | BR-ACC-03 | Áp dụng cho **thiết bị mobile** (phiên web theo BR-WEB-02). Một thiết bị chỉ gắn với 1 tài khoản. Đăng nhập tài khoản khác trên thiết bị đã gắn bị từ chối. Đổi thiết bị: tài khoản được chuyển sang thiết bị mới tối đa 2 lần/30 ngày; thiết bị cũ bị gỡ gắn. | MD BR-08 + BA (Q-06) |
 | BR-ACC-04 | Chỉ Verified Player được: niêm yết, mua trên chợ, đấu giá, nhắn tin, nhận thưởng referral. Player chưa xác thực được: mở pack, điểm danh, xem ads (Q-07). | BA |
@@ -799,6 +826,31 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 | BR-NFT-08 | Smart contract thực thi số lượng tối đa của mỗi Card Definition (BR-SUP-01). Công ty **không có quyền** thu hồi, sửa hay hủy NFT đang nằm trong ví người chơi. | CR-002 |
 | BR-NFT-09 | Thẻ kiếm được bằng Coin từ quảng cáo được rút như mọi thẻ khác. | CR-002 (quyết định PO) |
 | BR-NFT-10 | Ví liên kết được sàng lọc theo danh sách trừng phạt/rửa tiền trước khi rút; giao dịch rút giá trị cao được ghi nhận cho kiểm tra AML. | CR-002 |
+
+## 10.16. Quốc gia và tuân thủ (GEO) — CR-003
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-GEO-01 | Mỗi tài khoản có một **quốc gia pháp lý** xác định khi đăng ký, theo thứ tự ưu tiên: quốc gia của tài khoản store/phương thức thanh toán → quốc gia của SĐT đã xác thực → quốc gia theo IP. Người chơi không tự đổi; chỉ CS đổi khi có bằng chứng, ghi audit. | CR-003 |
+| BR-GEO-02 | Mỗi quốc gia có một **ma trận tính năng** (bật/tắt và tham số: tuổi tối thiểu, hạn mức). Mọi API của tính năng có thể tắt phải kiểm tra ma trận ở backend và trả `FEATURE_NOT_AVAILABLE_IN_REGION` khi bị tắt. Thay đổi ma trận cần maker-checker và Legal duyệt. | CR-003 |
+| BR-GEO-03 | Không cho đăng ký, đăng nhập, nạp tiền hay rút NFT từ quốc gia trong danh sách trừng phạt (theo quốc gia pháp lý hoặc IP). | CR-003 |
+| BR-GEO-04 | Tuổi tối thiểu và tuổi cần đồng ý của người giám hộ lấy theo ma trận quốc gia (mặc định 13 và 18). Thay thế số cố định trong BR-ACC-01. | CR-003 (Q-46) |
+| BR-GEO-05 | Ở thị trường yêu cầu công bố xác suất **từng vật phẩm**, app hiển thị thêm xác suất của từng Card Definition = tỷ lệ rarity ÷ số Card Definition còn bản trong rarity đó, cập nhật khi số lượng thay đổi. | CR-003 |
+| BR-GEO-06 | Không có phần thưởng nào chỉ nhận được khi gom đủ một bộ vật phẩm lấy từ gacha ở thị trường cấm cơ chế này (ví dụ "kompu gacha" ở Nhật). Mọi tính năng thưởng theo bộ phải khai báo cờ để ma trận quốc gia tắt được. | CR-003 |
+| BR-GEO-07 | Giá trong app theo bảng giá khu vực của store; giá trên web hiển thị bằng tiền tệ địa phương, đã gồm thuế tiêu dùng (VAT/GST) nếu luật nước đó yêu cầu. | CR-003 (Q-49) |
+| BR-GEO-08 | Đổi quốc gia pháp lý không làm mất tài sản; tính năng bị tắt ở quốc gia mới thì tài sản liên quan bị khóa ở trạng thái chỉ xem (ví dụ thẻ đang niêm yết bị gỡ khỏi chợ và trả về Owned). | CR-003 |
+
+## 10.17. Đa ngôn ngữ (I18N) — CR-003
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-I18N-01 | Ngôn ngữ mặc định lấy theo ngôn ngữ thiết bị/trình duyệt nếu thuộc 4 mã hỗ trợ, ngược lại dùng `en`. Người chơi đổi được bất cứ lúc nào; lựa chọn lưu theo tài khoản và đồng bộ giữa app và web. | CR-003 |
+| BR-I18N-02 | Nội dung **pháp lý và tiền tệ** (điều khoản, chính sách quyền riêng tư, tỷ lệ rơi, giá, phí, thông báo giao dịch) phải có đủ 4 bản trước khi phát hành; thiếu bản nào thì không phát hành nội dung đó. Chuỗi giao diện thường được dùng `en` làm dự phòng, CI cảnh báo khi thiếu. | CR-003 |
+| BR-I18N-03 | Story Fragment, tên hiệu thẻ, mô tả set phải có đủ 4 bản trước khi set mở bán. Tên riêng của Anima (Seraphel, Nocturne…) giữ nguyên chữ Latin ở mọi ngôn ngữ; tên hiệu được dịch (ví dụ "the Hopebringer"). | CR-003 (Q-47) |
+| BR-I18N-04 | Mã lỗi nghiệp vụ không đổi theo ngôn ngữ; thông điệp hiển thị cho người dùng lấy theo ngôn ngữ đang chọn. | CR-003 |
+| BR-I18N-05 | Ngày, giờ, số, tiền định dạng theo locale; thời điểm reset ngày vẫn theo múi giờ tài khoản (BR-CHK-01). | CR-003 |
+| BR-I18N-06 | Bộ lọc từ cấm cho tên hiển thị, chat, mô tả niêm yết áp dụng cho cả 4 ngôn ngữ. | CR-003 |
+| BR-I18N-07 | Metadata NFT (R2) có trường tên và mô tả mặc định bằng `en`, kèm bản dịch trong thuộc tính bổ sung. | CR-003 |
 
 ---
 
@@ -1112,6 +1164,9 @@ Mọi quyền được kiểm tra ở backend; client chỉ ẩn/hiện theo quy
 | Tạo mùa, đặt số lượng phát hành (CR-002) | ✘ | M | ✘ | ✘ | ✘ | C |
 | Đổi tỷ lệ rèn, phí rèn, tỷ lệ quy đổi, phí rút NFT | ✘ | ✘ | M | ✘ | ✘ | C |
 | Tạm dừng rút NFT toàn hệ thống (sự cố) | ✘ | ✘ | ✘ | ✔ | ✘ | ✔ |
+| Sửa ma trận tính năng theo quốc gia (CR-003) | ✘ | ✘ | M | ✘ | ✘ | C (sau khi Legal duyệt) |
+| Đổi quốc gia pháp lý của tài khoản (có bằng chứng) | ✔ | ✘ | ✘ | ✔ | ✘ | ✔ |
+| Quản lý bản dịch nội dung thẻ, story | ✘ | ✔ | ✘ | ✘ | ✘ | ✘ |
 
 **Segregation of duties:**
 - Người tạo thay đổi tham số kinh tế không được tự duyệt (BR-ADM-02).
@@ -1184,15 +1239,18 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | NFR-05 | Uptime | 99.9%/tháng cho API cốt lõi (đăng nhập, ví, pack, chợ) | MD |
 | NFR-06 | Tương thích | iOS 14+, Android 8+ | MD |
 | NFR-07 | Kích thước | Bản cài < 200MB; asset set thẻ tải sau | MD |
-| NFR-08 | Ngôn ngữ | Tiếng Việt, tiếng Anh; Story Fragment có bản dịch đầy đủ cả hai | MD |
+| NFR-08 | Ngôn ngữ | Tiếng Việt, tiếng Anh, tiếng Trung giản thể, tiếng Trung phồn thể (CR-003); đủ bản dịch theo BR-I18N-02/03; giao diện không vỡ khi chuỗi dài hơn 40% so với tiếng Anh | MD + CR-003 |
 | NFR-09 | Accessibility | Hỗ trợ screen reader, cỡ chữ hệ thống; chế độ giảm chuyển động tắt flash/shake (an toàn cho người nhạy cảm ánh sáng) | MD + BA |
 | NFR-10 | Offline | Xem bộ sưu tập đã đồng bộ khi offline; mọi giao dịch cần online | MD |
 | NFR-11 | Tính đúng của ledger | Sai lệch giữa số dư và tổng bút toán = 0; kiểm tra tự động hằng ngày | BA |
 | NFR-12 | RNG | Dùng CSPRNG; mỗi version drop rate được kiểm thử thống kê: lệch tỷ lệ thực tế so với công bố trong khoảng tin cậy 99% trên ≥ 1 triệu lượt mô phỏng | BA |
 | NFR-13 | Backup | RPO ≤ 5 phút, RTO ≤ 1 giờ cho dữ liệu ví và thẻ (Q-23) | BA |
 | NFR-14 | Observability | Cảnh báo khi: tỷ lệ lỗi API mua/mở pack > 1% trong 5 phút; SSV thất bại > 5%; lệch đối soát IAP | BA |
-| NFR-15 | Quyền riêng tư | Thu thập đồng ý xử lý dữ liệu cá nhân trước khi đăng ký; tuân thủ Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân (Legal xác nhận phạm vi) | BA |
+| NFR-15 | Quyền riêng tư | Thu thập đồng ý xử lý dữ liệu cá nhân trước khi đăng ký; tuân thủ luật bảo vệ dữ liệu của từng thị trường phát hành: Nghị định 13/2023/NĐ-CP (VN), PDPA (Singapore, Malaysia, Thái Lan), luật dữ liệu cá nhân Đài Loan và Hồng Kông, GDPR (EU, đợt 2), CCPA/CPRA (California, đợt 2) — Legal xác nhận phạm vi | BA + CR-003 |
 | NFR-16 | Chống bot | Rate limit theo tài khoản và thiết bị cho API kinh tế (điểm danh, ads, chợ) | BA |
+| NFR-17 | Độ trễ toàn cầu | API mua/mở pack p95 < 400 ms từ các thị trường đợt 1 (đo tại Singapore, Đài Bắc, Manila, Jakarta); asset tải qua CDN có điểm phân phối tại các thị trường đó | CR-003 |
+| NFR-18 | Kích thước app khi có chữ Trung | Vẫn đạt NFR-07 (< 200MB): font CJK tải theo ngôn ngữ đã chọn qua Addressables, không nhúng sẵn | CR-003 |
+| NFR-19 | Lưu trữ dữ liệu theo quốc gia | Ghi rõ nơi lưu dữ liệu cá nhân cho từng thị trường; có cơ chế chuyển dữ liệu xuyên biên giới hợp lệ (điều khoản hợp đồng mẫu…) theo Legal | CR-003 (Q-50) |
 
 ---
 
@@ -1274,6 +1332,14 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Q-40 | Thẻ rèn ra lấy từ mùa hiện tại hay từ mùa của thẻ đầu vào? | PO | BR-FRG-04 |
 | Q-41 | Ý kiến pháp lý về thẻ NFT rút được về ví và bán ở sàn ngoài, cho VN và từng thị trường mục tiêu; pháp nhân vận hành phần NFT đặt ở đâu? | Legal | BR-NFT-01 |
 | Q-42 | Chọn blockchain nào (T-09) và mức phí rút NFT? | Tech Lead + PO | BR-NFT-03, BR-NFT-04 |
+| Q-43 | Tiếng Trung làm cả giản thể và phồn thể ngay từ R1, hay chỉ một loại? | PO | NFR-08 |
+| Q-44 | Có loại Trung Quốc đại lục khỏi phạm vi phát hành không? (đề xuất: có) | PO + Legal | 4.5.2 |
+| Q-45 | Danh sách và thứ tự thị trường của từng đợt phát hành? | PO + Marketing | 4.5.2, PRD 10 |
+| Q-46 | Ma trận pháp lý từng thị trường: tuổi tối thiểu, loot box, NFT, quảng cáo cho trẻ vị thành niên, giấy phép game? | Legal | BR-GEO-02, 04 |
+| Q-47 | Cách dịch tên thẻ: giữ tên riêng Latin và dịch tên hiệu (đề xuất), hay dịch toàn bộ? | PO + Content | BR-I18N-03 |
+| Q-48 | Hỗ trợ khách hàng bằng những ngôn ngữ nào, thời gian phản hồi bao lâu? | PO + CS | Vận hành |
+| Q-49 | Thuế tiêu dùng khi bán qua web ở nhiều nước: tự đăng ký thuế từng nước hay dùng dịch vụ merchant of record? | Finance + Legal | BR-GEO-07 |
+| Q-50 | Dữ liệu người dùng các thị trường lưu ở đâu; có cần region thứ hai? | Legal + Tech Lead | NFR-19, T-02 |
 
 ---
 
@@ -1299,13 +1365,18 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | RK-14 | Bot/multi-account farm Coin từ quảng cáo rồi rèn và rút thẻ hiếm bán lấy tiền | Cao | BR-FRD-*, BR-FRG-07, BR-WAL-06, KYC khi rút, thời gian chờ | Fraud |
 | RK-15 | Mất NFT do lỗi smart contract hoặc lộ khóa ví lưu ký | Cao | Audit contract độc lập, ví lưu ký dùng multisig/HSM, giới hạn quyền minter | Tech Lead + Security |
 | RK-16 | Mua pack → rút NFT → đòi store hoàn tiền | Cao | Thời gian chờ BR-NFT-02; theo dõi tỷ lệ hoàn tiền | Fraud + Finance |
+| RK-17 | Luật loot box, tài sản số, quảng cáo khác nhau giữa các nước | **Rất cao** | Ma trận tính năng theo quốc gia (BR-GEO-02), phát hành theo đợt, Legal rà từng thị trường trước khi mở | Legal |
+| RK-18 | Bản dịch lore kém làm mất giá trị câu chuyện, nhất là tiếng Trung | Trung bình | Người dịch bản ngữ có kinh nghiệm game; glossary thuật ngữ; review bởi người đọc bản ngữ | Content |
+| RK-19 | Gian lận quốc gia (dùng VPN/SIM nước khác) để hưởng tính năng hoặc tier thưởng | Trung bình | Thứ tự ưu tiên xác định quốc gia BR-GEO-01, đối chiếu quốc gia store/thanh toán | Fraud |
+| RK-20 | Font chữ Trung làm app vượt dung lượng | Trung bình | NFR-18 | Mobile Lead |
+| RK-21 | Chi phí hỗ trợ khách hàng và kiểm duyệt nội dung đa ngôn ngữ | Trung bình | Q-48; công cụ dịch hỗ trợ cho CS; ưu tiên tự phục vụ (trung tâm trợ giúp 4 ngôn ngữ) | PO |
 
 ## 17.2. Ràng buộc
 
 - Tiền trong app không rút ra được (BR-ECO-01).
 - Thanh toán hàng hóa số trong app tuân thủ chính sách App Store và Google Play.
 - Độ tuổi tối thiểu 13+ (BR-ACC-01).
-- Tuân thủ quy định bảo vệ dữ liệu cá nhân tại VN (NFR-15).
+- Tuân thủ quy định bảo vệ dữ liệu cá nhân tại VN và các thị trường phát hành (NFR-15, NFR-19).
 - (CR-002) Công ty không mua lại thẻ bằng tiền thật/tiền mã hóa, không hứa giá hay lợi nhuận; NFT chỉ mở sau gate pháp lý.
 - Công nghệ đã chốt: Unity cho toàn bộ app, backend .NET; cloud chưa chốt (Master Document mục 9, [TECH_STACK.md](TECH_STACK.md)).
 
@@ -1344,6 +1415,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | FR-45, FR-47 → FR-49 | US-09.1, US-09.3 → US-09.5 | BR-ECO-04 | Viết ở FRD | Dashboard doanh thu |
 | FR-50 → FR-55 | US-10.1 → US-10.6 | BR-ADM-01 → BR-ADM-04 | SC-ADM-01 → SC-ADM-14 | Admin |
 | CR-001 (web) | US-01.x, US-02.2, US-03.1, US-04.x, US-05.x trên web | BR-WEB-01 → BR-WEB-07 | SC-WEB-01 → SC-WEB-12 | Toàn bộ màn hình người chơi trên web |
+| CR-003 (toàn cầu, đa ngôn ngữ) | Mọi US có giao diện; tính năng có thể tắt theo quốc gia | BR-GEO-*, BR-I18N-*, NFR-08, NFR-17 → 19 | SC-GEO-*, SC-I18N-* | Mọi màn hình (4 ngôn ngữ); Admin ma trận quốc gia |
 | CR-002 (tài sản số) | Lò rèn, kiểm chứng công bằng, số lượng phát hành, quy đổi, NFT | BR-SUP-*, BR-PF-*, BR-FRG-*, BR-NFT-*, BR-WAL-05/06, BR-ECO-01/02 | SC-SUP-*, SC-PF-*, SC-FRG-*, SC-NFT-*, SC-WAL-16→21 | Lò rèn, Kiểm chứng, Ví NFT (web), Admin mùa & số lượng |
 
 ## 18.2. Analysis Ready checklist

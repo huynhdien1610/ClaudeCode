@@ -84,5 +84,48 @@ window.ANIMA = (function () {
   const MAX_SUPPLY = { common: 50000, uncommon: 20000, rare: 5000, epic: 1000, legendary: 300, secret: 100 };
   /* Lò rèn: lật 1 slot theo tỷ lệ rèn (bằng tỷ lệ 1 slot của pack), không pity, không yếu tố tác động. */
   function revealSealed() { return pickCard(rollRarity()); }
-  return { ELEMENTS, RARITIES, cards, rarityIndex, openPack, revealSealed, MAX_SUPPLY };
+  /* Bản dịch nội dung thẻ (BR-I18N-03): tên riêng giữ Latin; story và nhãn hệ dịch theo ngôn ngữ. */
+  const EL_LABEL = {
+    en: { Luminara: "Hope · Joy", Umbryx: "Fear · Loneliness", Pyraxis: "Anger · Passion", Aqualis: "Sorrow · Nostalgia", Terrakin: "Resolve · Endurance", Ventara: "Freedom · Curiosity", Voltaris: "Excitement · Chaos", Nihilum: "Despair · Emptiness" },
+    "zh-Hans": { Luminara: "希望 · 喜悦", Umbryx: "恐惧 · 孤独", Pyraxis: "愤怒 · 热情", Aqualis: "悲伤 · 怀念", Terrakin: "坚定 · 坚韧", Ventara: "自由 · 好奇", Voltaris: "兴奋 · 混乱", Nihilum: "绝望 · 空虚" },
+    "zh-Hant": { Luminara: "希望 · 喜悅", Umbryx: "恐懼 · 孤獨", Pyraxis: "憤怒 · 熱情", Aqualis: "悲傷 · 懷念", Terrakin: "堅定 · 堅韌", Ventara: "自由 · 好奇", Voltaris: "興奮 · 混亂", Nihilum: "絕望 · 空虛" },
+  };
+  const STORY = {
+    en: {
+      1: "I was born from the smile of a child seeing the sun for the first time after a storm. I don't remember the child's name. But I remember that feeling — the feeling that everything will be all right.",
+      2: "I do not cry. I am the tears. I was born from a man who wept in silence for twenty years. He let no one see. But I saw. I am every tear he never let fall.",
+      3: "I am the anger that was never spoken. I stay loyal to the one who made me, even when they want to forget me.",
+      4: "I carry the sound of waves from a harbor where no one waits anymore. I remember every ship that never came home.",
+      5: "I was made from a promise that was never broken.",
+      6: "I am the \"what if\" of a child standing on a hilltop.",
+      7: "I am the moment everything suddenly becomes clear — and then shatters.",
+      8: "Mother... I'm here...",
+      _: "An everyday feeling of someone, strong enough to crystallize into this small form.",
+    },
+    "zh-Hans": {
+      1: "我诞生于一个孩子在暴风雨后第一次看到太阳时的笑容。我不记得那个孩子的名字，但我记得那种感觉——一切都会好起来的感觉。",
+      2: "我不哭泣。我就是眼泪。我诞生于一个默默哭泣了二十年的男人。他不让任何人看见，但我看见了。我是他所有未曾落下的泪水。",
+      3: "我是从未说出口的愤怒。即使创造我的人想要忘记我，我依然忠于他。",
+      4: "我带着一个再也无人等待的港口的浪声。我记得每一艘没有归来的船。",
+      5: "我由一个从未被打破的承诺铸成。",
+      6: "我是一个站在山顶的孩子心中的“如果”。",
+      7: "我是一切忽然变得清晰——然后破碎的那一刻。",
+      8: "妈妈……我在这里……",
+      _: "某人日常的一份情感，强烈到足以凝结成这个小小的形体。",
+    },
+    "zh-Hant": {
+      1: "我誕生於一個孩子在暴風雨後第一次看到太陽時的笑容。我不記得那個孩子的名字，但我記得那種感覺——一切都會好起來的感覺。",
+      2: "我不哭泣。我就是眼淚。我誕生於一個默默哭泣了二十年的男人。他不讓任何人看見，但我看見了。我是他所有未曾落下的淚水。",
+      3: "我是從未說出口的憤怒。即使創造我的人想要忘記我，我依然忠於他。",
+      4: "我帶著一個再也無人等待的港口的浪聲。我記得每一艘沒有歸來的船。",
+      5: "我由一個從未被打破的承諾鑄成。",
+      6: "我是一個站在山頂的孩子心中的「如果」。",
+      7: "我是一切忽然變得清晰——然後破碎的那一刻。",
+      8: "媽媽……我在這裡……",
+      _: "某人日常的一份情感，強烈到足以凝結成這個小小的形體。",
+    },
+  };
+  function storyOf(c, locale) { if (locale === "vi") return c.story; const m = STORY[locale] || STORY.en; return m[c.id] || m._; }
+  function elLabel(el, locale) { if (locale === "vi") return ELEMENTS[el].label; return (EL_LABEL[locale] || EL_LABEL.en)[el]; }
+  return { ELEMENTS, RARITIES, cards, rarityIndex, openPack, revealSealed, MAX_SUPPLY, storyOf, elLabel };
 })();

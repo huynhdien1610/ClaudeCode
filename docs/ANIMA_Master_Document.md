@@ -1,9 +1,9 @@
 # ANIMA: Echoes of the Heart
 ## Master Document — Dự án App Thẻ bài Số hóa
 
-**Version:** 1.2
+**Version:** 1.3
 **Ngày tạo:** 2026-10-05
-**Cập nhật:** 2026-10-06 — v1.1: thêm mục 9 Kiến trúc & Tech Stack. v1.2: mô hình tài sản số (mục 2.4, 5.7) theo CR-002
+**Cập nhật:** 2026-10-06 — v1.1: thêm mục 9 Kiến trúc & Tech Stack. v1.2: mô hình tài sản số (mục 2.4, 5.7) theo CR-002. v1.3: phát hành toàn cầu, 3 ngôn ngữ (CR-003)
 **Trạng thái:** Concept & Design Phase
 
 ---
@@ -41,6 +41,8 @@ Nền tảng mobile cho phép người dùng mua, mở, sưu tầm và giao dị
 - Người sưu tầm thẻ bài (Millennials, Gen Z)
 - Người chơi free muốn trải nghiệm không trả phí
 - Nhà đầu tư thẻ bài kỹ thuật số
+
+- (CR-003) Phát hành toàn cầu theo đợt: Việt Nam → Đông Nam Á, Đài Loan, Hồng Kông → Bắc Mỹ, châu Âu, Úc, Nhật, Hàn. Ngôn ngữ: tiếng Việt, tiếng Anh, tiếng Trung.
 
 ---
 
@@ -195,7 +197,7 @@ Giá: **1 pack 5 thẻ = $1** (100 Gem hoặc 1,000 Coin). Chi tiết quy tắc 
 | NFR-05 | Uptime | 99.9% |
 | NFR-06 | Tương thích | iOS 14+, Android 8+ |
 | NFR-07 | Kích thước app | < 200MB |
-| NFR-08 | Ngôn ngữ | Tiếng Việt, Anh |
+| NFR-08 | Ngôn ngữ | Tiếng Việt, Anh, Trung (giản thể và phồn thể) — CR-003 |
 | NFR-09 | Accessibility | Screen reader, font size |
 | NFR-10 | Offline mode | Xem bộ sưu tập offline |
 
@@ -948,6 +950,7 @@ Chi tiết đầy đủ nằm ở [TECH_STACK.md](TECH_STACK.md) và [SOLUTION_D
 | 2026-10-06 | Backend .NET (ASP.NET Core, .NET 10 LTS) | Đã chốt |
 | 2026-10-06 | Nhà cung cấp cloud và region dữ liệu | Hoãn, quyết định sau |
 | 2026-10-06 | Người chơi dùng cả website và app mobile; admin là website nội bộ (CR-001) | Đã chốt |
+| 2026-10-06 | Phát hành toàn cầu, giao diện và nội dung bằng tiếng Việt, tiếng Anh, tiếng Trung (CR-003) | Đã chốt; giản thể/phồn thể chờ Q-43 |
 
 ## 9.2. Tech stack theo lớp
 

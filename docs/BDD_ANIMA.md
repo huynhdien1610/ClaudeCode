@@ -4,9 +4,9 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BDD-ANIMA-001 |
-| Phiên bản | 0.3 (Draft) — thêm mục 12B tài sản số (CR-002); 12A website (CR-001) |
+| Phiên bản | 0.4 (Draft) — thêm 12C toàn cầu & đa ngôn ngữ (CR-003); 12B tài sản số (CR-002); 12A website (CR-001) |
 | Ngày | 2026-10-06 |
-| Nguồn | [BRD](BRD_ANIMA.md) v0.4, [PRD](PRD_ANIMA.md) v0.3 |
+| Nguồn | [BRD](BRD_ANIMA.md) v0.5, [PRD](PRD_ANIMA.md) v0.4 |
 | Trạng thái | **DRAFT — một số kịch bản phụ thuộc quyết định của PO** |
 
 Tài liệu này là bộ kịch bản đầy đủ. Mục 11 của BRD chỉ là trích đoạn; khi hai bên khác nhau, tài liệu này là bản chuẩn. Các ID kịch bản trong BRD được giữ nguyên.
@@ -1956,6 +1956,152 @@ Tính năng: NFT — rút và nạp thẻ (BR-NFT) — R2
       Thì server trả mã lỗi NOT_SUPPORTED
 ```
 
+## 12C. Tính năng: Toàn cầu và đa ngôn ngữ — CR-003
+
+```gherkin
+Tính năng: Quốc gia pháp lý và ma trận tính năng (BR-GEO)
+  Bối cảnh chung:
+    Cho trước ma trận tính năng:
+      | quốc gia  | mua pack bằng tiền | Lò rèn | NFT | tuổi tối thiểu |
+      | VN        | bật                | bật    | tắt | 13             |
+      | SG        | bật                | bật    | bật | 13             |
+      | Quốc gia X| tắt                | tắt    | tắt | 16             |
+
+  Quy tắc: BR-GEO-01 — Thứ tự xác định quốc gia pháp lý
+
+    @R1 @happy
+    Sơ đồ kịch bản: SC-GEO-01 — Xác định quốc gia khi đăng ký
+      Cho trước quốc gia store là <store>, quốc gia SĐT là <sđt>, quốc gia IP là <ip>
+      Khi người dùng hoàn tất đăng ký
+      Thì quốc gia pháp lý của tài khoản là <kết quả>
+
+      Ví dụ:
+        | store | sđt | ip  | kết quả |
+        | TW    | VN  | SG  | TW      |
+        | —     | VN  | SG  | VN      |
+        | —     | —   | SG  | SG      |
+
+    @R1 @unauthorized
+    Kịch bản: SC-GEO-02 — Người chơi tự đổi quốc gia
+      Cho trước tài khoản P1 có quốc gia pháp lý VN
+      Khi P1 gửi trực tiếp tới API yêu cầu đổi quốc gia thành SG
+      Thì server từ chối với mã lỗi FORBIDDEN
+      Và quốc gia pháp lý của P1 vẫn là VN
+
+  Quy tắc: BR-GEO-02 — Tính năng bị tắt theo quốc gia
+
+    @R1 @negative
+    Sơ đồ kịch bản: SC-GEO-03 — Gọi tính năng bị tắt
+      Cho trước tài khoản có quốc gia pháp lý <quốc gia>
+      Khi tài khoản gửi yêu cầu <hành động>
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | quốc gia   | hành động                 | kết quả                           |
+        | VN         | rèn 2 thẻ                 | thành công                        |
+        | Quốc gia X | rèn 2 thẻ                 | FEATURE_NOT_AVAILABLE_IN_REGION   |
+        | Quốc gia X | mua pack bằng Gem         | FEATURE_NOT_AVAILABLE_IN_REGION   |
+        | VN         | rút thẻ về ví NFT         | FEATURE_NOT_AVAILABLE_IN_REGION   |
+        | SG         | rút thẻ về ví NFT         | thành công nếu đủ BR-NFT-02       |
+
+    @R1 @negative
+    Kịch bản: SC-GEO-04 — Đổi ma trận không qua duyệt
+      Cho trước Economy Manager "E1" tạo bản nháp bật NFT cho VN
+      Khi E1 tự duyệt bản nháp
+      Thì server từ chối với mã lỗi SELF_APPROVAL_FORBIDDEN
+
+  Quy tắc: BR-GEO-03 — Quốc gia bị trừng phạt
+
+    @R1 @negative
+    Kịch bản: SC-GEO-05 — Đăng ký từ quốc gia bị trừng phạt
+      Cho trước IP của người dùng thuộc một quốc gia trong danh sách trừng phạt
+      Khi người dùng gửi yêu cầu đăng ký
+      Thì server từ chối với mã lỗi REGION_BLOCKED
+      Và không có tài khoản nào được tạo
+
+  Quy tắc: BR-GEO-04 — Tuổi theo quốc gia
+
+    @R1 @bien
+    Sơ đồ kịch bản: SC-GEO-06 — Tuổi tối thiểu theo ma trận
+      Cho trước ngày hiện tại là 2026-10-06 và quốc gia pháp lý là <quốc gia>
+      Khi người dùng sinh ngày <ngày sinh> đăng ký
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | quốc gia   | ngày sinh  | kết quả              |
+        | VN         | 2013-10-06 | thành công           |
+        | Quốc gia X | 2010-10-06 | thành công           |
+        | Quốc gia X | 2010-10-07 | AGE_BELOW_MINIMUM    |
+
+  Quy tắc: BR-GEO-05 — Xác suất từng thẻ
+
+    @R1 @tinhtoan
+    Kịch bản: SC-GEO-07 — Hiển thị xác suất từng Card Definition
+      Cho trước thị trường của P1 yêu cầu công bố xác suất từng vật phẩm
+      Và Legendary có tỷ lệ 4% mỗi slot, gồm 2 Card Definition còn bản
+      Khi P1 xem tỷ lệ của pack
+      Thì mỗi Card Definition Legendary hiển thị xác suất 2% mỗi slot
+      Và khi chỉ còn 1 Card Definition Legendary còn bản, thẻ đó hiển thị 4% mỗi slot
+
+  Quy tắc: BR-GEO-08 — Đổi quốc gia không mất tài sản
+
+    @R2 @trangthai
+    Kịch bản: SC-GEO-08 — Chuyển sang quốc gia tắt chợ
+      Cho trước P1 có quốc gia pháp lý SG và một thẻ đang niêm yết trên chợ
+      Khi CS đổi quốc gia pháp lý của P1 sang Quốc gia X có bằng chứng, ghi audit
+      Thì listing bị gỡ và thẻ trở về trạng thái "Owned"
+      Và mọi thẻ, Gem, Coin của P1 giữ nguyên
+
+Tính năng: Đa ngôn ngữ (BR-I18N)
+
+  Quy tắc: BR-I18N-01 — Ngôn ngữ mặc định và đồng bộ
+
+    @R1 @happy
+    Sơ đồ kịch bản: SC-I18N-01 — Chọn ngôn ngữ mặc định
+      Cho trước ngôn ngữ thiết bị là <thiết bị>
+      Khi người dùng mở app lần đầu
+      Thì ngôn ngữ giao diện là <kết quả>
+
+      Ví dụ:
+        | thiết bị | kết quả |
+        | vi-VN    | vi      |
+        | zh-TW    | zh-Hant |
+        | zh-CN    | zh-Hans |
+        | zh-SG    | zh-Hans |
+        | ja-JP    | en      |
+
+    @R1 @happy
+    Kịch bản: SC-I18N-02 — Đổi ngôn ngữ trên app, web theo
+      Cho trước P1 đang dùng ngôn ngữ vi trên app và web
+      Khi P1 đổi ngôn ngữ thành zh-Hant trên app
+      Thì lần tải trang kế tiếp trên website hiển thị zh-Hant
+
+  Quy tắc: BR-I18N-02 / BR-I18N-03 — Đủ bản dịch trước khi phát hành
+
+    @R1 @negative
+    Kịch bản: SC-I18N-03 — Mở bán set thiếu bản dịch story
+      Cho trước set "Awakening" có 100 Story Fragment, trong đó 3 chưa có bản zh-Hant
+      Khi Content Manager gửi duyệt mở bán set
+      Thì server từ chối với mã lỗi TRANSLATION_INCOMPLETE
+      Và phản hồi liệt kê 3 Card Definition và ngôn ngữ còn thiếu
+
+    @R1 @bien
+    Kịch bản: SC-I18N-04 — Chuỗi giao diện thiếu bản dịch
+      Cho trước chuỗi "forge.title" chưa có bản zh-Hans
+      Khi người chơi dùng zh-Hans mở màn Lò rèn
+      Thì chuỗi hiển thị bằng tiếng Anh
+      Và báo cáo CI liệt kê "forge.title" thiếu zh-Hans
+
+  Quy tắc: BR-I18N-04 — Mã lỗi không đổi theo ngôn ngữ
+
+    @R1 @happy
+    Kịch bản: SC-I18N-05 — Cùng lỗi, khác ngôn ngữ
+      Cho trước P1 có 999 Coin và đang dùng zh-Hans
+      Khi P1 mua pack giá 1,000 Coin
+      Thì mã lỗi trả về là INSUFFICIENT_BALANCE
+      Và thông điệp hiển thị bằng tiếng Trung giản thể
+```
+
 ---
 
 ## 13. Rà soát edge case
@@ -2070,12 +2216,24 @@ Tính năng: NFT — rút và nạp thẻ (BR-NFT) — R2
 | BR-NFT-08 | — | — | SC-NFT-12 |
 | BR-NFT-09 | SC-NFT-05 | — | — |
 | BR-NFT-10 | — | — | SC-NFT-03 |
+| BR-GEO-01 | SC-GEO-01 | SC-GEO-01 | SC-GEO-02 |
+| BR-GEO-02 | SC-GEO-03 | — | SC-GEO-03, SC-GEO-04 |
+| BR-GEO-03 | — (rule cấm) | — | SC-GEO-05 |
+| BR-GEO-04 | SC-GEO-06 | SC-GEO-06 | SC-GEO-06 |
+| BR-GEO-05 | SC-GEO-07 | SC-GEO-07 | — |
+| BR-GEO-06 | Kiểm tra cấu hình khi thêm tính năng thưởng theo bộ (hiện chưa có tính năng nào) | — | — |
+| BR-GEO-07 | Kiểm tra trên store và cổng thanh toán từng nước | — | — |
+| BR-GEO-08 | SC-GEO-08 | — | — |
+| BR-I18N-01 | SC-I18N-01, SC-I18N-02 | SC-I18N-01 | — |
+| BR-I18N-02, 03 | — | SC-I18N-04 | SC-I18N-03 |
+| BR-I18N-04 | SC-I18N-05 | — | — |
+| BR-I18N-05, 06, 07 | Kiểm thử bản địa hóa (QA) | — | — |
 
 Ô "—" ở cột Happy/Biên nghĩa là rule đó chỉ mô tả hành vi chặn hoặc không có giá trị ngưỡng; lý do được ghi trong ô. Các rule chỉ có cột Negative (BR-CHK-04, BR-REF-03, BR-MKT-02/03/10, BR-FRD-03, BR-ADM-03) là rule cấm; hành vi hợp lệ tương ứng đã nằm trong kịch bản happy của rule khác.
 
 ## 15. Số liệu
 
-- 18 tính năng, 180 kịch bản đơn và 27 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
+- 20 tính năng, 189 kịch bản đơn và 31 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
 - 23 kịch bản/sơ đồ có tag `@cho-*` và 2 dòng ví dụ được đánh dấu `@cho-*`, sẽ cập nhật khi PO trả lời câu hỏi mở trong BRD.
 
 ## 16. Bước tiếp theo

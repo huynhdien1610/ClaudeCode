@@ -3,7 +3,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | SAD-ANIMA-001 |
-| Phiên bản | 0.2 (Draft) — thêm commit–reveal, số lượng phát hành, Lò rèn, NFT (CR-002) |
+| Phiên bản | 0.3 (Draft) — thêm quốc tế hóa và tuân thủ theo quốc gia (CR-003); CR-002 |
 | Ngày | 2026-10-06 |
 | Đầu vào | [BRD](BRD_ANIMA.md) v0.4, [PRD](PRD_ANIMA.md) v0.3, [BDD](BDD_ANIMA.md) v0.3, [Tech Stack](TECH_STACK.md) v0.4 |
 | Trạng thái | Chờ Tech Lead review |
@@ -31,6 +31,7 @@ Tài liệu mô tả **cách xây** hệ thống. Quy tắc nghiệp vụ nằm 
 15. [Chiến lược kiểm thử](#15-chiến-lược-kiểm-thử)
 16. [Rủi ro kỹ thuật, spike và ADR](#16-rủi-ro-kỹ-thuật-spike-và-adr)
 17. [Blockchain và NFT (CR-002)](#17-blockchain-và-nft-cr-002)
+18. [Toàn cầu và đa ngôn ngữ (CR-003)](#18-toàn-cầu-và-đa-ngôn-ngữ-cr-003)
 
 ---
 
@@ -185,6 +186,7 @@ Modules/Gacha/
 | Rewards | Điểm danh, streak, Freeze, rewarded ads (SSV), tham số thưởng có version | BR-CHK-*, BR-ADS-*, BR-ECO-03/04 |
 | Fraud | Cờ thiết bị (Play Integrity/App Attest), điểm rủi ro, captcha, quy tắc gắn cờ | BR-FRD-* |
 | Admin | RBAC admin, audit log, che PII, bồi thường | BR-ADM-01/04 |
+| Compliance | Quốc gia pháp lý, ma trận tính năng theo quốc gia, danh sách trừng phạt, tuổi theo quốc gia | BR-GEO-* |
 | Analytics | Phát sự kiện server-side ra BigQuery | PRD mục 9 |
 
 ### 4.3. Thư viện và quy ước
@@ -663,6 +665,39 @@ sequenceDiagram
 - Chạy toàn bộ luồng trên testnet ít nhất một mùa beta.
 - Runbook sự cố: tạm dừng mint, xoay khóa minter, liên lạc người chơi.
 - Ý kiến pháp lý (Q-41), chọn chuỗi (T-09), KYC và sàng lọc ví (T-10).
+
+---
+
+## 18. Toàn cầu và đa ngôn ngữ (CR-003)
+
+### 18.1. Module Compliance
+
+| Thành phần | Thiết kế |
+|---|---|
+| `compliance.legal_country` | Gán khi đăng ký theo BR-GEO-01; đổi chỉ qua API admin có audit |
+| `compliance.feature_matrix` | Bảng version hóa: quốc gia × tính năng → bật/tắt + tham số (tuổi tối thiểu, tuổi cần người giám hộ, hạn mức); maker-checker, có trường "Legal duyệt bởi" |
+| Policy check | Endpoint filter `[RequiresFeature("forge")]` trên mọi endpoint của tính năng có thể tắt; trả `FEATURE_NOT_AVAILABLE_IN_REGION` |
+| Danh sách trừng phạt | Danh sách quốc gia bị chặn trong cấu hình, kiểm tra ở đăng ký, đăng nhập, nạp, rút NFT (BR-GEO-03) |
+| Xác suất từng thẻ | API `/packs/{id}` trả thêm xác suất từng Card Definition khi ma trận quốc gia yêu cầu (BR-GEO-05) |
+
+### 18.2. Bản địa hóa
+
+| Lớp | Thiết kế |
+|---|---|
+| API | Header `Accept-Language`; ngôn ngữ đã chọn lưu ở `identity.account.locale` (BR-I18N-01) |
+| Mã lỗi | Server trả `code` cố định; client tra thông điệp theo locale. `message` của server chỉ để debug |
+| Nội dung thẻ | `catalog.card_definition_translation(card_definition_id, locale, epithet, story, …)`; kiểm tra đủ 4 locale trước khi mở bán set (SC-I18N-03) |
+| Thông báo, email | Template theo locale |
+| Unity | Unity Localization; font CJK tải theo locale qua Addressables (NFR-18) |
+| Web | next-intl; route có tiền tố locale (`/vi`, `/en`, `/zh-Hans`, `/zh-Hant`) cho trang công khai |
+| CI | Kiểm tra khóa dịch thiếu, chuỗi dài vượt giới hạn, ký tự lạ; chụp ảnh màn hình 4 ngôn ngữ trong e2e |
+
+### 18.3. Hạ tầng toàn cầu
+
+- R1: một region chính (đề xuất Singapore) + CDN toàn cầu cho asset và bản Unity Web.
+- Đo NFR-17 từ các thị trường đợt 1 bằng synthetic monitoring.
+- Region thứ hai và nơi lưu dữ liệu theo luật từng nước: quyết định theo Q-50 (T-12).
+- Thời gian: mọi mốc lưu UTC; ngày nghiệp vụ theo múi giờ tài khoản; sự kiện toàn cầu (mùa, pack giới hạn) công bố theo UTC kèm giờ địa phương.
 
 ---
 

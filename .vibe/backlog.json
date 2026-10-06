@@ -2480,7 +2480,7 @@
     {
       "id": "T085",
       "sprint": "S010",
-      "title": "Đa ngôn ngữ vi/en toàn bộ client",
+      "title": "Đa ngôn ngữ vi/en/zh-Hans/zh-Hant toàn bộ client (hoàn thiện chuỗi)",
       "workstream": "web-player",
       "owner_skill": "build-full-stack",
       "source_refs": [
@@ -2488,7 +2488,9 @@
       ],
       "dependencies": [
         "T057",
-        "T065"
+        "T065",
+        "T114",
+        "T115"
       ],
       "allowed_files": [
         "web/apps/player/messages/**",
@@ -3205,6 +3207,313 @@
       "status": "BACKLOG",
       "context_files": [],
       "change_request": "CR-002"
+    },
+    {
+      "id": "T114",
+      "sprint": "S001",
+      "title": "Unity Localization: bảng chuỗi 4 locale, font CJK tải theo ngôn ngữ (Addressables)",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "NFR-08",
+        "NFR-18",
+        "BR-I18N-01"
+      ],
+      "dependencies": [
+        "T010"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Localization/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đổi ngôn ngữ trong app; font CJK không nhúng sẵn trong bản cài"
+      ],
+      "risk_tier": "low",
+      "estimate": "4h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T115",
+      "sprint": "S001",
+      "title": "Web: next-intl, route theo locale, ngôn ngữ mặc định theo trình duyệt",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "NFR-08",
+        "BR-I18N-01"
+      ],
+      "dependencies": [
+        "T011"
+      ],
+      "allowed_files": [
+        "web/apps/player/messages/**",
+        "web/apps/player/src/i18n/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-I18N-01 trên web"
+      ],
+      "risk_tier": "low",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T113",
+      "sprint": "S002",
+      "title": "Backend: locale theo tài khoản, Accept-Language, quy ước mã lỗi không đổi theo ngôn ngữ",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-I18N-01",
+        "BR-I18N-04"
+      ],
+      "dependencies": [
+        "T024"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Identity/Identity.Application/Locale/**",
+        "backend/src/Anima.Api/Localization/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-I18N-02, SC-I18N-05"
+      ],
+      "risk_tier": "standard",
+      "estimate": "3h",
+      "granularity": "task",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T119",
+      "sprint": "S003",
+      "title": "Xin ma trận pháp lý theo thị trường đợt 1 (Q-44, Q-46)",
+      "workstream": "release",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "CR-003",
+        "RK-17"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/release/market-matrix.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Ma trận tính năng từng nước có Legal ký"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T116",
+      "sprint": "S003",
+      "title": "Glossary lore + nền tảng quản lý bản dịch (T-11) + CI kiểm tra khóa thiếu",
+      "workstream": "content",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "BR-I18N-02",
+        "BR-I18N-03",
+        "RK-18"
+      ],
+      "dependencies": [
+        "T114",
+        "T115"
+      ],
+      "allowed_files": [
+        "docs/i18n/**",
+        ".github/workflows/i18n.yml"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "CI đỏ khi thiếu bản dịch nội dung pháp lý/tiền tệ"
+      ],
+      "risk_tier": "low",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T118",
+      "sprint": "S003",
+      "title": "FRD Compliance: quốc gia pháp lý, ma trận tính năng, tuổi theo quốc gia",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "BR-GEO-*"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/frd/FRD-12-compliance.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đạt FRD checklist"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T117",
+      "sprint": "S004",
+      "title": "Module Compliance: quốc gia pháp lý, ma trận tính năng, danh sách trừng phạt, xác suất từng thẻ",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-GEO-01..05",
+        "BR-GEO-08"
+      ],
+      "dependencies": [
+        "T024",
+        "T118"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Compliance/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-GEO-01→08"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T120",
+      "sprint": "S009",
+      "title": "Admin: ma trận tính năng theo quốc gia, đổi quốc gia pháp lý, quản lý bản dịch thẻ",
+      "workstream": "web-admin",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-GEO-02",
+        "BR-I18N-03"
+      ],
+      "dependencies": [
+        "T117",
+        "T037"
+      ],
+      "allowed_files": [
+        "web/apps/admin/src/resources/compliance/**",
+        "web/apps/admin/src/resources/translations/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Maker-checker cho ma trận; SC-I18N-03"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T121",
+      "sprint": "S010",
+      "title": "Dịch và review bản ngữ toàn bộ nội dung set Awakening (story, tên hiệu) sang en, zh-Hans, zh-Hant",
+      "workstream": "content",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "BR-I18N-03",
+        "RK-18"
+      ],
+      "dependencies": [
+        "T116",
+        "T042"
+      ],
+      "allowed_files": [
+        "backend/seed/awakening/i18n/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "100% Card Definition đủ 4 bản; người đọc bản ngữ duyệt"
+      ],
+      "risk_tier": "standard",
+      "estimate": "5d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T122",
+      "sprint": "S011",
+      "title": "QA bản địa hóa 4 ngôn ngữ: chuỗi tràn, font CJK, định dạng ngày/số/tiền",
+      "workstream": "quality",
+      "owner_skill": "assure-software-quality",
+      "source_refs": [
+        "NFR-08",
+        "NFR-18",
+        "BR-I18N-05"
+      ],
+      "dependencies": [
+        "T121",
+        "T085"
+      ],
+      "allowed_files": [
+        "docs/qa/S011-i18n/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Không còn lỗi hiển thị mức cao ở 4 ngôn ngữ"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
+    },
+    {
+      "id": "T123",
+      "sprint": "S011",
+      "title": "CDN và giám sát độ trễ từ thị trường đợt 1",
+      "workstream": "devops",
+      "owner_skill": "ship-and-operate",
+      "source_refs": [
+        "NFR-17"
+      ],
+      "dependencies": [
+        "T090"
+      ],
+      "allowed_files": [
+        "infra/observability/synthetic/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Có số đo p95 từ ≥ 4 thành phố"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-003"
     }
   ]
 }

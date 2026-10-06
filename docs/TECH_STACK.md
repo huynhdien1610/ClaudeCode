@@ -3,7 +3,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | TECH-ANIMA-001 |
-| Phiên bản | 0.4 — thêm blockchain/NFT cho R2 (CR-002) |
+| Phiên bản | 0.5 — đa ngôn ngữ và phát hành toàn cầu (CR-003) |
 | Ngày | 2026-10-06 |
 | Đầu vào | [Master Document](ANIMA_Master_Document.md) v1.1, [BRD](BRD_ANIMA.md) v0.2, [PRD](PRD_ANIMA.md) v0.1 |
 | Tóm tắt trong | Master Document mục 9 |
@@ -100,6 +100,23 @@ Trải nghiệm mở pack là điểm khác biệt, còn các màn form chỉ ph
 | Responsive | Desktop và trình duyệt mobile | |
 
 **Rủi ro kỹ thuật:** Unity Web trên trình duyệt mobile có giới hạn bộ nhớ, đặc biệt Safari iOS. Spike ở Sprint 0 (T009) phải đo dung lượng, thời gian tải và FPS trước khi chốt; nếu không đạt, website dùng chế độ rút gọn làm mặc định trên trình duyệt mobile.
+
+### 2.5. Đa ngôn ngữ và toàn cầu (CR-003)
+
+| Nhu cầu | Giải pháp | Ghi chú |
+|---|---|---|
+| Ngôn ngữ | `vi`, `en`, `zh-Hans`, `zh-Hant` | Mã theo BCP 47 |
+| Unity | Unity Localization (String Tables, Smart Strings, Asset Tables) | Bảng chuỗi tách theo màn hình |
+| Font | Be Vietnam Pro cho Latin/Việt; Noto Sans SC và Noto Sans TC cho chữ Trung, dạng TextMeshPro dynamic font, tải qua Addressables theo ngôn ngữ đã chọn | Giữ app < 200MB (NFR-18) |
+| Web người chơi, admin | next-intl (ICU MessageFormat) cho web người chơi; admin chỉ cần vi/en | |
+| Quản lý bản dịch | Một nền tảng TMS (ví dụ Crowdin hoặc Lokalise) đồng bộ với repo; glossary thuật ngữ lore | CI báo thiếu khóa dịch (BR-I18N-02) |
+| Nội dung thẻ | Bảng `catalog.card_definition_translation` theo locale; Story, tên hiệu, mô tả set | BR-I18N-03 |
+| Quốc gia | Xác định quốc gia pháp lý (BR-GEO-01) + ma trận tính năng (BR-GEO-02) trong module Compliance | |
+| Geo-IP | Cơ sở dữ liệu geo-IP (ví dụ MaxMind) cập nhật định kỳ | Chỉ là nguồn ưu tiên thấp nhất |
+| Thanh toán web đa tiền tệ | Cổng hỗ trợ nhiều tiền tệ (ví dụ Stripe) cho thị trường ngoài VN, cổng nội địa cho VN; cân nhắc merchant of record để xử lý thuế (Q-49) | |
+| CDN | CDN có điểm phân phối ở các thị trường đợt 1 | NFR-17 |
+
+**Lưu ý thị trường Trung Quốc đại lục:** Firebase, Google Play, AdMob không hoạt động ở đó. Nếu sau này PO quyết định vào thị trường này, cần bộ SDK thay thế và pháp nhân, giấy phép riêng; hiện đề xuất không phát hành (BRD Q-44).
 
 ---
 
@@ -328,7 +345,9 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 | T-07 | Mở pack trên web: Unity Web hay làm lại bằng công nghệ web | Unity Web + chế độ rút gọn; chốt sau spike T009 | Tech Lead | Mở |
 | T-08 | Cổng thanh toán web | Chờ Q-31 | PO + Finance | Mở |
 | T-09 | Blockchain cho NFT | Polygon PoS hoặc Base; chốt sau gate pháp lý | Tech Lead + PO | Mở |
-| T-10 | Nhà cung cấp KYC và sàng lọc ví | So sánh chi phí, hỗ trợ giấy tờ VN | PO + Legal | Mở |
+| T-10 | Nhà cung cấp KYC và sàng lọc ví | So sánh chi phí, hỗ trợ giấy tờ VN và các thị trường đợt 1 | PO + Legal | Mở |
+| T-11 | Nền tảng quản lý bản dịch (TMS) | Crowdin hoặc Lokalise | PO + Tech Lead | Mở |
+| T-12 | Region dữ liệu thứ hai cho người dùng ngoài châu Á | Chờ Q-50 | Tech Lead + Legal | Mở |
 
 ---
 

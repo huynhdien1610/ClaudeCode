@@ -1,5 +1,6 @@
 /* ANIMA prototype — giao diện sáng, phẳng. Token dùng chung cho app, web người chơi và admin. */
 :root {
+  /* Chữ Trung dùng Noto Sans SC/TC (BR-I18N, NFR-18); :lang() chọn đúng bộ chữ. */
   --bg: #f6f4ef;
   --bg-2: #efebe3;
   --surface: #ffffff;
@@ -28,7 +29,7 @@
   --radius: 10px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(28, 26, 23, 0.06), 0 4px 12px rgba(28, 26, 23, 0.05);
-  --font: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans SC", "Noto Sans TC", "PingFang SC", "PingFang TC", "Microsoft YaHei", sans-serif;
   --font-display: "Lora", Georgia, "Times New Roman", serif;
 }
 
@@ -122,3 +123,6 @@ code.err { color: var(--danger); font-size: 12px; }
   .card .inner { transition-duration: 0.01s !important; }
   .card.holo .art::after { animation: none; }
 }
+
+:lang(zh-Hans) body, :lang(zh-Hans) { --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Be Vietnam Pro", sans-serif; }
+:lang(zh-Hant) body, :lang(zh-Hant) { --font: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Be Vietnam Pro", sans-serif; }

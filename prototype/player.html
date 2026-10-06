@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ANIMA — Prototype người chơi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:wght@700&display=swap&subset=vietnamese" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap&subset=vietnamese" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css">
 <style>
   /* Thanh điều khiển của prototype (không thuộc sản phẩm) */
@@ -118,6 +118,7 @@
   </span>
   <label class="row" style="font-size:13px;display:flex"><input type="checkbox" id="reduced"> Giảm chuyển động</label>
   <label class="row" style="font-size:13px;display:flex"><input type="checkbox" id="fast"> Fast mode</label>
+  <label>Ngôn ngữ <select id="langSel"></select></label>
   <button class="btn sm ghost" id="newday">Sang ngày mới (demo)</button>
   <button class="btn sm ghost" id="reset">Đặt lại dữ liệu</button>
   <span class="tag">Dữ liệu giả, lưu trên trình duyệt này</span>
@@ -167,18 +168,24 @@
 <div class="fake-ad" id="fakead"><div><h2>Quảng cáo (giả lập)</h2><p id="adtimer">3</p><small>Phần thưởng chỉ được cộng khi server nhận xác nhận từ ad network (SSV)</small></div></div>
 
 <script src="assets/data.js"></script>
+<script src="assets/i18n.js"></script>
 <script>
 (() => {
   const A = window.ANIMA;
   const $ = (s, el = document) => el.querySelector(s);
   const KEY = "anima-proto-v2";
   const fresh = () => ({ coin: 1300, gem: 120, pity: 17, unopened: 0, collection: {}, inst: [], issued: {}, sealed: 0, forgedToday: 0, gemFromCoinToday: 0, nonce: 1, seedHash: "9bda19bd88620c85d06a774f70f150a0379a20995f91a3525caf895375f6ccdf", revealed: [], streak: 4, checkedToday: false, day: 5,
-    freeze: 1, adsToday: 0, lastAdAt: 0, ledger: [["Thưởng đăng nhập lần đầu", "+100 Coin"], ["Hoàn thành tutorial", "+200 Coin"], ["Điểm danh ngày 4", "+50 Coin"]],
+    freeze: 1, adsToday: 0, lastAdAt: 0, ledger: [[["lg.firstLogin"], "+100 Coin"], [["lg.tutorial"], "+200 Coin"], [["lg.checkin", { n: 4 }], "+50 Coin"]],
     recent: [], phoneVerified: false, deletion: false });
   let S;
   try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch (e) { S = fresh(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
-  const fmt = (n) => n.toLocaleString("vi-VN");
+  const I = window.ANIMA_I18N;
+  if (!S.locale) S.locale = I.detect(navigator.language);
+  let t = I.make(S.locale);
+  const fmt = (n) => n.toLocaleString(I.NUMBER_LOCALE[S.locale] || "en-US");
+  const rName = (key) => t("r." + key);
+  function setLocale(l) { S.locale = l; t = I.make(l); document.documentElement.lang = l; const sel = document.getElementById("langSel"); if (sel) sel.value = l; save(); route(); }
   const mode = () => (document.body.classList.contains("mode-web") ? "web" : "app");
   const reduced = () => $("#reduced").checked;
   if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) $("#reduced").checked = true;
@@ -198,9 +205,9 @@
     forge: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h11l3-3h2v4l-3 3v1H7l-3-3z"/><path d="M8 15v3M14 15v3M6 21h10"/></svg>',
     account: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
   };
-  const NAV = [["home", "Trang chủ"], ["store", "Cửa hàng"], ["collection", "Bộ sưu tập"], ["forge", "Lò rèn"], ["rewards", "Nhận thưởng", "Thưởng"], ["account", "Tài khoản"]];
+  const NAV = [["home", "nav.home"], ["store", "nav.store"], ["collection", "nav.collection"], ["forge", "nav.forge"], ["rewards", "nav.rewards", "nav.rewardsShort"], ["account", "nav.account"]];
   function renderNav(cur) {
-    const link = (short) => NAV.map(([k, l, sl]) => `<a href="#${k}" class="${cur === k ? "on" : ""}">${ICON[k]}${short && sl ? sl : l}</a>`).join("");
+    const link = (short) => NAV.map(([k, l, sl]) => `<a href="#${k}" class="${cur === k ? "on" : ""}">${ICON[k]}${t(short && sl ? sl : l)}</a>`).join("");
     $("#topnav").innerHTML = link(false);
     $("#bottomnav").innerHTML = link(true);
     $("#gemv").textContent = fmt(S.gem);
@@ -214,7 +221,7 @@
       <div class="inner"><div class="back">A</div>
       <div class="face"><div class="art">${locked ? "?" : el.glyph}</div>
       <div class="name">${locked ? "???" : c.name}</div>
-      <div class="meta"><span>${c.element}</span><span class="rarity-text">${r.name}</span></div></div></div></div>`;
+      <div class="meta"><span>${c.element}</span><span class="rarity-text">${rName(c.rarity)}</span></div></div></div></div>`;
   }
   const owned = () => Object.keys(S.collection).length;
   /* Mỗi thẻ là một bản duy nhất: serial + số thứ tự trong edition (BR-SUP-02). */
@@ -241,162 +248,163 @@
     home() {
       const best = S.recent.slice(0, 5).map((id) => A.cards.find((c) => c.id === id));
       return `<div class="screen">
-        <div><h1>Chào Keeper</h1><p>Heart-Song hôm nay vang lên từ hệ <b>Luminara</b>.</p></div>
+        <div><h1>${t("home.hello")}</h1><p>${t("home.heartsong")}</p></div>
         <div class="hero"><div class="pack-art">AWAKENING<br><small>Standard</small></div>
-          <div><h2>Set Awakening</h2><p>5 thẻ mỗi pack · 1,000 Coin hoặc 100 Gem</p>
-          <div class="row wrap"><a class="btn primary" href="#pack">Mở pack</a><span class="chip">Pity ${S.pity}/50</span></div></div></div>
+          <div><h2>${t("home.set")}</h2><p>${t("home.packInfo", { coin: fmt(1000), gem: fmt(100) })}</p>
+          <div class="row wrap"><a class="btn primary" href="#pack">${t("btn.openPack")}</a><span class="chip">Pity ${S.pity}/50</span></div></div></div>
         <div class="cols">
-          <div class="panel"><div class="row"><h3>Tiến độ bộ sưu tập</h3><span class="spacer"></span><b>${owned()}/${total}</b></div>
+          <div class="panel"><div class="row"><h3>${t("home.progress")}</h3><span class="spacer"></span><b>${owned()}/${total}</b></div>
             <div class="progress"><i style="width:${(owned() / total) * 100}%"></i></div>
-            <small>Prototype dùng ${total} thẻ mẫu; set thật có 100 thẻ (BRD CF-06).</small></div>
-          <div class="panel app-only"><div class="row"><h3>Chuỗi điểm danh: ${S.streak} ngày</h3><span class="spacer"></span><a class="btn sm" href="#rewards">${S.checkedToday ? "Đã điểm danh" : "Điểm danh"}</a></div>
-            <small>Ads hôm nay: ${S.adsToday}/10</small></div>
-          <div class="panel web-only"><h3>Chuỗi điểm danh: ${S.streak} ngày</h3>
-            <div class="note">Điểm danh và xem quảng cáo nhận Coin chỉ có trên app mobile ở bản đầu (BR-WEB-03).</div></div>
+            <small>${t("home.sampleNote", { n: total })}</small></div>
+          <div class="panel app-only"><div class="row"><h3>${t("home.streak", { n: S.streak })}</h3><span class="spacer"></span><a class="btn sm" href="#rewards">${S.checkedToday ? t("btn.checkedIn") : t("btn.checkin")}</a></div>
+            <small>${t("home.adsToday")}: ${S.adsToday}/10</small></div>
+          <div class="panel web-only"><h3>${t("home.streak", { n: S.streak })}</h3>
+            <div class="note">${t("home.webOnlyApp")}</div></div>
         </div>
-        <div class="panel"><div class="row"><div><h3>Lò rèn</h3><p style="margin:0">2 thẻ không cần + 50 Coin → 1 thẻ chưa lật.</p></div><span class="spacer"></span><a class="btn" href="#forge">Vào lò</a></div></div>
-        <div class="panel"><h3>Vừa mở được</h3>${best.length ? `<div class="card-grid">${best.map((c) => cardHTML(c)).join("")}</div>` : "<p>Chưa mở pack nào. Thử mở một pack nhé!</p>"}</div>
+        <div class="panel"><div class="row"><div><h3>${t("nav.forge")}</h3><p style="margin:0">${t("home.forgeDesc")}</p></div><span class="spacer"></span><a class="btn" href="#forge">${t("btn.enterForge")}</a></div></div>
+        <div class="panel"><h3>${t("home.recent")}</h3>${best.length ? `<div class="card-grid">${best.map((c) => cardHTML(c)).join("")}</div>` : `<p>${t("home.noPulls")}</p>`}</div>
       </div>`;
     },
     store() {
-      return `<div class="screen"><h1>Cửa hàng</h1>
+      return `<div class="screen"><h1>${t("nav.store")}</h1>
         <div class="hero"><div class="pack-art">AWAKENING<br><small>Standard</small></div>
-          <div><h2>Awakening Standard</h2><p>5 thẻ · đủ 6 bậc rarity · pity 50 pack</p>
-          <div class="row wrap"><a class="btn primary" href="#pack">Xem chi tiết</a><span class="chip"><b class="cur coin">1.000</b> Coin</span><span class="chip"><b class="cur gem">100</b> Gem</span></div></div></div>
+          <div><h2>Awakening Standard</h2><p>${t("store.desc")}</p>
+          <div class="row wrap"><a class="btn primary" href="#pack">${t("btn.details")}</a><span class="chip"><b class="cur coin">${fmt(1000)}</b> Coin</span><span class="chip"><b class="cur gem">100</b> Gem</span></div></div></div>
         <div class="panel"><div class="row"><div class="pack-art" style="width:64px;font-size:10px;border-color:#a78bfa">PREMIUM</div>
-          <div><h3>Awakening Premium <span class="chip">Đề xuất — PQ-07</span></h3><p>Chờ số liệu beta để quyết định.</p></div></div></div>
-        <div class="panel"><h3>Gói Gem</h3><p>Nạp trong <a href="#wallet">Ví</a>. ${mode() === "web" ? "Website thanh toán qua cổng thanh toán." : "App thanh toán qua App Store / Google Play."}</p></div>
+          <div><h3>Awakening Premium <span class="chip">${t("st.proposal")}</span></h3><p>${t("st.premiumNote")}</p></div></div></div>
+        <div class="panel"><h3>${t("store.gemPacks")}</h3><p>${t("store.topupIn")} <a href="#wallet">${t("nav.wallet")}</a>. ${mode() === "web" ? t("store.payWeb") : t("store.payApp")}</p></div>
       </div>`;
     },
     pack() {
-      const rows = A.RARITIES.map((r) => `<tr class="rarity-${r.key}"><td><span class="rarity-text">${r.name}</span></td><td>${r.vi}</td><td style="text-align:right">${r.odds}%</td></tr>`).join("");
-      return `<div class="screen"><a href="#store" class="muted">← Cửa hàng</a>
+      const rows = A.RARITIES.map((r) => `<tr class="rarity-${r.key}"><td><span class="rarity-text">${rName(r.key)}</span></td><td style="text-align:right">${r.odds}%</td></tr>`).join("");
+      return `<div class="screen"><a href="#store" class="muted">← ${t("nav.store")}</a>
         <div class="cols">
           <div class="panel"><div class="row"><div class="pack-art">AWAKENING<br><small>Standard</small></div>
-            <div><h2>Awakening Standard</h2><p>5 thẻ mỗi pack. Kết quả do server quyết định trước khi trình diễn.</p>
-            <span class="chip">Bạn còn ${S.unopened} pack chưa mở</span></div></div>
+            <div><h2>Awakening Standard</h2><p>${t("pack.desc")}</p>
+            <span class="chip">${t("pack.unopened", { n: S.unopened })}</span></div></div>
             <div class="grid" style="margin-top:14px">
-              <div class="row wrap"><button class="btn primary" id="buyCoin">Mua bằng 1.000 Coin</button><button class="btn" id="buyGem">Mua bằng 100 Gem</button></div>
-              ${S.unopened ? `<button class="btn" id="openNow">Mở pack đang có (${S.unopened})</button>` : ""}
+              <div class="row wrap"><button class="btn primary" id="buyCoin">${t("btn.buyCoin", { n: fmt(1000) })}</button><button class="btn" id="buyGem">${t("btn.buyGem", { n: 100 })}</button></div>
+              ${S.unopened ? `<button class="btn" id="openNow">${t("btn.openOwned", { n: S.unopened })}</button>` : ""}
             </div></div>
-          <div class="panel"><div class="row"><h3>Tỷ lệ rơi mỗi thẻ</h3><span class="spacer"></span><span class="chip">Version v1</span></div>
+          <div class="panel"><div class="row"><h3>${t("pack.odds")}</h3><span class="spacer"></span><span class="chip">Version v1</span></div>
             <table class="odds"><tbody>${rows}</tbody></table>
-            <div style="margin-top:10px"><div class="row"><b>Bảo đảm (pity)</b><span class="spacer"></span>${S.pity}/50</div>
+            <div style="margin-top:10px"><div class="row"><b>${t("pack.pity")}</b><span class="spacer"></span>${S.pity}/50</div>
             <div class="progress"><i style="width:${(S.pity / 50) * 100}%"></i></div>
-            <small>Sau 49 pack liên tiếp không có Legendary trở lên, pack thứ 50 chắc chắn có ít nhất 1 Legendary.</small></div>
-            <div class="note warn" style="margin-top:10px">Tỷ lệ là bản đề xuất (BRD DT-01 phương án A), chờ PO chốt.</div></div>
+            <small>${t("pack.pityDesc")}</small></div>
+            <div class="note warn" style="margin-top:10px">${t("pack.oddsNote")}</div></div>
         </div></div>`;
     },
     collection() {
       const f = screens._filter || { el: "", r: "", q: "" };
       const list = A.cards.slice().sort((a, b) => (!!S.collection[b.id] - !!S.collection[a.id]) || (A.rarityIndex(b.rarity) - A.rarityIndex(a.rarity))).filter((c) => (!f.el || c.element === f.el) && (!f.r || c.rarity === f.r) && (!f.q || c.name.toLowerCase().includes(f.q.toLowerCase())));
       const els = Object.keys(A.ELEMENTS).map((e) => `<option ${f.el === e ? "selected" : ""}>${e}</option>`).join("");
-      const rs = A.RARITIES.map((r) => `<option value="${r.key}" ${f.r === r.key ? "selected" : ""}>${r.name}</option>`).join("");
-      return `<div class="screen"><div class="row"><h1>Bộ sưu tập</h1><span class="spacer"></span><b>${owned()}/${total}</b></div>
+      const rs = A.RARITIES.map((r) => `<option value="${r.key}" ${f.r === r.key ? "selected" : ""}>${rName(r.key)}</option>`).join("");
+      return `<div class="screen"><div class="row"><h1>${t("nav.collection")}</h1><span class="spacer"></span><b>${owned()}/${total}</b></div>
         <div class="progress"><i style="width:${(owned() / total) * 100}%"></i></div>
-        <div class="row wrap"><input id="q" placeholder="Tìm theo tên" value="${f.q}" style="flex:1;min-width:140px">
-          <select id="fel"><option value="">Mọi hệ</option>${els}</select><select id="fr"><option value="">Mọi rarity</option>${rs}</select></div>
+        <div class="row wrap"><input id="q" placeholder="${t("col.search")}" value="${f.q}" style="flex:1;min-width:140px">
+          <select id="fel"><option value="">${t("col.allEl")}</option>${els}</select><select id="fr"><option value="">${t("col.allR")}</option>${rs}</select></div>
         <div class="card-grid">${list.map((c) => cardHTML(c, { locked: !S.collection[c.id], count: S.collection[c.id] || 0 })).join("")}</div>
-        <small class="app-only">Bộ sưu tập xem được khi offline (dữ liệu đồng bộ lần cuối).</small></div>`;
+        <small class="app-only">${t("col.offline")}</small></div>`;
     },
     card(id) {
       const c = A.cards.find((x) => x.id === +id);
       if (!c) return screens.collection();
       const has = S.collection[c.id];
       const el = A.ELEMENTS[c.element];
-      return `<div class="screen"><a href="#collection" class="muted">← Bộ sưu tập</a>
+      return `<div class="screen"><a href="#collection" class="muted">← ${t("nav.collection")}</a>
         <div class="cols"><div style="display:grid;place-items:center">${cardHTML(c, { locked: !has, w: "min(70vw,240px)" })}</div>
-        <div class="panel"><h2>${has ? c.name : "Chưa sở hữu"}</h2>
-          <div class="row wrap"><span class="chip">${el.glyph} ${c.element} · ${el.label}</span><span class="chip rarity-${c.rarity}"><span class="rarity-text">${A.RARITIES[A.rarityIndex(c.rarity)].name}</span></span>${has ? `<span class="chip">Đang có ×${has}</span>` : ""}</div>
-          <p style="margin-top:10px"><small>Phát hành tối đa ${fmt(A.MAX_SUPPLY[c.rarity])} bản mùa Awakening S1</small></p>
-          ${has ? `<div class="list" style="margin:8px 0 4px">${S.inst.filter((x) => x.id === c.id).map((x) => `<div class="item"><span>Bản <b>${edLabel(x)}</b></span><small>${x.serial}</small></div>`).join("")}</div>` : ""}
-          <h3 style="margin-top:14px">Story Fragment</h3>
-          ${has ? `<p style="font-style:italic;color:var(--text)">“${c.story}”</p>` : `<div class="note">Sở hữu thẻ này để mở câu chuyện. <code class="err">CARD_NOT_COLLECTED</code></div>`}
-          ${has ? `<div class="web-only" style="margin-top:12px"><button class="btn" disabled>Rút về ví (NFT)</button> <small>Mở ở bản R2 sau khi có ý kiến pháp lý; cần KYC, từ 18 tuổi, thẻ giữ đủ 30 ngày.</small></div>
-          <div class="app-only note" style="margin-top:12px">Rút thẻ về ví NFT chỉ làm trên website (bản R2).</div>` : ""}
+        <div class="panel"><h2>${has ? c.name : t("card.notOwned")}</h2>
+          <div class="row wrap"><span class="chip">${el.glyph} ${c.element} · ${A.elLabel(c.element, S.locale)}</span><span class="chip rarity-${c.rarity}"><span class="rarity-text">${rName(c.rarity)}</span></span>${has ? `<span class="chip">${t("card.have", { n: has })}</span>` : ""}</div>
+          <p style="margin-top:10px"><small>${t("card.maxSupply", { n: fmt(A.MAX_SUPPLY[c.rarity]) })}</small></p>
+          ${has ? `<div class="list" style="margin:8px 0 4px">${S.inst.filter((x) => x.id === c.id).map((x) => `<div class="item"><span>${t("card.copy")} <b>${edLabel(x)}</b></span><small>${x.serial}</small></div>`).join("")}</div>` : ""}
+          <h3 style="margin-top:14px">${t("card.story")}</h3>
+          ${has ? `<p style="font-style:italic;color:var(--text)">“${A.storyOf(c, S.locale)}”</p>` : `<div class="note">${t("card.lockedStory")} <code class="err">CARD_NOT_COLLECTED</code></div>`}
+          ${has ? `<div class="web-only" style="margin-top:12px"><button class="btn" disabled>${t("card.withdraw")}</button> <small>${t("card.withdrawNote")}</small></div>
+          <div class="app-only note" style="margin-top:12px">${t("card.appNft")}</div>` : ""}
         </div></div></div>`;
     },
     rewards() {
       const vals = [20, 30, 40, 50, 60, 80, 150];
       const pos = S.streak % 7;
-      const cal = vals.map((v, i) => `<div class="${i < pos ? "done" : ""} ${i === pos && !S.checkedToday ? "today" : ""}">Ngày ${i + 1}<br><b>${v}</b></div>`).join("");
+      const cal = vals.map((v, i) => `<div class="${i < pos ? "done" : ""} ${i === pos && !S.checkedToday ? "today" : ""}">${t("rw.day", { n: i + 1 })}<br><b>${v}</b></div>`).join("");
       const next = [14, 30, 100].find((m) => m > S.streak);
       const cd = Math.max(0, 60 - Math.floor((Date.now() - S.lastAdAt) / 1000));
-      return `<div class="screen"><h1>Nhận thưởng</h1>
-        <div class="web-only note warn">Website không có điểm danh và quảng cáo ở bản đầu (BR-WEB-03). Mở app mobile để nhận Coin. Gửi yêu cầu từ web sẽ bị server từ chối với mã <code class="err">PLATFORM_NOT_SUPPORTED</code>.</div>
-        <div class="panel"><div class="row"><h3>Điểm danh · Streak ${S.streak} ngày</h3><span class="spacer"></span><span class="chip">Streak Freeze: ${S.freeze}/2</span></div>
+      return `<div class="screen"><h1>${t("nav.rewards")}</h1>
+        <div class="web-only note warn">${t("rw.webNote")} <code class="err">PLATFORM_NOT_SUPPORTED</code></div>
+        <div class="panel"><div class="row"><h3>${t("rw.checkinTitle", { n: S.streak })}</h3><span class="spacer"></span><span class="chip">Streak Freeze: ${S.freeze}/2</span></div>
           <div class="cal">${cal}</div>
-          <p style="margin-top:8px">Mốc kế tiếp: <b>${next} ngày</b> (+${{ 14: "200", 30: "1,000", 100: "5,000 + thẻ độc quyền" }[next]} Coin)</p>
-          <div class="row wrap"><button class="btn primary" id="checkin" ${S.checkedToday ? "disabled" : ""}>${S.checkedToday ? "Đã điểm danh hôm nay" : `Điểm danh +${vals[pos]} Coin`}</button>
-          <button class="btn" id="buyFreeze">Mua Freeze (200 Coin)</button></div>
-          <small>Bỏ lỡ 1 ngày mà không có Freeze thì streak về 0.</small></div>
-        <div class="panel"><div class="row"><h3>Xem quảng cáo</h3><span class="spacer"></span><b>${S.adsToday}/10</b></div>
-          <p>Mỗi video +8 Coin · lượt thứ 5 thêm +10 · lượt thứ 10 thêm +20. Cách nhau tối thiểu 60 giây.</p>
-          <div class="row wrap"><button class="btn primary" id="watchAd" ${S.adsToday >= 10 || cd > 0 ? "disabled" : ""}>${S.adsToday >= 10 ? "Hết lượt hôm nay" : cd > 0 ? `Chờ ${cd}s` : "Xem quảng cáo"}</button>
-          ${cd > 0 && S.adsToday < 10 ? `<button class="btn ghost sm" id="skipCd">Bỏ cooldown (demo)</button>` : ""}</div></div>
+          <p style="margin-top:8px">${t("rw.next")}: <b>${t("unit.days", { n: next })}</b> (+${{ 14: fmt(200), 30: fmt(1000), 100: fmt(5000) + " Coin + " + t("rw.exclusive") }[next]}${next === 100 ? "" : " Coin"})</p>
+          <div class="row wrap"><button class="btn primary" id="checkin" ${S.checkedToday ? "disabled" : ""}>${S.checkedToday ? t("btn.checkedToday") : t("btn.checkinPlus", { n: vals[pos] })}</button>
+          <button class="btn" id="buyFreeze">${t("btn.buyFreeze")}</button></div>
+          <small>${t("rw.freezeNote")}</small></div>
+        <div class="panel"><div class="row"><h3>${t("rw.ads")}</h3><span class="spacer"></span><b>${S.adsToday}/10</b></div>
+          <p>${t("rw.adsDesc")}</p>
+          <div class="row wrap"><button class="btn primary" id="watchAd" ${S.adsToday >= 10 || cd > 0 ? "disabled" : ""}>${S.adsToday >= 10 ? t("btn.noAds") : cd > 0 ? t("btn.wait", { n: cd }) : t("rw.ads")}</button>
+          ${cd > 0 && S.adsToday < 10 ? `<button class="btn ghost sm" id="skipCd">${t("btn.skipCd")}</button>` : ""}</div></div>
       </div>`;
     },
     forge() {
       const sel = screens._forgeSel || [];
       const lim = S.phoneVerified ? 100 : 5;
       const items = S.inst.slice().sort((a, b) => A.rarityIndex(A.cards.find((c) => c.id === a.id).rarity) - A.rarityIndex(A.cards.find((c) => c.id === b.id).rarity));
-      const odds = A.RARITIES.map((r) => `<tr class="rarity-${r.key}"><td><span class="rarity-text">${r.name}</span></td><td style="text-align:right">${r.odds}%</td></tr>`).join("");
-      return `<div class="screen"><h1>Lò rèn</h1>
-        <p>Đưa 2 thẻ bất kỳ vào lò cùng phí rèn để nhận 1 thẻ chưa lật. Hai thẻ đưa vào bị hủy vĩnh viễn.</p>
+      const odds = A.RARITIES.map((r) => `<tr class="rarity-${r.key}"><td><span class="rarity-text">${rName(r.key)}</span></td><td style="text-align:right">${r.odds}%</td></tr>`).join("");
+      return `<div class="screen"><h1>${t("nav.forge")}</h1>
+        <p>${t("fg.desc")}</p>
         <div class="cols">
-          <div class="panel"><div class="row"><h3>Chọn 2 thẻ (${sel.length}/2)</h3><span class="spacer"></span><small>Hôm nay đã rèn ${S.forgedToday}/${lim}</small></div>
-            ${items.length < 2 ? `<p>Bạn cần ít nhất 2 thẻ. <a href="#pack">Mở pack</a> để có thêm.</p>` : `<div class="card-grid">${items.map((x) => { const c = A.cards.find((k) => k.id === x.id); return `<div data-pick="${x.serial}" style="position:relative;cursor:pointer;${sel.includes(x.serial) ? "outline:3px solid var(--ink);outline-offset:3px;border-radius:8px" : ""}">${cardHTML(c).replace('data-card=', 'data-x=')}<small style="display:block;text-align:center;margin-top:4px">${edLabel(x)}</small></div>`; }).join("")}</div>`}
+          <div class="panel"><div class="row"><h3>${t("fg.pick")} (${sel.length}/2)</h3><span class="spacer"></span><small>${t("fg.today")} ${S.forgedToday}/${lim}</small></div>
+            ${items.length < 2 ? `<p>${t("fg.needTwo")} <a href="#pack">${t("btn.openPack")}</a> ${t("fg.getMore")}</p>` : `<div class="card-grid">${items.map((x) => { const c = A.cards.find((k) => k.id === x.id); return `<div data-pick="${x.serial}" style="position:relative;cursor:pointer;${sel.includes(x.serial) ? "outline:3px solid var(--ink);outline-offset:3px;border-radius:8px" : ""}">${cardHTML(c).replace('data-card=', 'data-x=')}<small style="display:block;text-align:center;margin-top:4px">${edLabel(x)}</small></div>`; }).join("")}</div>`}
           </div>
           <div class="grid">
-            <div class="panel"><h3>Phí rèn</h3>
+            <div class="panel"><h3>${t("fg.fee")}</h3>
               <label style="display:flex;flex-direction:row;gap:8px;align-items:center"><input type="radio" name="fee" value="coin" checked> 50 Coin</label>
               <label style="display:flex;flex-direction:row;gap:8px;align-items:center"><input type="radio" name="fee" value="gem"> 5 Gem</label>
-              <button class="btn primary" id="doForge" style="margin-top:10px;width:100%" ${sel.length === 2 ? "" : "disabled"}>Rèn</button></div>
-            <div class="panel"><div class="row"><h3>Thẻ chưa lật</h3><span class="spacer"></span><b id="sealedCount">${S.sealed}</b></div>
+              <button class="btn primary" id="doForge" style="margin-top:10px;width:100%" ${sel.length === 2 ? "" : "disabled"}>${t("btn.forge")}</button></div>
+            <div class="panel"><div class="row"><h3>${t("fg.sealed")}</h3><span class="spacer"></span><b id="sealedCount">${S.sealed}</b></div>
               <div id="sealStage" style="display:grid;place-items:center;min-height:${S.sealed ? 0 : 0}px"></div>
-              <button class="btn" id="doReveal" style="width:100%;margin-top:8px" ${S.sealed ? "" : "disabled"}>Lật 1 thẻ</button></div>
-            <div class="panel"><h3>Tỷ lệ khi lật thẻ rèn</h3><table class="odds"><tbody>${odds}</tbody></table>
-              <small>Bằng tỷ lệ một slot của pack Awakening Standard. Không có pity hay vật phẩm nào làm thay đổi tỷ lệ. Kết quả kiểm chứng được (Tài khoản → Kiểm chứng công bằng).</small></div>
+              <button class="btn" id="doReveal" style="width:100%;margin-top:8px" ${S.sealed ? "" : "disabled"}>${t("btn.reveal")}</button></div>
+            <div class="panel"><h3>${t("fg.odds")}</h3><table class="odds"><tbody>${odds}</tbody></table>
+              <small>${t("fg.oddsNote")}</small></div>
           </div>
         </div></div>`;
     },
     wallet() {
       const app = mode() === "app";
       const skus = [["100 Gem", "$0.99"], ["550 Gem", "$4.99"], ["1,200 Gem", "$9.99"], ["2,600 Gem", "$19.99"]];
-      return `<div class="screen"><h1>Ví</h1>
+      return `<div class="screen"><h1>${t("nav.wallet")}</h1>
         <div class="cols"><div class="panel"><div class="row"><div class="kv"><small>Gem</small><b class="cur gem">${fmt(S.gem)}</b></div><span class="spacer"></span><div class="kv"><small>Coin</small><b class="cur coin">${fmt(S.coin)}</b></div></div>
-          <small>Gem và Coin không rút ra tiền thật và không chuyển trực tiếp cho người khác. ANIMA không mua lại thẻ.</small></div>
-        <div class="panel"><h3>Nạp Gem</h3><p>${app ? "Thanh toán qua App Store / Google Play." : "Thanh toán qua cổng thanh toán (VNPay / MoMo — chờ chốt Q-31)."}</p>
+          <small>${t("wl.noCashout")}</small></div>
+        <div class="panel"><h3>${t("wl.topup")}</h3><p>${app ? t("store.payApp") : t("store.payWeb")}</p>
           <div class="grid" style="grid-template-columns:1fr 1fr">${skus.map(([g, p]) => `<button class="btn" data-sku="${g}">${g}<br><small>${p}</small></button>`).join("")}</div>
-          <small>Bảng giá là đề xuất (PRD PQ-04).</small></div></div>
-        <div class="panel"><h3>Quy đổi Gem ↔ Coin</h3>
+          <small>${t("wl.priceNote")}</small></div></div>
+        <div class="panel"><h3>${t("wl.convert")}</h3>
           <div class="grid" style="grid-template-columns:1fr 1fr">
-            <label>Gem → Coin (1 Gem = 9 Coin)<span class="row"><input id="g2c" type="number" min="1" value="10" style="width:100%"><button class="btn" id="doG2C">Đổi</button></span></label>
-            <label>Coin → Gem (11 Coin = 1 Gem)<span class="row"><input id="c2g" type="number" min="11" value="110" style="width:100%"><button class="btn" id="doC2G">Đổi</button></span></label>
+            <label>Gem → Coin (1 Gem = 9 Coin)<span class="row"><input id="g2c" type="number" min="1" value="10" style="width:100%"><button class="btn" id="doG2C">${t("btn.convert")}</button></span></label>
+            <label>Coin → Gem (11 Coin = 1 Gem)<span class="row"><input id="c2g" type="number" min="11" value="110" style="width:100%"><button class="btn" id="doC2G">${t("btn.convert")}</button></span></label>
           </div>
-          <small>Coin → Gem cần xác thực SĐT, tối đa 1.000 Gem/ngày (hôm nay đã đổi ${S.gemFromCoinToday}). Số lẻ không đủ 1 đơn vị không bị trừ.</small></div>
-        <div class="panel"><h3>Lịch sử giao dịch</h3><div class="list">${S.ledger.slice().reverse().slice(0, 12).map(([a, b]) => `<div class="item"><span>${a}</span><b>${b}</b></div>`).join("")}</div></div>
+          <small>${t("wl.convertNote", { n: S.gemFromCoinToday })}</small></div>
+        <div class="panel"><h3>${t("wl.history")}</h3><div class="list">${S.ledger.slice().reverse().slice(0, 12).map(([a, b]) => `<div class="item"><span>${Array.isArray(a) ? t(a[0], a[1]) : a}</span><b>${b}</b></div>`).join("")}</div></div>
       </div>`;
     },
     account() {
-      return `<div class="screen"><h1>Tài khoản</h1>
-        <div class="panel"><h3>Keeper #2049</h3><p>keeper2049@example.com · Đăng nhập bằng Google</p>
-          <div class="row wrap"><span class="chip">${S.phoneVerified ? "Đã xác thực SĐT 090****123" : "Chưa xác thực SĐT"}</span>${S.phoneVerified ? "" : `<button class="btn sm primary" id="verify">Xác thực SĐT</button>`}</div>
-          <small>Cần xác thực SĐT để giao dịch trên chợ (bản sau) và bảo vệ tài khoản.</small></div>
-        <div class="panel"><h3>Thiết bị và phiên đăng nhập</h3><div class="list">
-          <div class="item"><span>iPhone 13 (app) — thiết bị đang gắn</span><small>Đổi thiết bị: tối đa 2 lần / 30 ngày</small></div>
-          <div class="item"><span>Chrome trên Windows (website)</span><small>Phiên web 1/3</small></div></div></div>
-        <div class="panel"><h3>Kiểm chứng công bằng</h3>
-          <p>Kết quả mở pack và lật thẻ rèn được tính từ server seed (giữ bí mật, công bố mã băm trước), client seed của bạn và số thứ tự lần quay.</p>
-          <div class="list"><div class="item"><span>Mã băm server seed</span><small style="word-break:break-all;max-width:60%;text-align:right">${S.seedHash}</small></div>
+      return `<div class="screen"><h1>${t("nav.account")}</h1>
+        <div class="panel"><h3>Keeper #2049</h3><p>keeper2049@example.com · ${t("ac.loginGoogle")}</p>
+          <div class="row wrap"><span class="chip">${S.phoneVerified ? t("ac.verified") + " 090****123" : t("ac.unverified")}</span>${S.phoneVerified ? "" : `<button class="btn sm primary" id="verify">${t("btn.verify")}</button>`}</div>
+          <small>${t("ac.verifyNote")}</small></div>
+        <div class="panel"><h3>${t("ac.devices")}</h3><div class="list">
+          <div class="item"><span>${t("ac.dev1")}</span><small>${t("ac.devLimit")}</small></div>
+          <div class="item"><span>${t("ac.dev2")}</span><small>${t("ac.webSess")}</small></div></div></div>
+        <div class="panel"><h3>${t("ac.fairness")}</h3>
+          <p>${t("ac.fairDesc")}</p>
+          <div class="list"><div class="item"><span>${t("ac.seedHash")}</span><small style="word-break:break-all;max-width:60%;text-align:right">${S.seedHash}</small></div>
             <div class="item"><span>Client seed</span><small>keeper2049</small></div>
-            <div class="item"><span>Lần quay tiếp theo (nonce)</span><small>${S.nonce}</small></div></div>
-          ${S.revealed.length ? `<div class="note" style="margin-top:8px">Seed cũ đã công bố: <code>${S.revealed[S.revealed.length - 1]}</code> — SHA-256 của chuỗi này khớp mã băm đã hiển thị trước đó.</div>` : ""}
-          <div class="row wrap" style="margin-top:10px"><button class="btn" id="rotateSeed">Đổi seed (công bố seed cũ)</button><span class="muted" style="font-size:13px">Công cụ tự tính lại: trang Kiểm chứng trên website</span></div></div>
-        <div class="panel web-only"><h3>Ví NFT</h3><p>Liên kết ví để rút thẻ về ví riêng dưới dạng NFT và nạp lại khi muốn chơi.</p>
-          <button class="btn" disabled>Liên kết ví</button> <small>Bản R2, sau khi có ý kiến pháp lý (BRD BR-NFT-01).</small></div>
-        <div class="panel"><h3>Cài đặt</h3><p>Ngôn ngữ: Tiếng Việt · Âm thanh: bật · Rung: bật · Giảm chuyển động: dùng nút trên thanh prototype</p></div>
-        <div class="panel"><h3>Xóa tài khoản</h3>${S.deletion ? `<p>Tài khoản sẽ bị xóa sau 30 ngày. Đăng nhập lại và hủy yêu cầu trước thời hạn để giữ tài khoản.</p><button class="btn" id="undoDel">Hủy yêu cầu xóa</button>` : `<p>Dữ liệu cá nhân bị xóa sau 30 ngày kể từ khi yêu cầu.</p><button class="btn danger" id="del">Yêu cầu xóa tài khoản</button>`}</div>
+            <div class="item"><span>${t("ac.nonce")}</span><small>${S.nonce}</small></div></div>
+          ${S.revealed.length ? `<div class="note" style="margin-top:8px">${t("ac.revealed")}: <code>${S.revealed[S.revealed.length - 1]}</code> — ${t("ac.revealedNote")}</div>` : ""}
+          <div class="row wrap" style="margin-top:10px"><button class="btn" id="rotateSeed">${t("btn.rotate")}</button><span class="muted" style="font-size:13px">${t("ac.verifyTool")}</span></div></div>
+        <div class="panel web-only"><h3>${t("ac.nft")}</h3><p>${t("ac.nftDesc")}</p>
+          <button class="btn" disabled>${t("btn.linkWallet")}</button> <small>${t("ac.nftNote")}</small></div>
+        <div class="panel"><h3>${t("ac.settings")}</h3><label style="max-width:260px">${t("ac.language")}<select id="langSel2">${I.LOCALES.map(([k, n]) => `<option value="${k}" ${k === S.locale ? "selected" : ""}>${n}</option>`).join("")}</select></label>
+          <p style="margin-top:10px">${t("ac.country")}: VN</p></div>
+        <div class="panel"><h3>${t("ac.delete")}</h3>${S.deletion ? `<p>${t("ac.delPending")}</p><button class="btn" id="undoDel">${t("btn.undoDel")}</button>` : `<p>${t("ac.delInfo")}</p><button class="btn danger" id="del">${t("btn.del")}</button>`}</div>
       </div>`;
     },
   };
@@ -405,6 +413,8 @@
   function route() {
     const [name, arg] = (location.hash.slice(1) || "home").split("/");
     const fn = screens[name] && name[0] !== "_" ? screens[name] : screens.home;
+    $("#skipBtn").textContent = t("btn.skip");
+    document.documentElement.lang = S.locale;
     renderNav(name === "card" ? "collection" : name === "pack" ? "store" : name === "wallet" ? "" : name);
     $("#content").innerHTML = fn(arg);
     $("#content").scrollTop = 0;
@@ -420,20 +430,21 @@
     on("buyGem", () => buy("gem"));
     on("openNow", () => startOpening());
     on("checkin", () => {
-      if (mode() === "web") return toast("Server từ chối: <code class='err'>PLATFORM_NOT_SUPPORTED</code>", true);
+      if (mode() === "web") return toast(t("err.platform") + ": <code class='err'>PLATFORM_NOT_SUPPORTED</code>", true);
       const vals = [20, 30, 40, 50, 60, 80, 150];
       const v = vals[S.streak % 7];
       S.streak += 1; S.checkedToday = true;
       const bonus = { 14: 200, 30: 1000, 100: 5000 }[S.streak] || 0;
-      addCoin(v + bonus, `Điểm danh ngày ${S.streak}`);
+      addCoin(v + bonus, ["lg.checkin", { n: S.streak }]);
       save(); route(); toast(`+${v + bonus} Coin · streak ${S.streak} ngày`);
     });
     on("buyFreeze", () => {
       if (S.freeze >= 2) return toast("Đã giữ tối đa 2 Freeze <code class='err'>FREEZE_LIMIT</code>", true);
-      if (S.coin < 200) return toast("Không đủ Coin <code class='err'>INSUFFICIENT_BALANCE</code>", true);
-      addCoin(-200, "Mua Streak Freeze"); S.freeze += 1; save(); route();
+      if (S.coin < 200) return toast(t("err.noCoin") + " <code class='err'>INSUFFICIENT_BALANCE</code>", true);
+      addCoin(-200, ["lg.freeze"]); S.freeze += 1; save(); route();
     });
     on("watchAd", watchAd);
+    const ls2 = document.getElementById("langSel2"); if (ls2) ls2.onchange = (e) => setLocale(e.target.value);
     document.querySelectorAll("[data-pick]").forEach((e) => (e.onclick = () => {
       const sel = screens._forgeSel || [], k = e.dataset.pick, i = sel.indexOf(k);
       if (i >= 0) sel.splice(i, 1); else if (sel.length < 2) sel.push(k); else { sel.shift(); sel.push(k); }
@@ -445,10 +456,10 @@
       if (sel.length !== 2) return toast("Cần đúng 2 thẻ <code class='err'>FORGE_REQUIRES_TWO_CARDS</code>", true);
       if (S.forgedToday >= lim) return toast("Hết lượt rèn hôm nay <code class='err'>FORGE_DAILY_LIMIT</code>", true);
       const cur = document.querySelector('input[name="fee"]:checked').value;
-      if (cur === "coin") { if (S.coin < 50) return toast("Không đủ Coin <code class='err'>INSUFFICIENT_BALANCE</code>", true); addCoin(-50, "Phí rèn"); }
-      else { if (S.gem < 5) return toast("Không đủ Gem <code class='err'>INSUFFICIENT_BALANCE</code>", true); addGem(-5, "Phí rèn"); }
+      if (cur === "coin") { if (S.coin < 50) return toast(t("err.noCoin") + " <code class='err'>INSUFFICIENT_BALANCE</code>", true); addCoin(-50, ["lg.forge"]); }
+      else { if (S.gem < 5) return toast(t("err.noGem") + " <code class='err'>INSUFFICIENT_BALANCE</code>", true); addGem(-5, ["lg.forge"]); }
       sel.forEach(burnCard); S.sealed += 1; S.forgedToday += 1; screens._forgeSel = [];
-      save(); route(); toast("Đã rèn: 2 thẻ bị hủy, nhận 1 thẻ chưa lật");
+      save(); route(); toast(t("ok.forged"));
     });
     on("doReveal", async () => {
       if (!S.sealed) return;
@@ -458,22 +469,22 @@
       st.innerHTML = cardHTML(c, { flipped: false, w: "140px" }) + `<div style="text-align:center;margin-top:6px"><b>${c.name}</b><br><small>${edLabel(x)} · ${x.serial}</small></div>`;
       const el = st.querySelector(".card"); el.style.setProperty("--flip", reduced() ? "0.01s" : "0.9s");
       await new Promise((r) => setTimeout(r, 60)); el.classList.add("flipped");
-      $("#sealedCount").textContent = S.sealed; $("#doReveal").disabled = !S.sealed; $("#doReveal").textContent = S.sealed ? `Lật 1 thẻ (còn ${S.sealed})` : "Lật 1 thẻ";
+      $("#sealedCount").textContent = S.sealed; $("#doReveal").disabled = !S.sealed; $("#doReveal").textContent = t("btn.reveal") + (S.sealed ? ` (${S.sealed})` : "");
       renderNav("forge");
     });
     on("doG2C", () => {
       const n = Math.floor(+$("#g2c").value || 0);
       if (n < 1) return toast("<code class='err'>INVALID_AMOUNT</code>", true);
-      if (S.gem < n) return toast("Không đủ Gem <code class='err'>INSUFFICIENT_BALANCE</code>", true);
-      addGem(-n, "Đổi Gem → Coin"); addCoin(n * 9, "Đổi Gem → Coin"); save(); route(); toast(`Đã đổi ${n} Gem → ${n * 9} Coin`);
+      if (S.gem < n) return toast(t("err.noGem") + " <code class='err'>INSUFFICIENT_BALANCE</code>", true);
+      addGem(-n, ["lg.g2c"]); addCoin(n * 9, ["lg.g2c"]); save(); route(); toast(`Đã đổi ${n} Gem → ${n * 9} Coin`);
     });
     on("doC2G", () => {
       if (!S.phoneVerified) return toast("Cần xác thực SĐT <code class='err'>PHONE_VERIFICATION_REQUIRED</code>", true);
       const coin = Math.floor(+$("#c2g").value || 0), g = Math.floor(coin / 11);
       if (g < 1) return toast("Chưa đủ 11 Coin cho 1 Gem <code class='err'>INVALID_AMOUNT</code>", true);
-      if (S.coin < g * 11) return toast("Không đủ Coin <code class='err'>INSUFFICIENT_BALANCE</code>", true);
+      if (S.coin < g * 11) return toast(t("err.noCoin") + " <code class='err'>INSUFFICIENT_BALANCE</code>", true);
       if (S.gemFromCoinToday + g > 1000) return toast("Vượt hạn mức 1.000 Gem/ngày <code class='err'>COIN_TO_GEM_DAILY_LIMIT</code>", true);
-      addCoin(-g * 11, "Đổi Coin → Gem"); addGem(g, "Đổi Coin → Gem"); S.gemFromCoinToday += g; save(); route(); toast(`Đã đổi ${g * 11} Coin → ${g} Gem`);
+      addCoin(-g * 11, ["lg.c2g"]); addGem(g, ["lg.c2g"]); S.gemFromCoinToday += g; save(); route(); toast(`Đã đổi ${g * 11} Coin → ${g} Gem`);
     });
     on("rotateSeed", () => {
       S.revealed.push("anima-demo-server-seed-" + String(S.revealed.length + 1).padStart(3, "0"));
@@ -492,17 +503,17 @@
     if (name === "rewards" && Date.now() - S.lastAdAt < 60000) setTimeout(() => location.hash.startsWith("#rewards") && route(), 1000);
   }
   function buy(cur) {
-    if (cur === "coin") { if (S.coin < 1000) return toast("Không đủ Coin <code class='err'>INSUFFICIENT_BALANCE</code>", true); addCoin(-1000, "Mua pack Awakening Standard"); }
-    else { if (S.gem < 100) return toast("Không đủ Gem <code class='err'>INSUFFICIENT_BALANCE</code>", true); addGem(-100, "Mua pack Awakening Standard"); }
+    if (cur === "coin") { if (S.coin < 1000) return toast(t("err.noCoin") + " <code class='err'>INSUFFICIENT_BALANCE</code>", true); addCoin(-1000, ["lg.pack"]); }
+    else { if (S.gem < 100) return toast(t("err.noGem") + " <code class='err'>INSUFFICIENT_BALANCE</code>", true); addGem(-100, ["lg.pack"]); }
     S.unopened += 1; save(); renderNav("store"); startOpening();
   }
   function topup(sku) {
     const n = parseInt(sku.replace(/\D/g, ""), 10);
-    if (mode() === "app") { toast("Đang xác thực receipt với store…"); setTimeout(() => { addGem(n, `Nạp ${sku} (IAP)`); save(); route(); toast(`Đã cộng ${sku}`); }, 1200); }
-    else { toast("Chuyển tới cổng thanh toán… Đơn ở trạng thái <b>Chờ xác nhận</b> đến khi server nhận IPN"); setTimeout(() => { addGem(n, `Nạp ${sku} (cổng thanh toán)`); save(); route(); toast(`IPN hợp lệ — đã cộng ${sku}`); }, 2200); }
+    if (mode() === "app") { toast("Đang xác thực receipt với store…"); setTimeout(() => { addGem(n, ["lg.iap", { n: sku }]); save(); route(); toast(`Đã cộng ${sku}`); }, 1200); }
+    else { toast("Chuyển tới cổng thanh toán… Đơn ở trạng thái <b>Chờ xác nhận</b> đến khi server nhận IPN"); setTimeout(() => { addGem(n, ["lg.web", { n: sku }]); save(); route(); toast(`IPN hợp lệ — đã cộng ${sku}`); }, 2200); }
   }
   function watchAd() {
-    if (mode() === "web") return toast("Server từ chối: <code class='err'>PLATFORM_NOT_SUPPORTED</code>", true);
+    if (mode() === "web") return toast(t("err.platform") + ": <code class='err'>PLATFORM_NOT_SUPPORTED</code>", true);
     const ad = $("#fakead"); ad.classList.add("on");
     let t = 3; $("#adtimer").textContent = t;
     const iv = setInterval(() => {
@@ -511,7 +522,7 @@
         clearInterval(iv); ad.classList.remove("on");
         S.adsToday += 1; S.lastAdAt = Date.now();
         const bonus = S.adsToday === 5 ? 10 : S.adsToday === 10 ? 20 : 0;
-        addCoin(8 + bonus, `Xem quảng cáo lượt ${S.adsToday}`);
+        addCoin(8 + bonus, ["lg.ad", { n: S.adsToday }]);
         save(); route(); toast(`SSV hợp lệ · +${8 + bonus} Coin`);
       }
     }, 1000);
@@ -564,7 +575,7 @@
     pack.getAnimations({ subtree: true }).forEach((an) => an.cancel());
     pack.querySelectorAll(".half").forEach((h) => (h.style.transform = ""));
     $("#light").style.opacity = 0;
-    cap.textContent = mode() === "web" ? "Website: phần này chạy bản Unity Web (prototype mô phỏng bằng HTML)" : "";
+    cap.textContent = mode() === "web" ? t("op.web") : "";
 
     // Giai đoạn 0 — Entry
     if (!reduced()) await pack.animate([{ transform: "translateY(120cqh) rotate(0deg)" }, { transform: "translateY(0) rotate(355deg)" }], { duration: 800, easing: "cubic-bezier(.34,1.56,.64,1)" }).finished.catch(() => {});
@@ -572,7 +583,7 @@
     // Giai đoạn 1 — Presentation: chờ người chơi xé
     if (!skipped) {
       if (!reduced()) pack.style.animation = "bob 2s ease-in-out infinite";
-      cap.textContent = "Vuốt lên hoặc chạm vào pack để xé";
+      cap.textContent = t("op.swipe");
       await new Promise((resolve) => {
         let y0 = null;
         const done = () => { pack.onpointerdown = pack.onpointerup = null; clearInterval(chk); resolve(); };
@@ -646,10 +657,11 @@
     if (!row.children.length) row.innerHTML = res.cards.map((c) => cardHTML(c)).join("");
     [...row.children].forEach((e) => { e.style.setProperty("--flip", "0.01s"); e.classList.add("flipped"); });
     row.lastElementChild.classList.add("best");
-    $("#caption").innerHTML = res.pityTriggered ? "Pity kích hoạt: bảo đảm 1 Legendary" : `Pity hiện tại: ${S.pity}/50`;
+    $("#caption").innerHTML = res.pityTriggered ? t("sum.pityHit") : t("sum.pity", { n: S.pity });
     $("#summary").style.display = "flex";
     $("#skipBtn").style.display = "none";
-    $("#sumAgain").textContent = S.unopened ? `Mở pack tiếp (${S.unopened})` : "Mua & mở pack khác";
+    $("#sumAgain").textContent = S.unopened ? t("sum.again", { n: S.unopened }) : t("sum.buyAgain");
+    $("#sumCollection").textContent = t("sum.collection"); $("#sumShare").textContent = t("sum.share"); $("#sumClose").textContent = t("sum.close");
     $("#sumAgain").onclick = () => { if (S.unopened) startOpening(); else { close(); location.hash = "pack"; } };
     $("#sumCollection").onclick = () => { close(); location.hash = "collection"; };
     $("#sumShare").onclick = () => toast("Ảnh kết quả đã sẵn sàng để chia sẻ (giả lập)");
@@ -674,6 +686,10 @@
   };
   $("#reset").onclick = () => { S = fresh(); save(); route(); toast("Đã đặt lại dữ liệu demo"); };
   if (/[?&]mode=web/.test(location.search)) document.querySelector('[data-mode="web"]').click();
+  const ls = $("#langSel");
+  ls.innerHTML = I.LOCALES.map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+  ls.value = S.locale;
+  ls.onchange = (e) => setLocale(e.target.value);
   window.addEventListener("hashchange", route);
   route();
 })();

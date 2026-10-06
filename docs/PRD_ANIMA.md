@@ -4,7 +4,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | PRD-ANIMA-001 |
-| Phiên bản | 0.3 (Draft) — thêm tài sản số: Lò rèn, kiểm chứng công bằng, NFT (CR-002) |
+| Phiên bản | 0.4 (Draft) — phát hành toàn cầu, 3 ngôn ngữ (CR-003); tài sản số (CR-002) |
 | Ngày | 2026-10-06 |
 | Phạm vi | Release 1 (MVP), định hướng Release 2–3 |
 | Tài liệu liên quan | [Master Document](ANIMA_Master_Document.md), [BRD](BRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md), [Solution Design](SOLUTION_DESIGN.md), [Sprint Plan](SPRINT_PLAN.md), [Prototype](../prototype/index.html) |
@@ -51,6 +51,12 @@ ANIMA là nền tảng sưu tầm thẻ bài số trên **app mobile và website
 ---
 
 ## 3. Người dùng mục tiêu
+
+### 3.0. Thị trường mục tiêu (CR-003)
+
+Phát hành toàn cầu theo đợt: Việt Nam (soft launch) → Đông Nam Á, Đài Loan, Hồng Kông → Bắc Mỹ, châu Âu, Úc, Nhật, Hàn. Đề xuất không phát hành ở Trung Quốc đại lục. Chi tiết ở BRD mục 4.5; danh sách cuối cùng chờ PO (Q-45).
+
+Persona dưới đây giữ nguyên; ở thị trường Hoa ngữ, nhóm "Người sưu tầm" và "Nhà đầu tư thẻ" được kỳ vọng lớn hơn vì văn hóa sưu tầm thẻ bài phổ biến.
 
 ### 3.1. Persona
 
@@ -158,7 +164,8 @@ flowchart LR
 | 17 | Push notification nhắc điểm danh | Should | Giữ streak | [Đề xuất] |
 | 18 | Haptic theo độ hiếm | Should | Tăng cảm giác "juice" | US-04.7 (BRD xếp R2; đề xuất đưa lên R1 nếu kịp) |
 | 19 | Chia sẻ ảnh kết quả mở pack | Could | Lan truyền tự nhiên | US-04.10 (BRD xếp R2) |
-| 20 | Tiếng Việt, tiếng Anh | Must | Hai thị trường đầu tiên | NFR-08 |
+| 20 | Tiếng Việt, tiếng Anh, tiếng Trung giản thể và phồn thể (CR-003) | Must | Phát hành toàn cầu | NFR-08, BR-I18N |
+| 28 | Ma trận tính năng theo quốc gia (CR-003) | Must | Mở được nhiều thị trường mà vẫn tuân thủ luật từng nơi | BR-GEO |
 | 21 | Chế độ giảm chuyển động | Must | An toàn, accessibility | NFR-09 |
 | 22 | Admin: người dùng, thẻ, pack/tỷ lệ, cấu hình kinh tế, dashboard | Must | Vận hành | EP-10 |
 | 23 | **Website người chơi**: đăng nhập, ví, nạp Gem qua cổng thanh toán, cửa hàng, mở pack, bộ sưu tập, story | Must | Dùng trên máy tính; nạp với phí thấp hơn store; chia sẻ link | BRD 4.4, BR-WEB |
@@ -289,7 +296,7 @@ Các mục dưới đây mô tả **trải nghiệm cần đạt**. Quy tắc ng
 
 ## 9. Kế hoạch đo lường (analytics)
 
-Mọi sự kiện có thuộc tính chung: `account_id`, `device_id` (mobile) hoặc `web_session_id` (web), `app_version`, `platform` (`ios`/`android`/`web`), `country_tier`, `session_id`.
+Mọi sự kiện có thuộc tính chung: `account_id`, `device_id` (mobile) hoặc `web_session_id` (web), `app_version`, `platform` (`ios`/`android`/`web`), `country_tier`, `legal_country`, `locale` (`vi`/`en`/`zh-Hans`/`zh-Hant`), `session_id`.
 
 | Sự kiện | Khi nào | Thuộc tính riêng | Dùng cho |
 |---|---|---|---|
@@ -334,7 +341,8 @@ Sự kiện kinh tế (`pack_purchased`, `pack_opened`, `ad_rewarded`, `iap_comp
 | Prototype mở pack | Tháng 1–2 | Nội bộ + 10–15 người dùng thử | Kiểm chứng cảm xúc khi mở pack | Đạt tiêu chí mục 8.1 |
 | Closed beta | Tháng 3–4 | 500–1,000 người (TestFlight, Play internal) | Ổn định, kinh tế, FTUE | Crash-free ≥ 99%; không có lỗi tiền; FTUE hoàn thành ≥ 60% |
 | Soft launch **[Đề xuất: chỉ Việt Nam]** | Tháng 5–6 | Công khai trên store tại VN | Chỉ số soft launch mục 4.2 | Đạt D7 ≥ 15% và guardrail kinh tế |
-| Global launch (VN + EN) | Sau soft launch | Mở thêm thị trường tiếng Anh | Tăng trưởng | PO quyết định dựa trên số liệu soft launch |
+| Đợt 1 toàn cầu (CR-003) | Sau soft launch | Đông Nam Á, Đài Loan, Hồng Kông; vi/en/zh-Hans/zh-Hant | Tăng trưởng, kiểm chứng thị trường Hoa ngữ | Đạt chỉ số soft launch; Legal duyệt ma trận từng nước; đủ 4 bản dịch |
+| Đợt 2 toàn cầu | Sau đợt 1 | Bắc Mỹ, châu Âu, Úc, Nhật, Hàn | Mở rộng | Legal rà luật loot box, tài sản số, dữ liệu cá nhân từng nước |
 
 Mốc tháng tính từ khi bắt đầu phát triển, khớp với Roadmap MVP 3–6 tháng ở Master Document §8.1.
 
@@ -391,6 +399,8 @@ Ngoài các câu hỏi mở trong BRD mục 16, PRD cần thêm:
 | PQ-05 | Đưa haptic và chia sẻ ảnh lên R1? | Haptic lên R1; chia sẻ để R1 nếu còn thời gian |
 | PQ-06 | Không có interstitial/banner ở R1? | Đồng ý |
 | PQ-07 | Thêm pack Premium ở launch? | Chờ số liệu beta |
+| PQ-08 | Thị trường và thứ tự đợt phát hành (BRD Q-45)? | Theo đề xuất BRD 4.5.2 |
+| PQ-09 | Ngôn ngữ hỗ trợ khách hàng và kênh cộng đồng (Discord/Facebook/LINE…) theo thị trường? | vi, en, zh; kênh theo thị trường |
 
 ---
 
