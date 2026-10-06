@@ -4,7 +4,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | PRD-ANIMA-001 |
-| Phiên bản | 0.4 (Draft) — phát hành toàn cầu, 3 ngôn ngữ (CR-003); tài sản số (CR-002) |
+| Phiên bản | 0.5 (Draft) — Đấu trường (CR-004); phát hành toàn cầu, 3 ngôn ngữ (CR-003); tài sản số (CR-002) |
 | Ngày | 2026-10-06 |
 | Phạm vi | Release 1 (MVP), định hướng Release 2–3 |
 | Tài liệu liên quan | [Master Document](ANIMA_Master_Document.md), [BRD](BRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md), [Solution Design](SOLUTION_DESIGN.md), [Sprint Plan](SPRINT_PLAN.md), [Prototype](../prototype/index.html) |
@@ -160,7 +160,7 @@ flowchart LR
 | 13 | Xem bộ sưu tập offline | Should | Xem thẻ mọi lúc | US-05.6 |
 | 14 | Điểm danh, streak, Streak Freeze | Must | Lý do quay lại mỗi ngày | US-07.1 |
 | 15 | Rewarded ads | Must | Kiếm pack miễn phí | US-07.2, US-09.2 |
-| 16 | Tutorial với pack miễn phí | Must | Trải nghiệm "aha" ngay phút đầu | Mục 7.1 PRD |
+| 16 | Tutorial với gói chào mừng 5 Anima Common thuộc 5 hệ (CR-004) | Must | Trải nghiệm "aha" ngay phút đầu | Mục 7.1 PRD, BR-NEW-01 |
 | 17 | Push notification nhắc điểm danh | Should | Giữ streak | [Đề xuất] |
 | 18 | Haptic theo độ hiếm | Should | Tăng cảm giác "juice" | US-04.7 (BRD xếp R2; đề xuất đưa lên R1 nếu kịp) |
 | 19 | Chia sẻ ảnh kết quả mở pack | Could | Lan truyền tự nhiên | US-04.10 (BRD xếp R2) |
@@ -173,6 +173,8 @@ flowchart LR
 | 25 | **Kiểm chứng công bằng** (commit–reveal) | Must | Niềm tin vào tỷ lệ | BR-PF |
 | 26 | **Số lượng phát hành và số thứ tự** `#n/N` | Must | Độ hiếm minh bạch | BR-SUP |
 | 27 | Quy đổi Gem ↔ Coin hai chiều | Must | Linh hoạt trả phí rèn, mua pack | BR-WAL-05/06 |
+| 29 | **Chỉ số chiến đấu trên thẻ** (CR-004): loại thẻ, Cộng hưởng, ATK/DEF/HP, kỹ năng, mạch truyện, công thức Hợp thể; bất biến sau phát hành | Must | Thẻ có giá trị sử dụng, chuẩn bị cho Đấu trường R2 | BR-CARD, US-13.1 |
+| 30 | **Nhiệm vụ Tân thủ 7 ngày** (CR-004): 5 pack cơ bản, thẻ gắn chặt tài khoản | Must | Người chơi free đủ 30 lá trong ~5 ngày | BR-NEW-02 → 05, US-13.2 |
 
 ### 6.2A. Nền tảng (CR-001)
 
@@ -193,7 +195,9 @@ Ma trận chi tiết tính năng theo nền tảng ở BRD mục 4.4. Ở R1, đ
 | Feed, follow, chat, leaderboard | R2 | Cần lượng người dùng đủ lớn |
 | NFT: liên kết ví, rút/nạp thẻ, royalty (CR-002) | R2 | Cần gate pháp lý (BRD Q-41), audit smart contract, KYC |
 | Livestream mở pack | R2 | Cần BRD riêng |
-| Battle Pass, AR/3D, game đối kháng | R3 | Ngoài MVP |
+| Đấu trường: trận hướng dẫn, PvE Act 1, luyện tập, giao hữu, xây bộ bài (CR-004) | R2 | Cần engine luật dùng chung client/server, mô phỏng cân bằng (Q-51) |
+| Đấu trường: xếp hạng theo mùa, cược Arena Point, giải đấu, Draft, xem lại trận (CR-004) | R3 | Cần đủ người chơi để ghép trận, chống thông đồng; Q-57 hỏi có đưa sớm hơn không |
+| Battle Pass, AR/3D | R3 | Ngoài MVP |
 
 ---
 
@@ -206,14 +210,16 @@ Ma trận chi tiết tính năng theo nền tảng ở BRD mục 4.4. Ở R1, đ
 | 1 | Mở app lần đầu | Chọn ngôn ngữ; cảnh mở đầu ngắn về Heart-Song (có thể bỏ qua) | `ftue_started` |
 | 2 | Xác nhận độ tuổi | Hỏi ngày sinh (BR-ACC-01) | `age_gate_passed` |
 | 3 | Đăng ký | Ưu tiên đăng nhập một chạm Google/Apple | `signup_completed` < 60 giây từ bước 1 |
-| 4 | Nhận pack chào mừng | Nhận 100 Coin đăng nhập lần đầu + 1 pack tutorial miễn phí | — |
-| 5 | Mở pack tutorial | Hướng dẫn thao tác "vuốt để xé"; full animation, không cho skip ở lần này | `tutorial_pack_opened` < 2 phút từ bước 1 |
+| 4 | Nhận gói chào mừng | Nhận 100 Coin đăng nhập lần đầu + gói chào mừng 5 Anima Common thuộc 5 hệ khác nhau, gắn chặt tài khoản (BR-NEW-01, 04) | — |
+| 5 | Mở gói chào mừng | Hướng dẫn thao tác "vuốt để xé"; full animation, không cho skip ở lần này | `tutorial_pack_opened` < 2 phút từ bước 1 |
 | 6 | Xem thẻ và story | Gợi ý đọc Story Fragment thẻ hiếm nhất | `story_read` |
 | 7 | Điểm danh ngày 1 | Giới thiệu streak | `checkin_completed` |
 | 8 | Hoàn thành tutorial | Nhận 200 Coin | `tutorial_completed` |
 | 9 | Gợi ý xác thực SĐT | Giải thích lợi ích (bảo vệ tài khoản, giao dịch ở R2) | `phone_verified` |
+| 10 | Giới thiệu nhiệm vụ Tân thủ | Thanh tiến độ "5/30 lá — đủ 30 lá để vào Đấu trường"; nhiệm vụ ngày 1 (BR-NEW-03) | `newbie_quest_day_completed` |
+| 11 (R2) | Trận hướng dẫn | Trận có kịch bản với bộ bài mượn, đối thủ là máy; dạy Cộng hưởng, khắc hệ, bẫy, Hợp thể (BR-NEW-06) | `tutorial_battle_completed` |
 
-**[Đề xuất] Pack tutorial** là một Pack Definition riêng với bảng tỷ lệ riêng, được công khai như mọi pack khác, đảm bảo ít nhất 1 thẻ Rare. Không được ngầm "bơm" tỷ lệ của pack thường cho người mới; mọi ưu đãi cho người mới phải hiện rõ trong tỷ lệ công khai (BR-PACK-01).
+**Gói chào mừng (CR-004, thay pack tutorial bảo đảm Rare ở v0.4):** 5 Anima Common thuộc 5 hệ khác nhau trong 7 hệ vòng nhân quả, không có thẻ hiếm, không có bài hỗ trợ. Nội dung và quy tắc chọn được công khai như mọi pack khác (BR-PACK-01). Không được ngầm "bơm" tỷ lệ của pack thường cho người mới. Người chơi đủ 30 lá bằng nhiệm vụ Tân thủ (5 pack cơ bản), quảng cáo, điểm danh hoặc mua pack (BR-NEW-02, 03).
 
 ### 7.2. Vòng lặp hằng ngày
 
@@ -286,8 +292,8 @@ Các mục dưới đây mô tả **trải nghiệm cần đạt**. Quy tắc ng
 
 | Nội dung | Số lượng | Trạng thái |
 |---|---|---|
-| Set "Awakening" (art + story VI/EN) | 100 thẻ (BRD CF-06: danh sách hiện chỉ có 96) | Chưa có |
-| Pack Definition | Tutorial, Standard **[Đề xuất thêm Premium]** | Chưa có |
+| Set "Awakening" (art + story VI/EN) | 100 thẻ = 80 Anima + 20 bài hỗ trợ, có chỉ số chiến đấu và mạch truyện (BR-CARD-07; BRD CF-06: danh sách hiện chỉ có 96) | Chưa có |
+| Pack Definition | Gói chào mừng, pack cơ bản Tân thủ, Standard **[Đề xuất thêm Premium]** | Chưa có |
 | Animation theo rarity | 6 bậc | Có spec, chưa có asset |
 | Sound | ≥ 20 sound, 5 layer | Có spec, chưa có asset |
 | Cảnh mở đầu Heart-Song | 1 (≤ 30 giây, bỏ qua được) | Chưa có |
@@ -321,6 +327,12 @@ Mọi sự kiện có thuộc tính chung: `account_id`, `device_id` (mobile) ho
 | `ad_requested` / `ad_rewarded` / `ad_failed` | Vòng đời một lượt ads | `network`, `ad_type`, `reward`, `daily_count` | H-02, H-05 |
 | `iap_started` / `iap_completed` / `iap_failed` | Vòng đời nạp | `sku`, `price_usd`, `error` | H-04 |
 | `share_clicked` | Chia sẻ | `channel`, `content_type` | Lan truyền |
+| `newbie_quest_day_completed` | Xong nhóm nhiệm vụ một ngày (server) | `day`, `late` | Funnel Tân thủ, RK-25 |
+| `deck_saved` (R2) | Lưu bộ bài hợp lệ | `anima_count`, `support_count`, `elements`, `rarity_mix` | Đấu trường |
+| `tutorial_battle_completed` (R2) | Xong trận hướng dẫn | `duration_sec`, `retries` | Funnel |
+| `match_started` / `match_finished` (R2) | Vòng đời một trận (server) | `mode`, `arena_id`, `turns`, `duration_sec`, `result`, `end_reason`, `deck_elements` | Cân bằng, độ dài trận 3–5 phút |
+| `fusion_performed` (R2) | Hợp thể trong trận | `recipe_id` | Cân bằng |
+| `ap_wagered` / `ap_settled` (R3) | Cược Arena Point | `amount`, `result` | Kinh tế AP |
 
 Sự kiện kinh tế (`pack_purchased`, `pack_opened`, `ad_rewarded`, `iap_completed`, `checkin_completed`) phải được ghi **từ server** để số liệu không bị client làm sai.
 
@@ -331,6 +343,8 @@ Sự kiện kinh tế (`pack_purchased`, `pack_opened`, `ad_rewarded`, `iap_comp
 3. Kinh tế: Coin phát ra và Coin tiêu đi mỗi ngày; chi phí thưởng ads / doanh thu ads; tỷ lệ pity được kích hoạt.
 4. Doanh thu: IAP theo gói, ARPPU, tỷ lệ hoàn tiền.
 5. Animation: tỷ lệ skip theo giai đoạn và theo rarity.
+6. Tân thủ (CR-004): tỷ lệ người mới đủ 30 lá theo ngày 1 → 7.
+7. Đấu trường (R2): độ dài trận (mục tiêu trung vị 3–5 phút), tỷ lệ thắng theo hệ, theo sàn, theo lượt đi trước, theo tổng rarity của bộ bài (cảnh báo khi chênh > 5 điểm %).
 
 ---
 
@@ -383,6 +397,8 @@ Công nghệ đã chốt (Master Document mục 9, [TECH_STACK.md](TECH_STACK.md
 | 3 | Bị coi là cờ bạc | Bị gỡ app, phạt | Công khai tỷ lệ, không rút tiền, tư vấn luật | BRD RK-01 |
 | 4 | Người dùng skip animation quá nhiều | Mất giá trị khác biệt | Đo `skip_at_stage`, rút ngắn giai đoạn bị skip nhiều | Mục 9 |
 | 5 | Người dưới 18 chiếm tỷ lệ lớn ở nhóm free | Ràng buộc pháp lý về thanh toán | Chờ Legal; chuẩn bị luồng đồng ý của người giám hộ | BRD Q-21 |
+| 6 | Đấu trường bị cảm nhận là "nạp tiền là thắng" | Mất người chơi free, tranh luận cộng đồng | Khung chỉ số theo chi phí, giới hạn thẻ hiếm/bộ, mô phỏng trước khi mở | BRD RK-22 |
+| 7 | Cược Arena Point bị coi là cờ bạc | Pháp lý | AP không mua được, không đổi ra tiền hay vật phẩm có giá; bật theo ma trận quốc gia | BRD BR-PVP-03, 04 |
 
 ---
 
@@ -393,7 +409,7 @@ Ngoài các câu hỏi mở trong BRD mục 16, PRD cần thêm:
 | ID | Câu hỏi | Đề xuất |
 |---|---|---|
 | PQ-01 | North Star là "người sưu tầm tích cực/tuần"? | Có |
-| PQ-02 | Pack tutorial có bảng tỷ lệ riêng, bảo đảm ≥ 1 Rare? | Có |
+| PQ-02 | Pack tutorial có bảng tỷ lệ riêng, bảo đảm ≥ 1 Rare? | **Đã thay bằng gói chào mừng 5 Common (CR-004)** |
 | PQ-03 | Soft launch chỉ ở Việt Nam? | Có |
 | PQ-04 | Bảng giá gói Gem (mục 8.2)? | Theo đề xuất, cần Finance kiểm tra |
 | PQ-05 | Đưa haptic và chia sẻ ảnh lên R1? | Haptic lên R1; chia sẻ để R1 nếu còn thời gian |

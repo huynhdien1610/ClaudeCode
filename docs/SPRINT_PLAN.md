@@ -14,7 +14,7 @@
 ## 1. Tóm tắt
 
 - **12 sprint × 2 tuần = 24 tuần** từ lúc bắt đầu tới quyết định soft launch, khớp mốc MVP 3–6 tháng (Master Document §8.1) ở cận trên.
-- **122 task** (T001 → T123; 13 task theo CR-002, 11 task theo CR-003; ID T106 bỏ trống, không dùng lại). Sprint S001 và S002 đã tách tới mức task 1–4 giờ; S003 → S012 ở mức story 0.5–5 ngày, sẽ được tách thành task nhỏ khi lập kế hoạch từng sprint (ID mới, không dùng lại ID cũ).
+- **132 task** (T001 → T133; 13 task theo CR-002, 11 task theo CR-003, 10 task theo CR-004; ID T106 bỏ trống, không dùng lại). Sprint S001 và S002 đã tách tới mức task 1–4 giờ; S003 → S012 ở mức story 0.5–5 ngày, sẽ được tách thành task nhỏ khi lập kế hoạch từng sprint (ID mới, không dùng lại ID cũ).
 - Mỗi sprint là một **lát cắt dọc chạy được**: backend + client + QA cho cùng một nhóm rule.
 - **Phân tích đi trước một sprint:** FRD và wireframe của sprint N được làm trong sprint N−1, để khi sprint N bắt đầu, task code đã đủ DoR.
 
@@ -155,6 +155,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | [CR-001](../.vibe/changes/CR-001.json) | Người chơi dùng được cả website (ngoài app mobile); admin là website | BRD v0.3 (mục 4.4, BR-WEB), PRD v0.2, BDD mục 12A, Tech Stack 2.4, thêm sprint S006 và các task web |
 | [CR-003](../.vibe/changes/CR-003.json) | Phát hành toàn cầu; vi, en, zh-Hans, zh-Hant; ma trận tính năng theo quốc gia | BRD v0.5 (4.5, BR-GEO, BR-I18N, NFR-17→19), BDD 12C, SAD 18, Tech Stack 2.5; thêm T113 → T123 |
 | [CR-002](../.vibe/changes/CR-002.json) | Tài sản số: số lượng phát hành, commit–reveal, Lò rèn, quy đổi Gem ↔ Coin (R1); NFT (R2, sau gate pháp lý) | BRD v0.4, BDD v0.3, SAD v0.2 (mục 8, 17), Tech Stack 5.1, Master 2.4/5.7; thêm T099 → T112 và epic R2-E8 → E11 |
+| [CR-004](../.vibe/changes/CR-004.json) | Đấu trường: chỉ số chiến đấu, bộ bài 30 lá, vòng nhân quả 7 hệ, 8 sàn, Cộng minh/Hợp thể, Arena Point; gói chào mừng và nhiệm vụ Tân thủ | BRD v0.6 (10.18 → 10.25, EP-13), BDD 12D, PRD v0.5, SAD 19, Tech Stack 5.2, Master 3.11; thêm T124 → T133 (R1: dữ liệu thẻ, người mới; T133 spike engine), sửa T084; epic R2-E12 → E14, R3-E1 → E3 |
 
 ---
 
@@ -217,6 +218,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T034 | QA Identity trên staging | quality | assure-software-quality | T024, T025, T026, T027, T028 | SC-ACC-*; SC-PERM-01; SC-WEB-04..06 | QA_PASSED hoặc danh sách defect | high | 4h | task |
 | T035 | Môi trường staging tạm (container trên 1 VM) chờ chốt cloud | devops | ship-and-operate | T013 | T-02; SAD §14.1 | Deploy tự động từ main | low | 4h | task |
 | T113 | Backend: locale theo tài khoản, Accept-Language, quy ước mã lỗi không đổi theo ngôn ngữ | backend | build-full-stack | T024 | BR-I18N-01; BR-I18N-04 | SC-I18N-02, SC-I18N-05 | standard | 3h | task |
+| T124 | FRD Đấu trường phần R1: loại thẻ, chỉ số, mạch truyện, công thức Hợp thể, gói chào mừng, nhiệm vụ Tân thủ | analysis | senior-business-analyst | T001 | BR-CARD-01..07; BR-NEW-01..05; US-13.1; US-13.2 | Đạt FRD coverage checklist; trả lời hoặc hẹn ngày Q-52, Q-53, Q-56 | standard | 1d | story (tách khi lập sprint) |
 
 ### S003 — Ví/Ledger & Catalog (Tuần 5–6)
 
@@ -238,6 +240,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T119 | Xin ma trận pháp lý theo thị trường đợt 1 (Q-44, Q-46) | release | ship-and-operate | T001 | CR-003; RK-17 | Ma trận tính năng từng nước có Legal ký | high | 1d | story (tách khi lập sprint) |
 | T116 | Glossary lore + nền tảng quản lý bản dịch (T-11) + CI kiểm tra khóa thiếu | content | senior-business-analyst | T114, T115 | BR-I18N-02; BR-I18N-03; RK-18 | CI đỏ khi thiếu bản dịch nội dung pháp lý/tiền tệ | low | 1d | story (tách khi lập sprint) |
 | T118 | FRD Compliance: quốc gia pháp lý, ma trận tính năng, tuổi theo quốc gia | analysis | senior-business-analyst | T001 | BR-GEO-* | Đạt FRD checklist | high | 1d | story (tách khi lập sprint) |
+| T125 | Thiết kế 100 thẻ Awakening: 80 Anima + 20 bài hỗ trợ, chỉ số theo khung chi phí, 15–20 mạch truyện, công thức Hợp thể | content | senior-business-analyst | T124 | BR-CARD-03; BR-CARD-07; BR-FUS-01..05; Q-56 | Mọi Anima nằm trong khung ±10%; mỗi hệ có đủ Cộng hưởng 1–6; đủ 4 Epic+ mỗi hệ | high | 4d | story (tách khi lập sprint) |
 
 ### S004 — Gacha: mua và mở pack (server + cửa hàng) (Tuần 7–8)
 
@@ -259,6 +262,9 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T101 | Module Fairness: seed, HMAC-SHA256, đổi seed, API kiểm chứng | backend | build-full-stack | T008 | BR-PF-01..05; SAD 8.1 | SC-PF-01→05 (vector chuẩn khớp) | high | 2d | story (tách khi lập sprint) |
 | T110 | Xin ý kiến pháp lý cho mô hình NFT (Q-41) và chọn pháp nhân | release | ship-and-operate | T001 | CR-002; RK-13 | Có văn bản ý kiến pháp lý | high | 1d | story (tách khi lập sprint) |
 | T117 | Module Compliance: quốc gia pháp lý, ma trận tính năng, danh sách trừng phạt, xác suất từng thẻ | backend | build-full-stack | T024, T118 | BR-GEO-01..05; BR-GEO-08 | SC-GEO-01→08 | high | 3d | story (tách khi lập sprint) |
+| T126 | Catalog: thêm loại thẻ, Cộng hưởng, ATK/DEF/HP, kỹ năng, mạch truyện, công thức Hợp thể; khóa sửa sau phát hành | backend | build-full-stack | T037, T124 | BR-CARD-02; BR-CARD-06; SAD 19.4 | SC-DECK-01; sửa chỉ số thẻ đã phát hành bị chặn và có audit | high | 2d | story (tách khi lập sprint) |
+| T127 | Seed chỉ số chiến đấu set Awakening từ bảng thiết kế | content | senior-business-analyst | T125, T126, T042 | BR-CARD-07 | 100/100 thẻ có chỉ số; script kiểm tra khung chỉ số chạy xanh | low | 0.5d | story (tách khi lập sprint) |
+| T128 | Pack Definition gói chào mừng (5 Common, 5 hệ khác nhau trong 7 hệ) và pack cơ bản Tân thủ; công khai quy tắc | backend | build-full-stack | T037, T045 | BR-NEW-01; BR-NEW-05; BR-PACK-01 | SC-NEW-01..03, SC-NEW-07 | high | 1.5d | story (tách khi lập sprint) |
 
 ### S005 — Trình diễn mở pack trên app & Bộ sưu tập (Tuần 9–10)
 
@@ -275,6 +281,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T055 | QA hiệu năng trên ma trận thiết bị | quality | assure-software-quality | T051, T053 | NFR-01; NFR-02 | Báo cáo FPS, thời gian chờ | standard | 1d | story (tách khi lập sprint) |
 | T102 | Module Forge: rèn 2 → 1, thu phí Coin/Gem, lật thẻ chưa lật | backend | build-full-stack | T045, T101, T100 | BR-FRG-01..07 | SC-FRG-01→09 | high | 3d | story (tách khi lập sprint) |
 | T103 | Quy đổi Gem ↔ Coin hai chiều + hạn mức | backend | build-full-stack | T036 | BR-WAL-05; BR-WAL-06 | SC-WAL-16→23 | high | 1d | story (tách khi lập sprint) |
+| T129 | Thẻ gắn chặt tài khoản: chặn niêm yết, rèn, rút NFT | backend | build-full-stack | T046, T102 | BR-NEW-04 | SC-NEW-04, SC-NEW-05 | high | 1d | story (tách khi lập sprint) |
 
 ### S006 — Website người chơi (Tuần 11–12)
 
@@ -293,6 +300,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T107 | App: màn kiểm chứng công bằng (mã băm seed, đổi seed, xem số thứ tự thẻ) | mobile | build-full-stack | T101, T112 | US-11.3; US-11.4 | Hiển thị đúng dữ liệu SC-PF-02/03 | standard | 1d | story (tách khi lập sprint) |
 | T105 | Web: Lò rèn, kiểm chứng công bằng (công cụ tự tính lại), quy đổi | web-player | build-full-stack | T102, T101, T103, T112 | US-11.1..11.5 | Công cụ kiểm chứng tính đúng vector SC-PF-01 | standard | 2d | story (tách khi lập sprint) |
 | T109 | QA Lò rèn, kiểm chứng, số lượng phát hành, quy đổi | quality | assure-software-quality | T102, T101, T100, T103 | SC-FRG-*; SC-PF-*; SC-SUP-*; SC-WAL-16..23 | Test report | high | 2d | story (tách khi lập sprint) |
+| T132 | App + web: chi tiết thẻ hiện loại, Cộng hưởng, ATK/DEF/HP, kỹ năng, mạch, công thức Hợp thể | web-player | build-full-stack | T126, T057 | US-13.1; BR-CARD-02 | Đủ trường theo BR-CARD-02 ở 4 ngôn ngữ | standard | 1d | story (tách khi lập sprint) |
 
 ### S007 — Điểm danh, quảng cáo, chống gian lận (Tuần 13–14)
 
@@ -309,6 +317,8 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T065 | App: màn điểm danh, lịch streak, Freeze; tích hợp AppLovin MAX | mobile | build-full-stack | T061, T062, T054 | US-07.1; US-07.2 | Điểm danh và xem ad trên thiết bị | standard | 3d | story (tách khi lập sprint) |
 | T066 | Chính sách nền tảng: chặn kiếm Coin từ phiên web | backend | build-full-stack | T061, T062 | BR-WEB-03 | SC-WEB-07 | standard | 0.5d | story (tách khi lập sprint) |
 | T067 | QA Rewards + Fraud | quality | assure-software-quality | T061, T062, T063, T064 | SC-CHK-*; SC-ADS-*; SC-FRD-* | Test report | high | 2d | story (tách khi lập sprint) |
+| T130 | Nhiệm vụ Tân thủ 7 ngày: nhóm nhiệm vụ, làm bù, phát pack cơ bản | backend | build-full-stack | T061, T128 | BR-NEW-02; BR-NEW-03; SAD 19.5 | SC-NEW-06, SC-NEW-08 | standard | 2d | story (tách khi lập sprint) |
+| T131 | App + web: màn nhiệm vụ Tân thủ, thanh tiến độ "n/30 lá" | mobile | build-full-stack | T130, T054, T065 | US-13.2; PRD 7.1 bước 10 | Hiển thị đúng ngày, nhiệm vụ làm bù, trạng thái đã nhận | standard | 1.5d | story (tách khi lập sprint) |
 
 ### S008 — Thanh toán: IAP, cổng web, hoàn tiền (Tuần 15–16)
 
@@ -354,7 +364,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 |---|---|---|---|---|---|---|---|---|---|
 | T082 | Cinematic Legendary/Secret theo timeline từng frame | mobile | build-full-stack | T051 | Master §4.5 | Khớp 5 peak moment | standard | 4d | story (tách khi lập sprint) |
 | T083 | Âm thanh FMOD 5 layer + haptic | mobile | build-full-stack | T051 | Master §4.6, §4.7 | Sidechain khi DING/BOOM | standard | 3d | story (tách khi lập sprint) |
-| T084 | FTUE + pack tutorial | mobile | build-full-stack | T051, T061 | PRD 7.1; PQ-02 | Mở pack đầu tiên < 2 phút | standard | 2d | story (tách khi lập sprint) |
+| T084 | FTUE + gói chào mừng 5 Anima Common (CR-004) | mobile | build-full-stack | T051, T061, T128 | PRD 7.1; BR-NEW-01; PQ-02 | Mở gói chào mừng < 2 phút từ lúc mở app; giới thiệu nhiệm vụ Tân thủ | standard | 2d | story (tách khi lập sprint) |
 | T085 | Đa ngôn ngữ vi/en/zh-Hans/zh-Hant toàn bộ client (hoàn thiện chuỗi) | web-player | build-full-stack | T057, T065, T114, T115 | NFR-08 | Không còn chuỗi cứng | standard | 1d | story (tách khi lập sprint) |
 | T086 | Accessibility: screen reader, cỡ chữ, giảm chuyển động | mobile | build-full-stack | T053 | NFR-09 | Đi qua luồng chính bằng screen reader | standard | 2d | story (tách khi lập sprint) |
 | T087 | Push nhắc điểm danh | backend | build-full-stack | T061 | PRD 6.2 #17 | Không gửi khi đã điểm danh | standard | 1d | story (tách khi lập sprint) |
@@ -377,6 +387,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T111 | Spike: chọn chuỗi (T-09), prototype contract ERC-721 + ERC-2981 trên testnet | spike | build-full-stack | T110 | T-09; SAD 17 | Mint/nạp thử trên testnet; báo cáo phí | low | 3d | story (tách khi lập sprint) |
 | T122 | QA bản địa hóa 4 ngôn ngữ: chuỗi tràn, font CJK, định dạng ngày/số/tiền | quality | assure-software-quality | T121, T085 | NFR-08; NFR-18; BR-I18N-05 | Không còn lỗi hiển thị mức cao ở 4 ngôn ngữ | standard | 2d | story (tách khi lập sprint) |
 | T123 | CDN và giám sát độ trễ từ thị trường đợt 1 | devops | ship-and-operate | T090 | NFR-17 | Có số đo p95 từ ≥ 4 thành phố | standard | 1d | story (tách khi lập sprint) |
+| T133 | Spike: thư viện luật Anima.Battle.Rules + golden replay chạy giống nhau trên .NET và Unity IL2CPP; mô phỏng 100k trận | spike | build-full-stack | T127 | SAD 19.1; SAD 19.7; T-13; Q-51 | Cùng replay cho cùng trạng thái cuối trên 2 runtime; báo cáo tỷ lệ thắng theo hệ | high | 3d | story (tách khi lập sprint) |
 
 ### S012 — Closed beta & sẵn sàng soft launch (Tuần 23–24)
 
@@ -392,7 +403,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | T097 | Sửa lỗi beta (buffer) | backend | build-full-stack | T094 | PRD 10 | Không còn lỗi chặn | standard | 5d | story (tách khi lập sprint) |
 | T098 | Họp go/no-go soft launch | release | ship-and-operate | T095, T096, T097 | PRD 10.1 | Đủ launch checklist | standard | 0.5d | story (tách khi lập sprint) |
 
-### Release 2 — epic chờ tách task
+### Release 2–3 — epic chờ tách task
 
 | ID | Epic | Tham chiếu |
 |---|---|---|
@@ -407,6 +418,12 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | R2-E9 | Liên kết ví (EIP-4361), KYC, sàng lọc ví | BR-NFT-02, 03, 10 |
 | R2-E10 | Rút thẻ (mint), nạp lại (indexer), tạm dừng khẩn cấp | BR-NFT-02..05, SC-NFT-* |
 | R2-E11 | Neo Merkle root hằng ngày lên chuỗi | BR-PF-06 |
+| R2-E12 | Engine trận đấu: module Battle, Decks, BattleHub (SignalR), replay, đồng hồ lượt | BR-BTL-*, BR-ELM-*, BR-ARN-*, BR-FUS-*, SAD 19, CR-004 |
+| R2-E13 | Xây bộ bài (10 bộ, kiểm tra hợp lệ) trên app và web | BR-DECK-*, US-13.4 |
+| R2-E14 | Trận hướng dẫn có kịch bản, luyện tập với máy, PvE Act 1, giao hữu | BR-NEW-06, US-13.3, US-13.5, US-13.6, Q-54 |
+| R3-E1 | Xếp hạng theo mùa (Glicko-2), thể thức Standard/Eternal, danh sách cấm | BR-PVP-06..08, US-13.7 |
+| R3-E2 | Cược Arena Point, chống thông đồng, theo ma trận quốc gia | BR-PVP-03, 04, US-13.8, BR-GEO |
+| R3-E3 | Giải đấu sự kiện, Draft, xem lại trận | BR-PVP-05, BR-BTL-10, US-13.9, US-13.10 |
 
 <!-- END GENERATED -->
 

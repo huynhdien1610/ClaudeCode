@@ -3,7 +3,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | TECH-ANIMA-001 |
-| Phiên bản | 0.5 — đa ngôn ngữ và phát hành toàn cầu (CR-003) |
+| Phiên bản | 0.6 — engine Đấu trường (CR-004); đa ngôn ngữ và phát hành toàn cầu (CR-003) |
 | Ngày | 2026-10-06 |
 | Đầu vào | [Master Document](ANIMA_Master_Document.md) v1.1, [BRD](BRD_ANIMA.md) v0.2, [PRD](PRD_ANIMA.md) v0.1 |
 | Tóm tắt trong | Master Document mục 9 |
@@ -240,6 +240,18 @@ Firebase Analytics xuất sang BigQuery hằng ngày; worker đẩy thêm sự k
 
 ---
 
+### 5.2. Đấu trường (CR-004, R2–R3)
+
+| Hạng mục | Lựa chọn | Lý do |
+|---|---|---|
+| Luật trận | `Anima.Battle.Rules` — C# netstandard2.1 thuần, tất định, số nguyên | Một mã nguồn cho server và Unity; replay và dự đoán chính xác |
+| Realtime | ASP.NET Core SignalR (WebSocket), backplane Redis | Trận theo lượt, 20 s/lượt: TCP đủ nhanh; không thêm nhà cung cấp |
+| Trạng thái trận | Actor trong bộ nhớ + log hành động PostgreSQL, khóa Redis | Khôi phục trận khi node chết bằng phát lại |
+| Ghép trận, rating | Glicko-2 (thư viện nhỏ tự viết hoặc port), hàng chờ Redis sorted set | Chuẩn cho game 1v1, có độ tin cậy rating |
+| AI | Bot luật + tìm kiếm nông (1–2 nước) trên `Anima.Battle.Rules` | Đủ cho PvE và luyện tập, không cần ML |
+| Mô phỏng cân bằng | Console app .NET chạy song song, xuất CSV sang BigQuery | Chỉnh hệ số trước khi phát hành set (Q-51) |
+| Kiểm thử | Reqnroll cho BDD 12D, golden replay chạy trên server và Unity IL2CPP trong CI | Bảo đảm hai nơi cho cùng kết quả |
+
 ## 6. Hạ tầng và vận hành
 
 > **Chưa chốt cloud.** Bảng dưới liệt kê dịch vụ tương đương trên GCP và AWS để so sánh khi quyết định. Code backend không gọi trực tiếp dịch vụ riêng của cloud, trừ lớp lưu file và secret được bọc qua interface.
@@ -318,7 +330,8 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 | Admin web | ✔ | Tranh chấp chợ | |
 | Marketplace, đấu giá, SignalR | | ✔ | |
 | Social, chat, leaderboard | | ✔ | |
-| Battle Pass, AR Foundation, game đối kháng | | | ✔ |
+| Đấu trường: thư viện luật dùng chung, module Battle/Decks, BattleHub, bot, mô phỏng (CR-004) | Dữ liệu chỉ số thẻ, nhiệm vụ Tân thủ | ✔ tutorial, PvE, luyện tập, giao hữu | Xếp hạng Glicko-2, cược AP, giải đấu, Draft |
+| Battle Pass, AR Foundation | | | ✔ |
 
 ## 9. Đội ngũ tối thiểu cho R1
 
@@ -348,6 +361,8 @@ Tiêu chí gợi ý khi chọn: chi phí ước tính ở 10,000 DAU, kinh nghi�
 | T-10 | Nhà cung cấp KYC và sàng lọc ví | So sánh chi phí, hỗ trợ giấy tờ VN và các thị trường đợt 1 | PO + Legal | Mở |
 | T-11 | Nền tảng quản lý bản dịch (TMS) | Crowdin hoặc Lokalise | PO + Tech Lead | Mở |
 | T-12 | Region dữ liệu thứ hai cho người dùng ngoài châu Á | Chờ Q-50 | Tech Lead + Legal | Mở |
+| T-13 | Engine trận đấu: thư viện C# dùng chung server/Unity, số nguyên, tất định (CR-004) | Tự viết `Anima.Battle.Rules`; không dùng engine bên thứ ba | Tech Lead | Đề xuất |
+| T-14 | Realtime trận đấu: SignalR hay transport riêng (Photon, Nakama) | SignalR (đã có trong stack, trận theo lượt không cần UDP) | Tech Lead | Đề xuất |
 
 ---
 

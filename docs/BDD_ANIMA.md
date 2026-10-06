@@ -4,9 +4,9 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BDD-ANIMA-001 |
-| Phiên bản | 0.4 (Draft) — thêm 12C toàn cầu & đa ngôn ngữ (CR-003); 12B tài sản số (CR-002); 12A website (CR-001) |
+| Phiên bản | 0.5 (Draft) — thêm 12D Đấu trường (CR-004); 12C toàn cầu (CR-003); 12B tài sản số (CR-002); 12A website (CR-001) |
 | Ngày | 2026-10-06 |
-| Nguồn | [BRD](BRD_ANIMA.md) v0.5, [PRD](PRD_ANIMA.md) v0.4 |
+| Nguồn | [BRD](BRD_ANIMA.md) v0.6, [PRD](PRD_ANIMA.md) v0.5 |
 | Trạng thái | **DRAFT — một số kịch bản phụ thuộc quyết định của PO** |
 
 Tài liệu này là bộ kịch bản đầy đủ. Mục 11 của BRD chỉ là trích đoạn; khi hai bên khác nhau, tài liệu này là bản chuẩn. Các ID kịch bản trong BRD được giữ nguyên.
@@ -2102,6 +2102,568 @@ Tính năng: Đa ngôn ngữ (BR-I18N)
       Và thông điệp hiển thị bằng tiếng Trung giản thể
 ```
 
+## 12D. Tính năng: Đấu trường — CR-004
+
+```gherkin
+Tính năng: Bộ bài (BR-DECK)
+  Bối cảnh chung:
+    Cho trước tài khoản "P1" Verified, có đủ thẻ cần thiết ở trạng thái Owned
+
+  Quy tắc: BR-DECK-01 → 03 — Cấu trúc bộ bài
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-DECK-01 — Kiểm tra bộ bài khi lưu
+      Cho trước bộ bài gồm <anima> Anima và <hỗ trợ> bài hỗ trợ, <điều kiện thêm>
+      Khi P1 lưu bộ bài
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | anima | hỗ trợ | điều kiện thêm                               | kết quả                   |
+        | 24    | 6      | không                                        | thành công                |
+        | 25    | 5      | không                                        | thành công                |
+        | 23    | 7      | không                                        | SUPPORT_LIMIT_EXCEEDED    |
+        | 24    | 5      | không                                        | DECK_SIZE_INVALID         |
+        | 25    | 6      | không                                        | DECK_SIZE_INVALID         |
+        | 30    | 0      | có 3 bản "Driftkoi"                          | COPY_LIMIT_EXCEEDED       |
+        | 30    | 0      | có 2 bản cùng một Legendary                  | COPY_LIMIT_EXCEEDED       |
+        | 30    | 0      | có 5 thẻ Epic                                | RARITY_LIMIT_EXCEEDED     |
+        | 30    | 0      | có 2 Secret Rare khác nhau                   | RARITY_LIMIT_EXCEEDED     |
+        | 30    | 0      | có 1 thẻ đang niêm yết trên chợ              | CARD_NOT_AVAILABLE        |
+        | 30    | 0      | có 1 thẻ đang nằm trong ví ngoài (In Wallet) | CARD_NOT_IN_ACCOUNT       |
+
+  Quy tắc: BR-DECK-05 — Số bộ được lưu
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-DECK-02 — Lưu bộ thứ n
+      Cho trước P1 đã lưu <đã lưu> bộ bài hợp lệ
+      Khi P1 lưu thêm một bộ hợp lệ
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | đã lưu | kết quả            |
+        | 9      | thành công         |
+        | 10     | DECK_SLOT_LIMIT    |
+
+  Quy tắc: BR-DECK-06 / BR-DECK-07 — Bộ bài chưa hợp lệ
+
+    @R2 @trangthai
+    Kịch bản: SC-DECK-03 — Bán một thẻ đang nằm trong bộ đã lưu
+      Cho trước bộ "Bão Luminara" của P1 hợp lệ, có thẻ "Brightling #4012"
+      Khi giao dịch bán "Brightling #4012" của P1 trên chợ hoàn tất
+      Thì "Brightling #4012" bị gỡ khỏi bộ "Bão Luminara"
+      Và bộ "Bão Luminara" có 29 lá và trạng thái "chưa hợp lệ"
+
+    @R2 @negative
+    Kịch bản: SC-DECK-04 — Vào trận bằng bộ chưa hợp lệ
+      Cho trước bộ "Bão Luminara" của P1 có 29 lá
+      Khi P1 gửi yêu cầu vào trận giao hữu với bộ đó
+      Thì server từ chối với mã lỗi DECK_INVALID
+
+  Quy tắc: BR-DECK-08 — Khóa thẻ trong trận
+
+    @R2 @trangthai
+    Sơ đồ kịch bản: SC-DECK-05 — Thao tác với thẻ của bộ đang đấu
+      Cho trước P1 đang trong một trận dùng bộ có thẻ "Tidemourn #121/300"
+      Khi P1 gửi yêu cầu <hành động> với "Tidemourn #121/300"
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | hành động           | kết quả        |
+        | niêm yết trên chợ   | CARD_IN_MATCH  |
+        | đưa vào Lò rèn      | CARD_IN_MATCH  |
+        | rút về ví NFT       | CARD_IN_MATCH  |
+
+    @R2 @happy
+    Kịch bản: SC-DECK-06 — Mở khóa sau trận
+      Cho trước trận của P1 vừa kết thúc
+      Khi P1 niêm yết "Tidemourn #121/300"
+      Thì niêm yết thành công
+
+  Quy tắc: BR-DECK-04 / BR-NEW-04 — Thẻ gắn chặt tài khoản dùng được
+
+    @R2 @happy
+    Kịch bản: SC-DECK-07 — Bộ bài toàn thẻ Tân thủ
+      Cho trước P1 chỉ có 30 thẻ Anima Common gắn chặt tài khoản, không thẻ nào quá 2 bản
+      Khi P1 lưu bộ gồm cả 30 thẻ đó
+      Thì bộ được lưu ở trạng thái hợp lệ
+
+Tính năng: Luật trận đấu (BR-BTL)
+  Bối cảnh chung:
+    Cho trước P1 và P2 đang đấu trên sàn không có luật riêng ảnh hưởng tới kịch bản
+
+  Quy tắc: BR-BTL-03 — Năng lượng Cộng hưởng
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-BTL-01 — Cộng hưởng theo lượt
+      Khi P1 bắt đầu lượt thứ <lượt>
+      Thì P1 có <cộng hưởng> điểm Cộng hưởng
+
+      Ví dụ:
+        | lượt | cộng hưởng |
+        | 1    | 1          |
+        | 6    | 6          |
+        | 9    | 6          |
+
+  Quy tắc: BR-BTL-04 — Anima vừa ra sân
+
+    @R2 @negative
+    Kịch bản: SC-BTL-02 — Tấn công ngay lượt ra sân
+      Cho trước P1 vừa đưa "Cinderpup" (không có kỹ năng xung phong) ra sân trong lượt này
+      Khi P1 cho "Cinderpup" tấn công
+      Thì server từ chối với mã lỗi ATTACK_NOT_ALLOWED
+
+  Quy tắc: BR-BTL-05 / BR-ELM-04 — Công thức sát thương
+
+    @R2 @tinhtoan
+    Sơ đồ kịch bản: SC-BTL-03 — Tính sát thương
+      Cho trước Anima tấn công hệ <hệ công> có ATK hiệu lực <atk>
+      Và mục tiêu hệ <hệ thủ> có DEF hiệu lực <def>
+      Khi Anima tấn công mục tiêu
+      Thì mục tiêu mất <sát thương> HP
+
+      Ví dụ:
+        | hệ công  | atk  | hệ thủ   | def  | sát thương | giải thích                         |
+        | Voltaris | 1800 | Aqualis  | 900  | 900        | không khắc: 900 × 1.0              |
+        | Voltaris | 800  | Aqualis  | 1000 | 100        | tối thiểu 100                      |
+        | Umbryx   | 1600 | Aqualis  | 700  | 1130       | khắc: 900 × 1.25 = 1125 → 1130     |
+        | Aqualis  | 1600 | Umbryx   | 700  | 680        | bị khắc: 900 × 0.75 = 675 → 680    |
+        | Nihilum  | 1600 | Terrakin | 700  | 990        | Nihilum: 900 × 1.1                 |
+        | Luminara | 1600 | Nihilum  | 700  | 1350       | Hy vọng khắc Trống rỗng: 900 × 1.5 |
+
+    @R2 @negative
+    Kịch bản: SC-BTL-04 — Đánh thẳng Keeper khi đối phương còn Anima
+      Cho trước sân Anima của P2 còn 1 thẻ
+      Khi P1 chọn tấn công thẳng Keeper của P2
+      Thì server từ chối với mã lỗi DIRECT_ATTACK_NOT_ALLOWED
+
+    @R2 @happy @tinhtoan
+    Kịch bản: SC-BTL-05 — Đánh thẳng Keeper khi sân trống
+      Cho trước sân Anima của P2 trống và Keeper của P2 còn 8,000 máu
+      Khi Anima của P1 có ATK hiệu lực 1,800 tấn công thẳng Keeper
+      Thì Keeper của P2 còn 6,200 máu
+
+  Quy tắc: BR-BTL-06 — Anima hết HP
+
+    @R2 @bien
+    Kịch bản: SC-BTL-06 — HP về đúng 0
+      Cho trước Anima của P2 còn 900 HP
+      Khi Anima đó nhận 900 sát thương
+      Thì Anima đó rời sân vào mộ
+
+  Quy tắc: BR-BTL-09 — Đột tử
+
+    @R2 @tinhtoan
+    Sơ đồ kịch bản: SC-BTL-07 — Mất máu khi bắt đầu lượt
+      Cho trước Keeper của P1 còn 5,000 máu
+      Khi P1 bắt đầu lượt thứ <lượt> của mình
+      Thì Keeper của P1 còn <máu> máu
+
+      Ví dụ:
+        | lượt | máu   |
+        | 9    | 5,000 |
+        | 10   | 4,500 |
+        | 11   | 4,000 |
+
+  Quy tắc: BR-BTL-08 — Hết thời gian
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-BTL-08 — Hết giờ liên tiếp
+      Cho trước P1 đã hết giờ <số lần> lượt liên tiếp và đã dùng hết quỹ dự phòng
+      Khi lượt tiếp theo của P1 cũng hết 20 giây mà P1 không thao tác
+      Thì kết quả trận là <kết quả>
+
+      Ví dụ:
+        | số lần | kết quả                      |
+        | 1      | trận tiếp tục, lượt chuyển P2 |
+        | 2      | P1 thua                      |
+
+  Quy tắc: BR-BTL-07 — Điều kiện thắng
+
+    @R2 @negative
+    Kịch bản: SC-BTL-09 — Phải bốc khi hết bài
+      Cho trước bộ bài của P1 không còn lá nào
+      Khi P1 bắt đầu lượt và phải bốc 1 lá
+      Thì P1 thua trận
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-BTL-10 — Mất kết nối
+      Cho trước P1 mất kết nối
+      Khi P1 kết nối lại sau <giây> giây
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | giây | kết quả                |
+        | 59   | trận tiếp tục          |
+        | 61   | P1 thua do mất kết nối |
+
+  Quy tắc: BR-BTL-02 — Đổi tay
+
+    @R2 @negative
+    Kịch bản: SC-BTL-11 — Đổi tay lần thứ hai
+      Cho trước P1 đã đổi tay một lần
+      Khi P1 yêu cầu đổi tay lần nữa
+      Thì server từ chối với mã lỗi MULLIGAN_USED
+
+  Quy tắc: BR-BTL-10 — Phát lại trận
+
+    @R2 @happy
+    Kịch bản: SC-BTL-12 — Phát lại cho ra cùng kết quả
+      Cho trước trận "M-501" đã kết thúc với P1 thắng và Keeper của P1 còn 2,350 máu
+      Khi hệ thống phát lại "M-501" từ dữ liệu đã lưu
+      Thì kết quả phát lại là P1 thắng và Keeper của P1 còn 2,350 máu
+
+Tính năng: Hệ và nhân quả (BR-ELM)
+
+  Quy tắc: BR-ELM-02 / BR-ELM-03 — Bảng khắc chế
+
+    @R2 @tinhtoan
+    Sơ đồ kịch bản: SC-ELM-01 — Hệ số theo cặp hệ
+      Khi Anima hệ <công> tấn công Anima hệ <thủ>
+      Thì hệ số sát thương là <hệ số>
+
+      Ví dụ:
+        | công     | thủ      | hệ số |
+        | Umbryx   | Aqualis  | 1.25  |
+        | Pyraxis  | Terrakin | 1.25  |
+        | Aqualis  | Ventara  | 1.25  |
+        | Terrakin | Voltaris | 1.25  |
+        | Ventara  | Luminara | 1.25  |
+        | Voltaris | Umbryx   | 1.25  |
+        | Luminara | Pyraxis  | 1.25  |
+        | Pyraxis  | Luminara | 0.75  |
+        | Voltaris | Aqualis  | 1.0   |
+        | Nihilum  | Luminara | 1.1   |
+        | Luminara | Nihilum  | 1.5   |
+        | Pyraxis  | Nihilum  | 1.0   |
+
+  Quy tắc: BR-ELM-05 — Sinh
+
+    @R2 @tinhtoan
+    Kịch bản: SC-ELM-02 — Ra sân khi có hệ sinh ra mình
+      Cho trước sân của P1 có một Anima Umbryx
+      Khi P1 đưa Anima Pyraxis có ATK 1,500 và HP 2,000 ra sân
+      Thì Anima Pyraxis có ATK 1,700 và HP 2,200
+
+    @R2 @negative
+    Kịch bản: SC-ELM-03 — Ngược chiều vòng sinh
+      Cho trước sân của P1 có một Anima Pyraxis
+      Khi P1 đưa Anima Umbryx có ATK 1,500 ra sân
+      Thì Anima Umbryx giữ ATK 1,500
+
+    @R2 @negative
+    Kịch bản: SC-ELM-04 — Nihilum không nhận sinh
+      Cho trước sân của P1 có Anima của cả 7 hệ trong vòng
+      Khi P1 đưa Anima Nihilum có ATK 2,000 ra sân
+      Thì Anima Nihilum giữ ATK 2,000
+
+  Quy tắc: BR-ELM-06 — Chuỗi nhân quả
+
+    @R2 @happy
+    Sơ đồ kịch bản: SC-ELM-05 — Kích hoạt chuỗi
+      Cho trước sân của P1 có 3 Anima hệ <ba hệ>
+      Khi P1 bắt đầu giai đoạn tấn công
+      Thì chuỗi nhân quả <kích hoạt>
+
+      Ví dụ:
+        | ba hệ                        | kích hoạt                         |
+        | Umbryx, Pyraxis, Aqualis     | có, cả 3 +300 ATK đến hết lượt    |
+        | Luminara, Umbryx, Pyraxis    | có (vòng khép kín)                |
+        | Umbryx, Aqualis, Terrakin    | không (không liên tiếp)           |
+
+Tính năng: Sàn đấu (BR-ARN)
+
+  Quy tắc: BR-ARN-02 — Hệ chủ nhà và hệ bị yếu
+
+    @R2 @tinhtoan
+    Sơ đồ kịch bản: SC-ARN-01 — Chỉ số khi vào sân
+      Cho trước trận diễn ra ở sàn <sàn>
+      Khi Anima hệ <hệ> có ATK <atk>, DEF 700, HP <hp> ra sân
+      Thì Anima có ATK <atk mới>, DEF 700, HP <hp mới>
+
+      Ví dụ:
+        | sàn            | hệ       | atk  | hp   | atk mới | hp mới | giải thích             |
+        | Thành Luminara | Luminara | 1600 | 2000 | 1840    | 2300   | chủ nhà +15%           |
+        | Thành Luminara | Pyraxis  | 1500 | 1800 | 1350    | 1620   | bị Luminara khắc −10%  |
+        | Thành Luminara | Aqualis  | 1500 | 1800 | 1500    | 1800   | không ảnh hưởng        |
+        | Tháp Sấm       | Voltaris | 1550 | 1050 | 1780    | 1210   | 1782.5 → 1780; 1207.5 → 1210 |
+        | Vết Nứt        | Pyraxis  | 1500 | 1800 | 1500    | 1800   | Vết Nứt không có hệ bị yếu |
+
+    @R2 @tinhtoan
+    Kịch bản: SC-ARN-02 — Kết hợp sàn và khắc chế
+      Cho trước trận ở sàn Thành Luminara
+      Và Anima Luminara của P1 có ATK hiệu lực 1,840
+      Và Anima Pyraxis của P2 có DEF 700 và HP hiện tại 1,620
+      Khi Anima Luminara tấn công Anima Pyraxis
+      Thì Anima Pyraxis mất 1,430 HP (1,140 × 1.25 = 1,425 → 1,430)
+      Và Anima Pyraxis còn 190 HP
+
+  Quy tắc: BR-ARN-03 — Luật riêng
+
+    @R2 @bien
+    Kịch bản: SC-ARN-03 — Núi Cuồng Nộ không để DEF âm
+      Cho trước trận ở sàn Núi Cuồng Nộ
+      Khi Anima có ATK 1,000 và DEF 100 ra sân
+      Thì Anima có ATK 1,200 và DEF 0
+
+    @R2 @tinhtoan
+    Kịch bản: SC-ARN-04 — Vết Nứt đột tử sớm
+      Cho trước trận ở sàn Vết Nứt và Keeper của P1 còn 5,000 máu
+      Khi P1 bắt đầu lượt thứ 8 của mình
+      Thì Keeper của P1 còn 4,500 máu
+
+  Quy tắc: BR-ARN-04 — Chọn sàn và bộ bài ở xếp hạng
+
+    @R3 @bien
+    Kịch bản: SC-ARN-05 — Không chọn bộ trong 15 giây
+      Cho trước trận xếp hạng của P1 vừa được ghép, sàn công bố là Biển Hoài Niệm
+      Và P1 có bộ "Thủy triều" được đặt làm bộ mặc định
+      Khi 15 giây trôi qua mà P1 không chọn bộ
+      Thì P1 vào trận với bộ "Thủy triều"
+
+Tính năng: Cộng minh và Hợp thể (BR-FUS)
+  Bối cảnh chung:
+    Cho trước công thức Hợp thể "Nocturne — Tiếng khóc vỡ òa" = "Nocturne, the Silent Tear" + "Quietshade" (cùng hệ Umbryx, cùng mạch "Người khóc thầm"), giá 3 Cộng hưởng
+    Và chỉ số công thức: ATK = 70% tổng ATK, HP = 70% tổng HP, DEF = DEF cao hơn
+
+  Quy tắc: BR-FUS-02 — Cộng minh
+
+    @R2 @tinhtoan
+    Sơ đồ kịch bản: SC-FUS-01 — Bonus theo số thẻ cùng mạch
+      Cho trước sân của P1 có <số thẻ> Anima cùng mạch "Người khóc thầm", mỗi thẻ ATK 1,000 và HP 1,500 trước bonus
+      Khi trạng thái sân được tính lại
+      Thì mỗi thẻ cùng mạch có ATK <atk> và HP <hp>
+
+      Ví dụ:
+        | số thẻ | atk  | hp   |
+        | 1      | 1000 | 1500 |
+        | 2      | 1100 | 1700 |
+        | 3      | 1200 | 1900 |
+
+  Quy tắc: BR-FUS-03 / BR-FUS-04 — Hợp thể
+
+    @R2 @happy @tinhtoan
+    Kịch bản: SC-FUS-02 — Hợp thể hợp lệ
+      Cho trước sân của P1 có "Nocturne" (ATK 1,200, DEF 600, HP 1,800) và "Quietshade" (ATK 1,000, DEF 700, HP 1,400)
+      Và P1 còn 3 Cộng hưởng trong lượt
+      Khi P1 Hợp thể hai thẻ đó
+      Thì "Nocturne — Tiếng khóc vỡ òa" xuất hiện với ATK 1,540, DEF 700, HP 2,240
+      Và "Nocturne" và "Quietshade" vào mộ
+      Và P1 còn 0 Cộng hưởng
+      Và dạng Hợp thể không tấn công được trong lượt này
+
+    @R2 @negative
+    Sơ đồ kịch bản: SC-FUS-03 — Hợp thể không hợp lệ
+      Cho trước <điều kiện>
+      Khi P1 yêu cầu Hợp thể
+      Thì server từ chối với mã lỗi <mã lỗi>
+
+      Ví dụ:
+        | điều kiện                                                    | mã lỗi                    |
+        | hai thẻ khác mạch truyện                                     | FUSION_RECIPE_NOT_FOUND   |
+        | hai thẻ cùng mạch nhưng hệ không giống và không liền nhau    | FUSION_RECIPE_NOT_FOUND   |
+        | P1 chỉ còn 2 Cộng hưởng                                      | INSUFFICIENT_RESONANCE    |
+        | P1 đã Hợp thể một lần trong lượt này                         | FUSION_LIMIT_PER_TURN     |
+
+    @R2 @happy
+    Kịch bản: SC-FUS-04 — Hợp thể khác hệ theo nhân quả
+      Cho trước công thức "Emberfang — Cơn giận sinh từ nỗi sợ" = một Anima Umbryx + "Emberfang" cùng mạch "Đứa trẻ bị bỏ rơi"
+      Khi P1 Hợp thể hai thẻ đó với đủ Cộng hưởng
+      Thì dạng Hợp thể xuất hiện (Sợ hãi sinh Giận dữ, hai hệ liền nhau trong vòng sinh)
+
+  Quy tắc: BR-FUS-05 — Thẻ Hợp thể bản sưu tầm
+
+    @R2 @happy
+    Kịch bản: SC-FUS-05 — Chỉ đổi hình hiển thị
+      Cho trước P1 sở hữu thẻ sưu tầm "Nocturne — Tiếng khóc vỡ òa" bản art đặc biệt
+      Khi P1 Hợp thể "Nocturne" và "Quietshade"
+      Thì dạng Hợp thể hiển thị art đặc biệt
+      Và chỉ số giống hệt SC-FUS-02
+
+Tính năng: Chế độ chơi và Arena Point (BR-PVP)
+
+  Quy tắc: BR-PVP-03 — AP không có giá trị quy đổi
+
+    @R3 @negative
+    Sơ đồ kịch bản: SC-PVP-01 — Thao tác bị cấm với AP
+      Khi P1 gửi yêu cầu <hành động>
+      Thì server trả mã lỗi NOT_SUPPORTED
+
+      Ví dụ:
+        | hành động                        |
+        | mua 1,000 AP bằng Gem            |
+        | đổi 500 AP sang Coin             |
+        | chuyển 100 AP cho P2             |
+        | dùng AP mua pack                 |
+
+  Quy tắc: BR-PVP-04 — Thách đấu cược
+
+    @R3 @happy @tinhtoan
+    Kịch bản: SC-PVP-02 — Người thắng nhận cả hai phần cược
+      Cho trước P1 và P2 mỗi người có 500 AP và đồng ý cược 200 AP
+      Khi trận bắt đầu
+      Thì mỗi người còn 300 AP khả dụng, 200 AP bị giữ
+      Và khi P1 thắng, P1 có 700 AP và P2 có 300 AP
+
+    @R3 @bien
+    Sơ đồ kịch bản: SC-PVP-03 — Mức cược
+      Cho trước P1 có 600 AP
+      Khi P1 đề nghị cược <mức> AP
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | mức  | kết quả               |
+        | 9    | WAGER_OUT_OF_RANGE    |
+        | 10   | thành công            |
+        | 600  | thành công            |
+        | 601  | INSUFFICIENT_AP       |
+
+    @R3 @happy
+    Kịch bản: SC-PVP-04 — Hủy trước khi bắt đầu
+      Cho trước P1 và P2 đã đồng ý cược 200 AP nhưng trận chưa bắt đầu
+      Khi P2 hủy thách đấu
+      Thì không có AP nào bị giữ hoặc chuyển
+
+    @R3 @negative
+    Kịch bản: SC-PVP-05 — Mất kết nối trong trận cược
+      Cho trước trận cược 200 AP giữa P1 và P2 đang diễn ra
+      Khi P2 mất kết nối quá 60 giây
+      Thì P1 thắng và nhận 400 AP tạm giữ
+
+  Quy tắc: BR-PVP-06 — Ghép trận
+
+    @R3 @negative
+    Kịch bản: SC-PVP-06 — Hai tài khoản cùng thiết bị
+      Cho trước P1 và "P1b" từng đăng nhập trên cùng một thiết bị
+      Khi P1 thách đấu cược P1b
+      Thì server từ chối với mã lỗi MATCH_NOT_ALLOWED
+
+    @R3 @bien
+    Sơ đồ kịch bản: SC-PVP-07 — Giới hạn trận giữa một cặp mỗi ngày
+      Cho trước P1 và P2 đã đấu <số trận> trận xếp hạng hoặc cược với nhau hôm nay
+      Khi P1 thách đấu cược P2
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | số trận | kết quả             |
+        | 2       | thành công          |
+        | 3       | PAIR_DAILY_LIMIT    |
+
+  Quy tắc: BR-PVP-07 — Dàn xếp trận
+
+    @R3 @negative
+    Kịch bản: SC-PVP-08 — Đầu hàng sớm lặp lại
+      Cho trước P2 đã đầu hàng P1 trong 2 lượt đầu ở 2 trận cược trong 7 ngày
+      Khi P2 đầu hàng P1 trong 2 lượt đầu lần thứ 3
+      Thì cặp P1–P2 được gắn cờ cho Fraud Analyst
+
+  Quy tắc: BR-PVP-08 — Thể thức
+
+    @R3 @negative
+    Sơ đồ kịch bản: SC-PVP-09 — Thẻ không hợp lệ trong thể thức
+      Cho trước mùa hiện tại là S4
+      Khi P1 vào trận <thể thức> với bộ có <thẻ>
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | thể thức | thẻ                                  | kết quả                     |
+        | Standard | thẻ của mùa S3                       | thành công                  |
+        | Standard | thẻ của mùa S2                       | CARD_NOT_LEGAL_IN_FORMAT    |
+        | Eternal  | thẻ của mùa S1                       | thành công                  |
+        | Eternal  | thẻ trong danh sách cấm              | CARD_BANNED                 |
+
+  Quy tắc: BR-PVP-09 — Tắt theo quốc gia
+
+    @R3 @negative
+    Kịch bản: SC-PVP-10 — Thách đấu cược bị tắt ở thị trường
+      Cho trước ma trận quốc gia tắt "thách đấu cược" cho quốc gia pháp lý của P1
+      Khi P1 tạo thách đấu cược
+      Thì server từ chối với mã lỗi FEATURE_NOT_AVAILABLE_IN_REGION
+
+Tính năng: Người chơi mới (BR-NEW)
+
+  Quy tắc: BR-NEW-01 — Gói chào mừng
+
+    @R1 @happy
+    Kịch bản: SC-NEW-01 — Nội dung gói chào mừng
+      Khi người dùng "N1" tạo tài khoản thành công
+      Thì N1 nhận 5 Card Instance Anima rarity Common
+      Và 5 thẻ thuộc 5 hệ khác nhau trong {Umbryx, Pyraxis, Aqualis, Terrakin, Ventara, Voltaris, Luminara}
+      Và không thẻ nào thuộc hệ Nihilum hoặc là bài hỗ trợ
+      Và cả 5 thẻ được đánh dấu gắn chặt tài khoản
+
+  Quy tắc: BR-NEW-04 — Thẻ gắn chặt tài khoản
+
+    @R1 @negative
+    Sơ đồ kịch bản: SC-NEW-02 — Thao tác bị cấm với thẻ tặng
+      Cho trước N1 có thẻ chào mừng "Driftkoi #30012"
+      Khi N1 <hành động> "Driftkoi #30012"
+      Thì server từ chối với mã lỗi <mã lỗi>
+
+      Ví dụ:
+        | hành động         | mã lỗi              |
+        | niêm yết          | CARD_NOT_TRADABLE   |
+        | rút về ví NFT     | CARD_NOT_TRADABLE   |
+        | đưa vào Lò rèn    | CARD_NOT_FORGEABLE  |
+
+  Quy tắc: BR-NEW-03 — Nhiệm vụ Tân thủ
+
+    @R1 @happy
+    Kịch bản: SC-NEW-03 — Hoàn thành nhiệm vụ ngày 3
+      Cho trước N1 tạo tài khoản ngày 2026-10-06 và đang ở ngày Tân thủ thứ 3
+      Khi N1 hoàn thành mọi nhiệm vụ của ngày 3
+      Thì N1 nhận 1 pack cơ bản 5 Anima Common gắn chặt tài khoản
+
+    @R1 @bien
+    Sơ đồ kịch bản: SC-NEW-04 — Làm bù nhiệm vụ
+      Cho trước N1 tạo tài khoản ngày 2026-10-06 và chưa hoàn thành nhiệm vụ ngày 2
+      Khi N1 hoàn thành nhiệm vụ ngày 2 vào ngày <ngày>
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | ngày       | kết quả                             |
+        | 2026-10-09 | nhận pack cơ bản của ngày 2         |
+        | 2026-10-12 | nhận pack cơ bản của ngày 2 (ngày 7)|
+        | 2026-10-13 | QUEST_EXPIRED                       |
+
+    @R1 @happy @cho-Q53
+    Kịch bản: SC-NEW-05 — Thưởng ngày 6
+      Cho trước N1 đang ở ngày Tân thủ thứ 6
+      Khi N1 hoàn thành mọi nhiệm vụ của ngày 6
+      Thì N1 nhận 200 Coin
+
+  Quy tắc: BR-NEW-05 — Không quá 2 bản trong thẻ Tân thủ
+
+    @R1 @bien
+    Kịch bản: SC-NEW-06 — Pack cơ bản tránh bản thứ 3
+      Cho trước N1 đã có 2 bản "Driftkoi" gắn chặt tài khoản
+      Khi N1 mở một pack cơ bản
+      Thì không thẻ nào trong pack là "Driftkoi"
+
+    @R1 @happy
+    Kịch bản: SC-NEW-07 — Đủ 30 lá sau ngày 5
+      Cho trước N1 có gói chào mừng và đã nhận 5 pack cơ bản
+      Khi N1 tạo bộ bài từ 30 thẻ gắn chặt tài khoản
+      Thì bộ bài hợp lệ theo BR-DECK-01 → 03
+
+  Quy tắc: BR-NEW-06 — Trận hướng dẫn
+
+    @R2 @happy
+    Kịch bản: SC-NEW-08 — Trận hướng dẫn không đổi bộ sưu tập
+      Cho trước N1 vừa nhận gói chào mừng và có 5 thẻ
+      Khi N1 chơi xong trận hướng dẫn bằng bộ bài mượn
+      Thì N1 vẫn có đúng 5 thẻ
+      Và tài khoản được đánh dấu đã hoàn thành hướng dẫn
+      Và N1 không nhận Coin, Gem hay thẻ từ trận này
+
+  Quy tắc: BR-PVP-02 — Chưa đủ 30 lá
+
+    @R2 @negative
+    Kịch bản: SC-NEW-09 — Người mới vào trận giao hữu khi mới có 5 thẻ
+      Cho trước N1 chỉ có 5 thẻ
+      Khi N1 gửi yêu cầu vào trận giao hữu
+      Thì server từ chối với mã lỗi DECK_INVALID
+```
+
 ---
 
 ## 13. Rà soát edge case
@@ -2228,12 +2790,50 @@ Tính năng: Đa ngôn ngữ (BR-I18N)
 | BR-I18N-02, 03 | — | SC-I18N-04 | SC-I18N-03 |
 | BR-I18N-04 | SC-I18N-05 | — | — |
 | BR-I18N-05, 06, 07 | Kiểm thử bản địa hóa (QA) | — | — |
+| BR-CARD-01 → 07 | Kiểm tra dữ liệu Card Definition khi phát hành (validator Catalog) | — | — |
+| BR-DECK-01 → 03 | SC-DECK-01 | SC-DECK-01 | SC-DECK-01 |
+| BR-DECK-04 | SC-DECK-07 | — | SC-DECK-01 |
+| BR-DECK-05 | SC-DECK-02 | SC-DECK-02 | SC-DECK-02 |
+| BR-DECK-06, 07 | SC-DECK-03 | — | SC-DECK-04 |
+| BR-DECK-08 | SC-DECK-06 | — | SC-DECK-05 |
+| BR-BTL-02 | — | — | SC-BTL-11 |
+| BR-BTL-03 | SC-BTL-01 | SC-BTL-01 | — |
+| BR-BTL-04 | — | — | SC-BTL-02 |
+| BR-BTL-05 | SC-BTL-03, SC-BTL-05 | SC-BTL-03 | SC-BTL-04 |
+| BR-BTL-06 | — | SC-BTL-06 | — |
+| BR-BTL-07 | — | SC-BTL-10 | SC-BTL-09 |
+| BR-BTL-08 | SC-BTL-08 | SC-BTL-08 | SC-BTL-08 |
+| BR-BTL-09 | SC-BTL-07 | SC-BTL-07 | — |
+| BR-BTL-10 | SC-BTL-12 | — | — |
+| BR-BTL-11 | Đo bằng mô phỏng và analytics | — | — |
+| BR-ELM-01, 02, 04 | SC-ELM-01 | — | SC-ELM-01 |
+| BR-ELM-03 | SC-ELM-01 | — | SC-ELM-04 |
+| BR-ELM-05 | SC-ELM-02 | — | SC-ELM-03 |
+| BR-ELM-06 | SC-ELM-05 | SC-ELM-05 | SC-ELM-05 |
+| BR-ARN-02 | SC-ARN-01, SC-ARN-02 | SC-ARN-01 | — |
+| BR-ARN-03 | SC-ARN-04 | SC-ARN-03 | — |
+| BR-ARN-04 | — | SC-ARN-05 | — |
+| BR-FUS-02 | SC-FUS-01 | SC-FUS-01 | — |
+| BR-FUS-03, 04 | SC-FUS-02, SC-FUS-04 | — | SC-FUS-03 |
+| BR-FUS-05 | SC-FUS-05 | — | — |
+| BR-PVP-03 | — (rule cấm) | — | SC-PVP-01 |
+| BR-PVP-04 | SC-PVP-02, SC-PVP-04 | SC-PVP-03 | SC-PVP-05 |
+| BR-PVP-06 | — | SC-PVP-07 | SC-PVP-06 |
+| BR-PVP-07 | — | — | SC-PVP-08 |
+| BR-PVP-08 | SC-PVP-09 | — | SC-PVP-09 |
+| BR-PVP-09 | — | — | SC-PVP-10 |
+| BR-NEW-01 | SC-NEW-01 | — | — |
+| BR-NEW-03 | SC-NEW-03, SC-NEW-05 | SC-NEW-04 | SC-NEW-04 |
+| BR-NEW-04 | — | — | SC-NEW-02 |
+| BR-NEW-05 | SC-NEW-07 | SC-NEW-06 | — |
+| BR-NEW-06 | SC-NEW-08 | — | — |
+| BR-PVP-02 | — | — | SC-NEW-09, SC-DECK-04 |
 
 Ô "—" ở cột Happy/Biên nghĩa là rule đó chỉ mô tả hành vi chặn hoặc không có giá trị ngưỡng; lý do được ghi trong ô. Các rule chỉ có cột Negative (BR-CHK-04, BR-REF-03, BR-MKT-02/03/10, BR-FRD-03, BR-ADM-03) là rule cấm; hành vi hợp lệ tương ứng đã nằm trong kịch bản happy của rule khác.
 
 ## 15. Số liệu
 
-- 20 tính năng, 189 kịch bản đơn và 31 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
+- 27 tính năng, 223 kịch bản đơn và 50 sơ đồ kịch bản (mỗi dòng trong bảng `Ví dụ` là một trường hợp kiểm thử).
 - 23 kịch bản/sơ đồ có tag `@cho-*` và 2 dòng ví dụ được đánh dấu `@cho-*`, sẽ cập nhật khi PO trả lời câu hỏi mở trong BRD.
 
 ## 16. Bước tiếp theo

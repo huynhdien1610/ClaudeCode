@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANIMA — Đấu trường</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:wght@700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  /* Thanh điều khiển của prototype (không thuộc sản phẩm) */
+  .proto-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--line); font-size: 13px; }
+  .proto-bar label { display: flex; flex-direction: row; align-items: center; gap: 6px; font-size: 13px; }
+  .proto-bar select { padding: 4px 8px; font-size: 13px; }
+  .proto-bar .tag { color: var(--text-3); font-size: 12px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: minmax(0, 1fr); } }
+
+  .board { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: grid; gap: 10px; }
+  .side { display: grid; gap: 8px; }
+  .side.foe { padding-bottom: 10px; border-bottom: 1px dashed var(--line-2); }
+  .side.me { padding-top: 10px; border-top: 1px dashed var(--line-2); }
+  .keeper { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--surface-2); }
+  .keeper .who { font-weight: 700; min-width: 74px; }
+  .keeper .hpbar { flex: 1; min-width: 120px; height: 10px; border-radius: 5px; background: var(--bg-2); overflow: hidden; }
+  .keeper .hpbar i { display: block; height: 100%; background: var(--ok); transition: width .3s; }
+  .keeper.low .hpbar i { background: var(--danger); }
+  .keeper .hp { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 82px; text-align: right; }
+  .keeper .meta { color: var(--text-3); font-size: 12px; }
+  .keeper.target { outline: 2px solid var(--danger); outline-offset: 2px; cursor: pointer; background: #fbefed; }
+
+  .lane { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, .8fr); gap: 8px; align-items: stretch; }
+  .traps { display: grid; gap: 6px; }
+  .slot { min-height: 150px; border: 1px dashed var(--line-2); border-radius: var(--radius-sm); display: grid; place-items: center; color: var(--text-3); font-size: 12px; background: var(--bg); position: relative; }
+  .slot.open { border-color: var(--accent); border-style: solid; background: #fbf3ee; cursor: pointer; color: var(--accent); font-weight: 600; }
+  .tslot { min-height: 0; height: 100%; min-height: 68px; }
+  .tslot .faceDown { width: 100%; height: 100%; border-radius: 6px; background: var(--ink); background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 2px, transparent 2px 8px); color: #e9e3d6; display: grid; place-items: center; font-size: 11px; text-align: center; padding: 4px; }
+
+  /* Thẻ trên sân và trên tay */
+  .u { --hue: 30; width: 100%; height: 100%; border: 2px solid var(--rc); border-radius: var(--radius-sm); background: #fff; padding: 6px; display: flex; flex-direction: column; gap: 3px; text-align: left; font: inherit; color: inherit; position: relative; cursor: default; }
+  button.u { cursor: pointer; }
+  .u .top { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+  .u .cost { width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; flex: none; }
+  .u .glyph { width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; background: hsl(var(--hue) 45% 92%); color: hsl(var(--hue) 45% 34%); font-size: 15px; flex: none; }
+  .u .nm { font-weight: 700; font-size: 13px; line-height: 1.2; overflow-wrap: anywhere; }
+  .u .sub { font-size: 11px; color: var(--text-3); line-height: 1.25; }
+  .u .stats { display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; font-variant-numeric: tabular-nums; margin-top: auto; }
+  .u .stats b { font-weight: 700; }
+  .u .stats .atk { color: var(--danger); }
+  .u .stats .def { color: var(--ink-2); }
+  .u .stats .hp { color: var(--ok); }
+  .u .badges { display: flex; flex-wrap: wrap; gap: 3px; }
+  .u .bd { font-size: 10px; padding: 0 5px; border-radius: 4px; background: var(--surface-2); border: 1px solid var(--line); color: var(--text-2); white-space: nowrap; }
+  .u .bd.good { background: #edf5ef; border-color: #b9d8c3; color: var(--ok); }
+  .u .bd.bad { background: #fbefed; border-color: #ecc4bf; color: var(--danger); }
+  .u.ready { box-shadow: 0 0 0 2px #b9d8c3; }
+  .u.sel { box-shadow: 0 0 0 3px var(--accent); }
+  .u.target { box-shadow: 0 0 0 3px var(--danger); cursor: pointer; }
+  .u.dim { opacity: .55; }
+  .u .pred { position: absolute; top: 34%; left: 50%; transform: translateX(-50%); background: var(--danger); color: #fff; font-weight: 700; padding: 2px 8px; border-radius: 6px; font-size: 13px; white-space: nowrap; box-shadow: var(--shadow); }
+  .u .pred small { color: #fde2de; font-weight: 500; }
+  .u.hit { animation: hit .35s; }
+  @keyframes hit { 0%,100% { transform: none; } 30% { transform: translateX(-4px); } 60% { transform: translateX(4px); } }
+
+  .mid { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px; border-radius: var(--radius-sm); background: var(--bg-2); }
+  .pips { display: inline-flex; gap: 4px; }
+  .pips i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--accent); display: inline-block; }
+  .pips i.on { background: var(--accent); }
+  .clock { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .clock.warn { color: var(--danger); }
+  .hint { font-size: 13px; color: var(--text-2); flex-basis: 100%; }
+
+  .hand { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; }
+  .hand .u { width: 132px; height: auto; min-height: 168px; flex: none; }
+  .hand .u.cant { opacity: .5; }
+  .hand .u .txt { font-size: 11px; color: var(--text-2); line-height: 1.3; }
+  .foe-hand { display: flex; gap: 4px; }
+  .foe-hand i { width: 14px; height: 20px; border-radius: 3px; background: var(--ink); display: inline-block; }
+
+  .panel h3 { margin-bottom: 8px; }
+  .log { max-height: 360px; overflow-y: auto; font-size: 13px; display: grid; gap: 4px; padding-right: 4px; }
+  .log div { color: var(--text-2); line-height: 1.4; }
+  .log div.turn { color: var(--text); font-weight: 600; margin-top: 4px; }
+  .cycle { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 12px; }
+  .cycle span.e { padding: 2px 6px; border-radius: 5px; background: hsl(var(--hue) 45% 92%); color: hsl(var(--hue) 45% 30%); font-weight: 600; }
+  .side-p { font-size: 13px; color: var(--text-2); margin: 6px 0 0; }
+
+  .ov { position: fixed; inset: 0; background: rgba(246, 244, 239, .86); display: grid; place-items: center; z-index: 80; padding: 16px; }
+  .ov .panel { max-width: 640px; max-height: calc(100vh - 32px); overflow-y: auto; width: 100%; display: grid; gap: 10px; box-shadow: var(--shadow); }
+  .ov .hand { flex-wrap: wrap; overflow: visible; }
+  .ov .hand .u { width: 104px; min-height: 140px; }
+  .res-big { font-family: var(--font-display); font-size: 34px; }
+  .res-big.win { color: var(--ok); }
+  .res-big.lose { color: var(--danger); }
+  code.seed { font-size: 12px; overflow-wrap: anywhere; color: var(--text-2); }
+
+  @media (max-width: 560px) {
+    .lane { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .traps { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
+    .slot { min-height: 138px; }
+    .u { padding: 4px; }
+    .u .nm { font-size: 12px; }
+    .u .stats { font-size: 11px; gap: 4px; }
+    .hand .u { width: 118px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <a href="index.html">← Prototype</a>
+  <label>Ngôn ngữ <select id="langSel"></select></label>
+  <label>Sàn <select id="arenaSel"></select></label>
+  <label><input type="checkbox" id="timerChk" checked> Đồng hồ lượt</label>
+  <label>Tốc độ máy <select id="speedSel"><option value="600">Thường</option><option value="120">Nhanh</option></select></label>
+  <button class="btn sm" id="newBtn">Trận mới</button>
+  <button class="btn sm" id="assistBtn">Máy chơi giúp lượt này</button>
+  <span class="tag">Luật rút gọn theo BRD 10.18 → 10.25; chỉ số tạm; trình duyệt đóng vai server.</span>
+</div>
+
+<div class="wrap">
+  <main class="board" id="board" aria-live="polite"></main>
+  <aside class="side-col grid">
+    <div class="panel" id="arenaPanel"></div>
+    <div class="panel"><h3 id="logTitle"></h3><div class="log" id="log"></div></div>
+    <div class="panel" id="rulesPanel"></div>
+  </aside>
+</div>
+<div id="ov"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/i18n.js"></script>
+<script>
+(function () {
+  const A = window.ANIMA, I = window.ANIMA_I18N;
+  const qs = new URLSearchParams(location.search);
+
+  /* ---------- Từ điển riêng của màn Đấu trường ---------- */
+  const T = {
+    vi: {
+      title: "Đấu trường", you: "Bạn", ai: "Máy", keeper: "Keeper", deck: "Bộ bài", hand: "Trên tay", grave: "Mộ",
+      res: "Cộng hưởng", turn: "Lượt {n}", yourTurn: "Lượt của bạn", aiTurn: "Máy đang đi…", endTurn: "Kết thúc lượt", surrender: "Đầu hàng",
+      fuse: "Hợp thể ({c} Cộng hưởng)", clock: "{s}s · dự trữ {b}s", suddenAt: "Đột tử từ lượt {n}", empty: "Ô trống", trap: "Ký ức", trapDown: "Ký ức úp",
+      "mull.title": "Bài khởi đầu", "mull.text": "Bạn đi {order}. Giữ 5 lá này hay đổi tay một lần?", "order.first": "trước", "order.second": "sau (được bốc thêm 1 lá)", "mull.keep": "Giữ bài", "mull.redraw": "Đổi tay",
+      "hint.idle": "Chọn một lá trên tay, hoặc một Anima đang sẵn sàng để tấn công.", "hint.anima": "Chọn ô trống trên sân của bạn.", "hint.echo": "Chọn một Anima của bạn để nhận Tiếng vọng.", "hint.seal": "Chọn ô Ký ức trống.", "hint.attack": "Chọn mục tiêu. Số trên mục tiêu là sát thương dự đoán.", "hint.noRes": "Không đủ Cộng hưởng.", "hint.full": "Không còn ô trống.", "hint.sick": "Anima vừa ra sân chưa tấn công được.", "hint.used": "Anima này đã tấn công trong lượt.", "hint.noTarget": "Không có mục tiêu hợp lệ.",
+      "type.anima": "Anima", "type.echo": "Tiếng vọng", "type.seal": "Ký ức phong ấn",
+      "b.sick": "Mới ra sân", "b.done": "Đã đánh", "b.ready": "Sẵn sàng", "b.gen": "Sinh", "b.chain": "Chuỗi +300", "b.bond": "Cộng minh", "b.hidden": "Ẩn", "b.home": "Sàn +15%", "b.weak": "Sàn −10%", "b.fused": "Hợp thể",
+      direct: "Đánh thẳng",
+      "log.start": "Trận bắt đầu ở {arena}. {who} đi trước.", "log.turn": "Lượt {n} của {who} · {r} Cộng hưởng", "log.play": "{who} đưa {card} ra sân.", "log.gen": "{src} sinh ra {card}: +200 ATK, +200 HP.", "log.chain": "Chuỗi nhân quả {a} → {b} → {c}: +300 ATK đến hết lượt.", "log.hit": "{a} đánh {b}: {d} sát thương{x}.", "log.hitK": "{a} đánh thẳng Keeper: {d} sát thương.", "log.ko": "{card} bị hạ.", "log.sea": "Biển Hoài Niệm: {card} trở về tay.", "log.echo": "{who} dùng {card} lên {t}: +{v} ATK, +{v} HP.", "log.set": "{who} úp một Ký ức phong ấn.", "log.trap": "Ký ức phong ấn kích hoạt: đòn của {a} bị hủy, {a} mất 400 HP.", "log.fuse": "Hợp thể: {a} + {b} → {c}.", "log.sudden": "Đột tử: Keeper của {who} mất {d}.", "log.thunder": "Tháp Sấm: {card} mất 100 HP.", "log.heal": "Thành Luminara: {card} hồi {d} HP.", "log.skillHeal": "{card}: Keeper hồi 1,000 máu.", "log.skillWave": "{card}: 300 sát thương lên mọi Anima đối phương.", "log.timeout": "Hết giờ, lượt tự kết thúc.", "log.burn": "Tay đầy, {card} vào mộ.", "log.mull": "{who} đổi tay.",
+      "x.strong": " (khắc ×1.25)", "x.weak": " (bị khắc ×0.75)", "x.nih": " (Nihilum ×1.1)", "x.lum": " (Luminara đánh Nihilum ×1.5)",
+      "r.win": "Chiến thắng", "r.lose": "Thất bại", "why.keeper": "Keeper đối thủ hết máu", "why.deck": "Hết bài để bốc", "why.surrender": "Đầu hàng", "why.timeout": "Hết giờ 3 lượt liên tiếp", "r.stats": "{t} lượt · {m} phút {s} giây", "r.seed": "Seed trận: {seed} · mã băm công bố lúc bắt đầu: {hash}", "r.again": "Đấu lại", "r.home": "Về trang chủ", "r.note": "Bản thật: trận luyện tập với máy không có phần thưởng có giá trị; xếp hạng và Arena Point có ở R3.",
+      "s.arena": "Sàn đấu", "s.log": "Diễn biến", "s.rules": "Luật tóm tắt", "s.cycle": "Vòng sinh (hệ trước sinh ra hệ sau):", "s.counter": "Khắc: mỗi hệ khắc hệ cách nó 2 bước trong vòng (×1.25), bị khắc ×0.75. Nihilum ×1.1 với mọi hệ; Luminara đánh Nihilum ×1.5.", "s.dmg": "Sát thương = max(100, ATK − DEF) × hệ số, làm tròn chục. Chỉ đánh thẳng Keeper khi sân đối phương trống.", "s.bonus": "Sinh: Anima ra sân khi phe mình có hệ sinh ra nó +200 ATK/HP. Ba hệ liên tiếp trên sân: +300 ATK một lượt. Cộng minh: 2 lá cùng mạch +100 ATK/+200 HP.", "s.deck": "Bộ của bạn: 30 lá (26 Anima, 2 Tiếng vọng, 2 Ký ức phong ấn) — Umbryx, Pyraxis, Aqualis, Luminara.", "s.mod": "Chủ nhà {el}: +15% ATK, HP · {weak}: −10%", "s.modN": "Chủ nhà Nihilum: +15% ATK, HP · không có hệ yếu", "s.random": "Ngẫu nhiên",
+      "arc.weeper": "Người khóc thầm", "arc.harbor": "Bến cảng vắng",
+      "sk.heal": "Khi ra sân: Keeper hồi 1,000 máu.", "sk.rush": "Xung phong: đánh được ngay lượt ra sân.", "sk.wave": "Khi ra sân: 300 sát thương lên mọi Anima đối phương.", "sk.echo": "+300 ATK, +300 HP cho 1 Anima phe mình; cùng hệ: +500/+500.", "sk.seal": "Tự kích hoạt khi Anima đối phương tấn công: hủy đòn, gây 400 sát thương lên nó.", "sk.fused": "Dạng Hợp thể của Nocturne + Quietshade.",
+      fusedName: "Nocturne — Tiếng khóc vỡ òa",
+      "ar.Luminara": "Thành Luminara", "ar.Umbryx": "Thung lũng Lặng Thinh", "ar.Pyraxis": "Núi Cuồng Nộ", "ar.Aqualis": "Biển Hoài Niệm", "ar.Terrakin": "Cao nguyên Bất Khuất", "ar.Ventara": "Đỉnh Gió Ngàn", "ar.Voltaris": "Tháp Sấm", "ar.Nihilum": "Vết Nứt",
+      "rule.Luminara": "Cuối mỗi lượt, Anima ít HP nhất của mỗi bên hồi 200.", "rule.Umbryx": "Anima vừa ra sân không bị chọn làm mục tiêu cho đến lượt kế của chủ.", "rule.Pyraxis": "Mọi Anima +200 ATK, −200 DEF.", "rule.Aqualis": "Mỗi bên một lần mỗi trận: Anima đầu tiên bị hạ trở về tay.", "rule.Terrakin": "DEF ×2 trong 3 lượt đầu của mỗi bên.", "rule.Ventara": "Mỗi lượt được đổi vị trí 2 Anima (prototype chưa mô phỏng vì vị trí chưa ảnh hưởng luật).", "rule.Voltaris": "Đầu mỗi lượt, 100 sát thương lên một Anima ngẫu nhiên trên sân.", "rule.Nihilum": "Tắt luật sàn khác; đột tử từ lượt 8.",
+    },
+    en: {
+      title: "Arena", you: "You", ai: "AI", keeper: "Keeper", deck: "Deck", hand: "Hand", grave: "Grave",
+      res: "Resonance", turn: "Turn {n}", yourTurn: "Your turn", aiTurn: "AI is playing…", endTurn: "End turn", surrender: "Surrender",
+      fuse: "Fuse ({c} Resonance)", clock: "{s}s · bank {b}s", suddenAt: "Sudden death from turn {n}", empty: "Empty", trap: "Memory", trapDown: "Set memory",
+      "mull.title": "Opening hand", "mull.text": "You go {order}. Keep these 5 cards or redraw once?", "order.first": "first", "order.second": "second (draw 1 extra card)", "mull.keep": "Keep", "mull.redraw": "Redraw",
+      "hint.idle": "Pick a card in your hand, or a ready Anima to attack.", "hint.anima": "Pick an empty slot on your side.", "hint.echo": "Pick one of your Anima to receive the Echo.", "hint.seal": "Pick an empty Memory slot.", "hint.attack": "Pick a target. The number on it is the predicted damage.", "hint.noRes": "Not enough Resonance.", "hint.full": "No empty slot.", "hint.sick": "An Anima can't attack the turn it enters.", "hint.used": "This Anima already attacked this turn.", "hint.noTarget": "No valid target.",
+      "type.anima": "Anima", "type.echo": "Echo", "type.seal": "Sealed Memory",
+      "b.sick": "Just entered", "b.done": "Attacked", "b.ready": "Ready", "b.gen": "Born", "b.chain": "Chain +300", "b.bond": "Bond", "b.hidden": "Hidden", "b.home": "Arena +15%", "b.weak": "Arena −10%", "b.fused": "Fused",
+      direct: "Attack directly",
+      "log.start": "Match starts at {arena}. {who} goes first.", "log.turn": "Turn {n} for {who} · {r} Resonance", "log.play": "{who} plays {card}.", "log.gen": "{src} gives birth to {card}: +200 ATK, +200 HP.", "log.chain": "Causal chain {a} → {b} → {c}: +300 ATK this turn.", "log.hit": "{a} hits {b}: {d} damage{x}.", "log.hitK": "{a} hits the Keeper directly: {d} damage.", "log.ko": "{card} is defeated.", "log.sea": "Sea of Nostalgia: {card} returns to hand.", "log.echo": "{who} uses {card} on {t}: +{v} ATK, +{v} HP.", "log.set": "{who} sets a Sealed Memory.", "log.trap": "Sealed Memory triggers: {a}'s attack is cancelled and {a} loses 400 HP.", "log.fuse": "Fusion: {a} + {b} → {c}.", "log.sudden": "Sudden death: {who}'s Keeper loses {d}.", "log.thunder": "Thunder Spire: {card} loses 100 HP.", "log.heal": "Luminara Citadel: {card} recovers {d} HP.", "log.skillHeal": "{card}: Keeper recovers 1,000.", "log.skillWave": "{card}: 300 damage to every enemy Anima.", "log.timeout": "Time's up, turn ended.", "log.burn": "Hand full, {card} goes to the grave.", "log.mull": "{who} redraws.",
+      "x.strong": " (counter ×1.25)", "x.weak": " (countered ×0.75)", "x.nih": " (Nihilum ×1.1)", "x.lum": " (Luminara vs Nihilum ×1.5)",
+      "r.win": "Victory", "r.lose": "Defeat", "why.keeper": "Opponent's Keeper fell", "why.deck": "No card left to draw", "why.surrender": "Surrender", "why.timeout": "Timed out 3 turns in a row", "r.stats": "{t} turns · {m} min {s} s", "r.seed": "Match seed: {seed} · hash published at start: {hash}", "r.again": "Play again", "r.home": "Home", "r.note": "In the real game, practice matches against the AI give no valuable rewards; ranked play and Arena Point come in R3.",
+      "s.arena": "Arena", "s.log": "Battle log", "s.rules": "Rules in brief", "s.cycle": "Generating cycle (each element gives birth to the next):", "s.counter": "Counter: each element counters the one two steps ahead (×1.25); countered ×0.75. Nihilum ×1.1 against all; Luminara vs Nihilum ×1.5.", "s.dmg": "Damage = max(100, ATK − DEF) × multiplier, rounded to tens. The Keeper can be hit directly only when the opposing field is empty.", "s.bonus": "Birth: an Anima entering while you control the element that generates it gets +200 ATK/HP. Three consecutive elements on your field: +300 ATK for one turn. Bond: 2 cards of the same arc +100 ATK/+200 HP.", "s.deck": "Your deck: 30 cards (26 Anima, 2 Echoes, 2 Sealed Memories) — Umbryx, Pyraxis, Aqualis, Luminara.", "s.mod": "Home {el}: +15% ATK, HP · {weak}: −10%", "s.modN": "Home Nihilum: +15% ATK, HP · no weakened element", "s.random": "Random",
+      "arc.weeper": "The Silent Weeper", "arc.harbor": "The Empty Harbor",
+      "sk.heal": "On entry: your Keeper recovers 1,000.", "sk.rush": "Rush: can attack the turn it enters.", "sk.wave": "On entry: 300 damage to every enemy Anima.", "sk.echo": "+300 ATK, +300 HP to one of your Anima; same element: +500/+500.", "sk.seal": "Triggers when an enemy Anima attacks: cancels the attack and deals 400 damage to it.", "sk.fused": "Fused form of Nocturne + Quietshade.",
+      fusedName: "Nocturne — Tears Unbound",
+      "ar.Luminara": "Luminara Citadel", "ar.Umbryx": "Silent Valley", "ar.Pyraxis": "Mount Fury", "ar.Aqualis": "Sea of Nostalgia", "ar.Terrakin": "Unyielding Highlands", "ar.Ventara": "Thousand-Wind Peak", "ar.Voltaris": "Thunder Spire", "ar.Nihilum": "The Rift",
+      "rule.Luminara": "At the end of each turn, each side's lowest-HP Anima recovers 200.", "rule.Umbryx": "A newly entered Anima can't be targeted until its owner's next turn.", "rule.Pyraxis": "All Anima +200 ATK, −200 DEF.", "rule.Aqualis": "Once per match for each side: the first Anima defeated returns to hand.", "rule.Terrakin": "DEF ×2 during each side's first 3 turns.", "rule.Ventara": "Swap 2 Anima once per turn (not simulated: positions don't affect rules yet).", "rule.Voltaris": "At the start of each turn, 100 damage to a random Anima on the board.", "rule.Nihilum": "Other arena rules off; sudden death from turn 8.",
+    },
+    "zh-Hans": {
+      title: "竞技场", you: "你", ai: "电脑", keeper: "守护者", deck: "牌库", hand: "手牌", grave: "墓地",
+      res: "共鸣", turn: "第 {n} 回合", yourTurn: "你的回合", aiTurn: "电脑行动中…", endTurn: "结束回合", surrender: "投降",
+      fuse: "融合（{c} 共鸣）", clock: "{s} 秒 · 备用 {b} 秒", suddenAt: "第 {n} 回合起突然死亡", empty: "空位", trap: "记忆", trapDown: "盖放的记忆",
+      "mull.title": "起手牌", "mull.text": "你{order}。保留这 5 张，还是重抽一次？", "order.first": "先手", "order.second": "后手（多抽 1 张）", "mull.keep": "保留", "mull.redraw": "重抽",
+      "hint.idle": "选择一张手牌，或一个已就绪的 Anima 进行攻击。", "hint.anima": "选择你场上的空位。", "hint.echo": "选择你的一个 Anima 接受回响。", "hint.seal": "选择空的记忆位。", "hint.attack": "选择目标。目标上的数字是预计伤害。", "hint.noRes": "共鸣不足。", "hint.full": "没有空位。", "hint.sick": "刚登场的 Anima 本回合不能攻击。", "hint.used": "该 Anima 本回合已攻击。", "hint.noTarget": "没有可选目标。",
+      "type.anima": "Anima", "type.echo": "回响", "type.seal": "封印记忆",
+      "b.sick": "刚登场", "b.done": "已攻击", "b.ready": "就绪", "b.gen": "相生", "b.chain": "因果链 +300", "b.bond": "共鸣羁绊", "b.hidden": "隐匿", "b.home": "场地 +15%", "b.weak": "场地 −10%", "b.fused": "融合",
+      direct: "直接攻击",
+      "log.start": "比赛在{arena}开始。{who}先手。", "log.turn": "{who}的第 {n} 回合 · {r} 共鸣", "log.play": "{who}让 {card} 登场。", "log.gen": "{src} 生出 {card}：ATK +200，HP +200。", "log.chain": "因果链 {a} → {b} → {c}：本回合 ATK +300。", "log.hit": "{a} 攻击 {b}：{d} 伤害{x}。", "log.hitK": "{a} 直接攻击守护者：{d} 伤害。", "log.ko": "{card} 被击倒。", "log.sea": "怀念之海：{card} 回到手牌。", "log.echo": "{who}对 {t} 使用 {card}：ATK +{v}，HP +{v}。", "log.set": "{who}盖放了一张封印记忆。", "log.trap": "封印记忆发动：{a} 的攻击被取消，{a} 失去 400 HP。", "log.fuse": "融合：{a} + {b} → {c}。", "log.sudden": "突然死亡：{who}的守护者失去 {d}。", "log.thunder": "雷霆之塔：{card} 失去 100 HP。", "log.heal": "Luminara 之城：{card} 回复 {d} HP。", "log.skillHeal": "{card}：守护者回复 1,000。", "log.skillWave": "{card}：对所有敌方 Anima 造成 300 伤害。", "log.timeout": "时间到，回合自动结束。", "log.burn": "手牌已满，{card} 进入墓地。", "log.mull": "{who}重抽了起手牌。",
+      "x.strong": "（克制 ×1.25）", "x.weak": "（被克制 ×0.75）", "x.nih": "（Nihilum ×1.1）", "x.lum": "（Luminara 对 Nihilum ×1.5）",
+      "r.win": "胜利", "r.lose": "失败", "why.keeper": "对手守护者生命归零", "why.deck": "没有牌可抽", "why.surrender": "投降", "why.timeout": "连续 3 回合超时", "r.stats": "{t} 回合 · {m} 分 {s} 秒", "r.seed": "比赛种子：{seed} · 开始时公布的哈希：{hash}", "r.again": "再来一局", "r.home": "返回首页", "r.note": "正式版：与电脑的练习赛没有有价值的奖励；排位赛和竞技点在 R3 推出。",
+      "s.arena": "场地", "s.log": "战况", "s.rules": "规则摘要", "s.cycle": "相生循环（前者生出后者）：", "s.counter": "相克：每个属性克制循环中往后第 2 个属性（×1.25），被克制 ×0.75。Nihilum 对所有属性 ×1.1；Luminara 对 Nihilum ×1.5。", "s.dmg": "伤害 = max(100, ATK − DEF) × 系数，四舍五入到十位。只有对方场上没有 Anima 时才能直接攻击守护者。", "s.bonus": "相生：己方场上有生出它的属性时登场，ATK/HP +200。场上 3 个连续属性：ATK +300 一回合。羁绊：同一故事线 2 张，ATK +100/HP +200。", "s.deck": "你的牌组：30 张（26 Anima、2 回响、2 封印记忆）— Umbryx、Pyraxis、Aqualis、Luminara。", "s.mod": "主场 {el}：ATK、HP +15% · {weak}：−10%", "s.modN": "主场 Nihilum：ATK、HP +15% · 没有被削弱的属性", "s.random": "随机",
+      "arc.weeper": "默泣之人", "arc.harbor": "空港",
+      "sk.heal": "登场时：守护者回复 1,000 生命。", "sk.rush": "冲锋：登场当回合即可攻击。", "sk.wave": "登场时：对所有敌方 Anima 造成 300 伤害。", "sk.echo": "己方一个 Anima ATK +300、HP +300；同属性：+500/+500。", "sk.seal": "敌方 Anima 攻击时自动发动：取消攻击，并对其造成 400 伤害。", "sk.fused": "Nocturne + Quietshade 的融合形态。",
+      fusedName: "Nocturne — 决堤之泪",
+      "ar.Luminara": "Luminara 之城", "ar.Umbryx": "静默山谷", "ar.Pyraxis": "狂怒之山", "ar.Aqualis": "怀念之海", "ar.Terrakin": "不屈高原", "ar.Ventara": "千风之巅", "ar.Voltaris": "雷霆之塔", "ar.Nihilum": "裂隙",
+      "rule.Luminara": "每回合结束时，双方 HP 最低的 Anima 各回复 200。", "rule.Umbryx": "新登场的 Anima 在其主人的下个回合前不能被选为目标。", "rule.Pyraxis": "所有 Anima ATK +200、DEF −200。", "rule.Aqualis": "每方每场一次：第一个被击倒的 Anima 回到手牌。", "rule.Terrakin": "双方各自前 3 回合 DEF ×2。", "rule.Ventara": "每回合可交换 2 个 Anima 的位置（原型未模拟：位置暂不影响规则）。", "rule.Voltaris": "每回合开始时，随机对场上一个 Anima 造成 100 伤害。", "rule.Nihilum": "关闭其他场地规则；第 8 回合起突然死亡。",
+    },
+    "zh-Hant": {
+      title: "競技場", you: "你", ai: "電腦", keeper: "守護者", deck: "牌庫", hand: "手牌", grave: "墓地",
+      res: "共鳴", turn: "第 {n} 回合", yourTurn: "你的回合", aiTurn: "電腦行動中…", endTurn: "結束回合", surrender: "投降",
+      fuse: "融合（{c} 共鳴）", clock: "{s} 秒 · 備用 {b} 秒", suddenAt: "第 {n} 回合起突然死亡", empty: "空位", trap: "記憶", trapDown: "蓋放的記憶",
+      "mull.title": "起手牌", "mull.text": "你{order}。保留這 5 張，還是重抽一次？", "order.first": "先手", "order.second": "後手（多抽 1 張）", "mull.keep": "保留", "mull.redraw": "重抽",
+      "hint.idle": "選擇一張手牌，或一個已就緒的 Anima 進行攻擊。", "hint.anima": "選擇你場上的空位。", "hint.echo": "選擇你的一個 Anima 接受回響。", "hint.seal": "選擇空的記憶位。", "hint.attack": "選擇目標。目標上的數字是預計傷害。", "hint.noRes": "共鳴不足。", "hint.full": "沒有空位。", "hint.sick": "剛登場的 Anima 本回合不能攻擊。", "hint.used": "該 Anima 本回合已攻擊。", "hint.noTarget": "沒有可選目標。",
+      "type.anima": "Anima", "type.echo": "回響", "type.seal": "封印記憶",
+      "b.sick": "剛登場", "b.done": "已攻擊", "b.ready": "就緒", "b.gen": "相生", "b.chain": "因果鏈 +300", "b.bond": "共鳴羈絆", "b.hidden": "隱匿", "b.home": "場地 +15%", "b.weak": "場地 −10%", "b.fused": "融合",
+      direct: "直接攻擊",
+      "log.start": "比賽在{arena}開始。{who}先手。", "log.turn": "{who}的第 {n} 回合 · {r} 共鳴", "log.play": "{who}讓 {card} 登場。", "log.gen": "{src} 生出 {card}：ATK +200，HP +200。", "log.chain": "因果鏈 {a} → {b} → {c}：本回合 ATK +300。", "log.hit": "{a} 攻擊 {b}：{d} 傷害{x}。", "log.hitK": "{a} 直接攻擊守護者：{d} 傷害。", "log.ko": "{card} 被擊倒。", "log.sea": "懷念之海：{card} 回到手牌。", "log.echo": "{who}對 {t} 使用 {card}：ATK +{v}，HP +{v}。", "log.set": "{who}蓋放了一張封印記憶。", "log.trap": "封印記憶發動：{a} 的攻擊被取消，{a} 失去 400 HP。", "log.fuse": "融合：{a} + {b} → {c}。", "log.sudden": "突然死亡：{who}的守護者失去 {d}。", "log.thunder": "雷霆之塔：{card} 失去 100 HP。", "log.heal": "Luminara 之城：{card} 回復 {d} HP。", "log.skillHeal": "{card}：守護者回復 1,000。", "log.skillWave": "{card}：對所有敵方 Anima 造成 300 傷害。", "log.timeout": "時間到，回合自動結束。", "log.burn": "手牌已滿，{card} 進入墓地。", "log.mull": "{who}重抽了起手牌。",
+      "x.strong": "（克制 ×1.25）", "x.weak": "（被克制 ×0.75）", "x.nih": "（Nihilum ×1.1）", "x.lum": "（Luminara 對 Nihilum ×1.5）",
+      "r.win": "勝利", "r.lose": "失敗", "why.keeper": "對手守護者生命歸零", "why.deck": "沒有牌可抽", "why.surrender": "投降", "why.timeout": "連續 3 回合逾時", "r.stats": "{t} 回合 · {m} 分 {s} 秒", "r.seed": "比賽種子：{seed} · 開始時公布的雜湊：{hash}", "r.again": "再來一局", "r.home": "返回首頁", "r.note": "正式版：與電腦的練習賽沒有有價值的獎勵；排位賽和競技點在 R3 推出。",
+      "s.arena": "場地", "s.log": "戰況", "s.rules": "規則摘要", "s.cycle": "相生循環（前者生出後者）：", "s.counter": "相剋：每個屬性剋制循環中往後第 2 個屬性（×1.25），被剋制 ×0.75。Nihilum 對所有屬性 ×1.1；Luminara 對 Nihilum ×1.5。", "s.dmg": "傷害 = max(100, ATK − DEF) × 係數，四捨五入到十位。只有對方場上沒有 Anima 時才能直接攻擊守護者。", "s.bonus": "相生：己方場上有生出它的屬性時登場，ATK/HP +200。場上 3 個連續屬性：ATK +300 一回合。羈絆：同一故事線 2 張，ATK +100/HP +200。", "s.deck": "你的牌組：30 張（26 Anima、2 回響、2 封印記憶）— Umbryx、Pyraxis、Aqualis、Luminara。", "s.mod": "主場 {el}：ATK、HP +15% · {weak}：−10%", "s.modN": "主場 Nihilum：ATK、HP +15% · 沒有被削弱的屬性", "s.random": "隨機",
+      "arc.weeper": "默泣之人", "arc.harbor": "空港",
+      "sk.heal": "登場時：守護者回復 1,000 生命。", "sk.rush": "衝鋒：登場當回合即可攻擊。", "sk.wave": "登場時：對所有敵方 Anima 造成 300 傷害。", "sk.echo": "己方一個 Anima ATK +300、HP +300；同屬性：+500/+500。", "sk.seal": "敵方 Anima 攻擊時自動發動：取消攻擊，並對其造成 400 傷害。", "sk.fused": "Nocturne + Quietshade 的融合形態。",
+      fusedName: "Nocturne — 決堤之淚",
+      "ar.Luminara": "Luminara 之城", "ar.Umbryx": "靜默山谷", "ar.Pyraxis": "狂怒之山", "ar.Aqualis": "懷念之海", "ar.Terrakin": "不屈高原", "ar.Ventara": "千風之巔", "ar.Voltaris": "雷霆之塔", "ar.Nihilum": "裂隙",
+      "rule.Luminara": "每回合結束時，雙方 HP 最低的 Anima 各回復 200。", "rule.Umbryx": "新登場的 Anima 在其主人的下個回合前不能被選為目標。", "rule.Pyraxis": "所有 Anima ATK +200、DEF −200。", "rule.Aqualis": "每方每場一次：第一個被擊倒的 Anima 回到手牌。", "rule.Terrakin": "雙方各自前 3 回合 DEF ×2。", "rule.Ventara": "每回合可交換 2 個 Anima 的位置（原型未模擬：位置暫不影響規則）。", "rule.Voltaris": "每回合開始時，隨機對場上一個 Anima 造成 100 傷害。", "rule.Nihilum": "關閉其他場地規則；第 8 回合起突然死亡。",
+    },
+  };
+
+  /* Ngôn ngữ dùng chung với player.html (cùng khóa lưu). */
+  const KEY = "anima-proto-v2";
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+  let locale = qs.get("lang") || saved.locale || I.detect(navigator.language);
+  if (!T[locale]) locale = "en";
+  const t = (k, v) => { let s = (T[locale] && T[locale][k]) || T.en[k] || k; if (v) Object.keys(v).forEach((x) => (s = s.split("{" + x + "}").join(v[x]))); return s; };
+  const fmt = (n) => Number(n).toLocaleString(I.NUMBER_LOCALE[locale] || "en-US");
+
+  /* ---------- Luật (bản rút gọn của Anima.Battle.Rules — SAD 19) ---------- */
+  const ORDER = ["Umbryx", "Pyraxis", "Aqualis", "Terrakin", "Ventara", "Voltaris", "Luminara"];
+  const ix = (e) => ORDER.indexOf(e);
+  const generates = (a, b) => ix(a) >= 0 && ix(b) >= 0 && (ix(a) + 1) % 7 === ix(b);
+  const counters = (a, b) => ix(a) >= 0 && ix(b) >= 0 && (ix(a) + 2) % 7 === ix(b);
+  /* Hệ số dạng phần nghìn để tính bằng số nguyên (SAD 19.1 mục 4). */
+  function coef(a, b) {
+    if (a === "Nihilum" && b !== "Nihilum") return [1100, "x.nih"];
+    if (a === "Luminara" && b === "Nihilum") return [1500, "x.lum"];
+    if (counters(a, b)) return [1250, "x.strong"];
+    if (counters(b, a)) return [750, "x.weak"];
+    return [1000, ""];
+  }
+  const r10 = (x) => Math.floor(x / 10 + 0.5) * 10;
+  const KEEPER_HP = 8000;
+
+  /* Khung chỉ số theo chi phí: ATK + DEF + HP/2 ≈ 600 × Cộng hưởng + 300 (BR-CARD-03). */
+  const BASE = { 1: [400, 200, 600], 2: [700, 300, 1000], 3: [1000, 400, 1400], 4: [1300, 500, 1800], 5: [1500, 700, 2200], 6: [1800, 800, 2600] };
+  const STYLE = { bal: [0, 0, 0], atk: [150, -100, -100], def: [-150, 100, 100] };
+  const DEF = {};
+  function anima(name, el, rarity, cost, style, extra) {
+    const b = BASE[cost], s = STYLE[style];
+    DEF[name] = Object.assign({ key: name, name, el, rarity, type: "anima", cost, atk: b[0] + s[0], def: b[1] + s[1], hp: b[2] + s[2], arc: null, skill: null }, extra || {});
+  }
+  // Bộ của người chơi: Umbryx → Pyraxis → Aqualis, cùng Luminara sinh Umbryx.
+  anima("Hollowmoth", "Umbryx", "common", 1, "bal");
+  anima("Quietshade", "Umbryx", "common", 2, "def", { arc: "weeper" });
+  anima("Duskveil", "Umbryx", "uncommon", 3, "bal");
+  anima("Nocturne, the Silent Tear", "Umbryx", "epic", 4, "atk", { arc: "weeper" });
+  anima("Cinderpup", "Pyraxis", "common", 1, "atk");
+  anima("Ashtongue", "Pyraxis", "common", 2, "bal");
+  anima("Flarekin", "Pyraxis", "uncommon", 3, "atk");
+  anima("Emberfang, the Ragebound", "Pyraxis", "epic", 5, "atk");
+  anima("Driftkoi", "Aqualis", "common", 2, "def");
+  anima("Rainmemory", "Aqualis", "rare", 3, "def");
+  anima("Glimmerkin", "Luminara", "common", 1, "def");
+  anima("Dawnpetal", "Luminara", "common", 2, "bal");
+  anima("Warmhush", "Luminara", "uncommon", 3, "bal");
+  anima("Seraphel, the Hopebringer", "Luminara", "legendary", 6, "bal", { skill: "heal" });
+  // Bộ của máy: Terrakin → Ventara → Voltaris là ba hệ liên tiếp.
+  anima("Pebbleguard", "Terrakin", "common", 1, "def");
+  anima("Rootbound", "Terrakin", "common", 2, "def");
+  anima("Mossback", "Terrakin", "uncommon", 3, "def");
+  anima("Stoneward, the Unyielding", "Terrakin", "rare", 4, "def");
+  anima("Breezeling", "Ventara", "common", 1, "atk");
+  anima("Kitewing", "Ventara", "common", 2, "atk");
+  anima("Zephyrion, the Freewind", "Ventara", "rare", 4, "atk", { skill: "rush" });
+  anima("Sparkit", "Voltaris", "common", 1, "atk");
+  anima("Jolt Imp", "Voltaris", "common", 2, "bal");
+  anima("Static Fox", "Voltaris", "uncommon", 3, "atk");
+  anima("Surgeflux, the Revelation", "Voltaris", "epic", 5, "atk");
+  anima("Tidelet", "Aqualis", "common", 2, "bal", { arc: "harbor" });
+  anima("Mistwhisper", "Aqualis", "uncommon", 3, "bal");
+  anima("Tidemourn, the Deep Sorrow", "Aqualis", "legendary", 6, "bal", { arc: "harbor", skill: "wave" });
+  DEF["Dawnsong"] = { key: "Dawnsong", name: "Dawnsong", el: "Luminara", rarity: "uncommon", type: "echo", cost: 1 };
+  DEF["Galeword"] = { key: "Galeword", name: "Galeword", el: "Ventara", rarity: "uncommon", type: "echo", cost: 1 };
+  DEF["Unspoken Vow"] = { key: "Unspoken Vow", name: "Unspoken Vow", el: "Umbryx", rarity: "rare", type: "seal", cost: 1 };
+  /* Công thức Hợp thể (BR-FUS-03/04): ~70% tổng ATK và HP, DEF lấy giá trị cao hơn; chỉ số ghi sẵn trong công thức. */
+  const RECIPE = { a: "Nocturne, the Silent Tear", b: "Quietshade", cost: 3, out: "fused" };
+  (function () {
+    const a = DEF[RECIPE.a], b = DEF[RECIPE.b];
+    DEF.fused = { key: "fused", name: "fused", el: "Umbryx", rarity: "legendary", type: "anima", cost: 3, atk: r10((a.atk + b.atk) * 0.7), def: Math.max(a.def, b.def), hp: r10((a.hp + b.hp) * 0.7), arc: "weeper", skill: "fused" };
+  })();
+  const cname = (key) => (key === "fused" ? t("fusedName") : DEF[key].name.split(",")[0]);
+
+  const PLAYER_DECK = ["Hollowmoth", "Quietshade", "Duskveil", "Nocturne, the Silent Tear", "Cinderpup", "Ashtongue", "Flarekin", "Emberfang, the Ragebound", "Driftkoi", "Rainmemory", "Glimmerkin", "Dawnpetal"]
+    .flatMap((k) => [k, k]).concat(["Warmhush", "Seraphel, the Hopebringer", "Dawnsong", "Dawnsong", "Unspoken Vow", "Unspoken Vow"]);
+  const AI_DECK = ["Pebbleguard", "Rootbound", "Mossback", "Stoneward, the Unyielding", "Breezeling", "Kitewing", "Zephyrion, the Freewind", "Sparkit", "Jolt Imp", "Static Fox", "Surgeflux, the Revelation", "Tidelet"]
+    .flatMap((k) => [k, k]).concat(["Mistwhisper", "Tidemourn, the Deep Sorrow", "Galeword", "Galeword", "Unspoken Vow", "Unspoken Vow"]);
+
+  /* Kiểm tra bộ bài theo BR-DECK (chạy khi khởi động; lỗi thì báo ngay trên console). */
+  function validateDeck(list) {
+    const errs = [], cnt = {};
+    list.forEach((k) => (cnt[k] = (cnt[k] || 0) + 1));
+    const anim = list.filter((k) => DEF[k].type === "anima").length;
+    if (list.length !== 30) errs.push("DECK_SIZE_INVALID");
+    if (anim < 24 || list.length - anim > 6) errs.push("DECK_SUPPORT_LIMIT");
+    Object.entries(cnt).forEach(([k, n]) => { const lim = ["legendary", "secret"].includes(DEF[k].rarity) ? 1 : 2; if (n > lim) errs.push("DECK_COPY_LIMIT:" + k); });
+    const by = (r) => list.filter((k) => DEF[k].rarity === r).length;
+    if (by("epic") > 4 || by("legendary") > 2 || by("secret") > 1) errs.push("DECK_RARITY_LIMIT");
+    return errs;
+  }
+  [PLAYER_DECK, AI_DECK].forEach((d) => { const e = validateDeck(d); if (e.length) console.error("Deck invalid", e); });
+
+  /* RNG tất định từ seed trận (bản thật: HMAC-DRBG theo commit–reveal, SAD 19.1). */
+  function mulberry32(a) { return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t2 = Math.imul(a ^ (a >>> 15), 1 | a); t2 = (t2 + Math.imul(t2 ^ (t2 >>> 7), 61 | t2)) ^ t2; return ((t2 ^ (t2 >>> 14)) >>> 0) / 4294967296; }; }
+  function fakeHash(s) { let h1 = 0x811c9dc5, h2 = 0x01000193; for (const ch of String(s)) { h1 = Math.imul(h1 ^ ch.charCodeAt(0), 16777619); h2 = Math.imul(h2 + ch.charCodeAt(0), 2246822519); } return ((h1 >>> 0).toString(16).padStart(8, "0") + (h2 >>> 0).toString(16).padStart(8, "0")).repeat(2); }
+
+  let G, rng, uidSeq = 0, timerId = null, aiBusy = false;
+  const timerOn = () => document.getElementById("timerChk").checked;
+  const speed = () => +document.getElementById("speedSel").value;
+
+  function newPlayer(id, list) {
+    const deck = list.map((key) => ({ uid: ++uidSeq, key }));
+    for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+    return { id, keeper: KEEPER_HP, deck, hand: [], field: [null, null, null], traps: [null, null], grave: [], n: 0, res: 0, timeouts: 0, chainUsed: false, fused: false, seaUsed: false };
+  }
+  const who = (p) => (p.id === 0 ? t("you") : t("ai"));
+  const foe = (p) => G.P[1 - p.id];
+  const L = (k, v) => { G.log.push([k, v || {}]); };
+
+  function newMatch() {
+    clearInterval(timerId); aiBusy = false;
+    const seed = +(qs.get("seed") || 0) || Math.floor(Math.random() * 1e9);
+    rng = mulberry32(seed);
+    const pick = document.getElementById("arenaSel").value;
+    const arena = pick === "random" ? ORDER.concat(["Nihilum"])[Math.floor(rng() * 8)] : pick;
+    G = { seed, hash: fakeHash(seed), arena, P: [newPlayer(0, PLAYER_DECK), newPlayer(1, AI_DECK)], turn: 0, active: 0, phase: "mulligan", log: [], sel: null, hint: null, started: Date.now(), over: null, clock: 20, bank: 30 };
+    G.first = rng() < 0.5 ? 0 : 1;
+    G.P.forEach((p) => { for (let i = 0; i < 5; i++) draw(p, true); });
+    draw(G.P[1 - G.first], true); // người đi sau bốc thêm 1 (BR-BTL-02)
+    render();
+  }
+
+  function draw(p, silent) {
+    const c = p.deck.shift();
+    if (!c) { if (!silent) endGame(1 - p.id, "why.deck"); return false; }
+    if (p.hand.length >= 10) { p.grave.push(c); L("log.burn", { card: cname(c.key) }); return true; }
+    p.hand.push(c); return true;
+  }
+
+  /* ----- chỉ số hiệu lực ----- */
+  const homeEl = () => G.arena;
+  const weakEl = () => (G.arena === "Nihilum" ? null : ORDER[(ix(G.arena) + 2) % 7]);
+  const rule = (el) => G.arena === el; // luật riêng của sàn
+  function bond(p, u) {
+    const arc = DEF[u.key].arc; if (!arc) return [0, 0];
+    const n = p.field.filter((x) => x && DEF[x.key].arc === arc).length;
+    return n >= 3 ? [200, 400] : n === 2 ? [100, 200] : [0, 0];
+  }
+  const atkOf = (p, u) => u.atk + bond(p, u)[0] + (u.chainTurn === G.turn ? 300 : 0) + (rule("Pyraxis") ? 200 : 0);
+  const defOf = (p, u) => Math.max(0, u.def - (rule("Pyraxis") ? 200 : 0)) * (rule("Terrakin") && p.n <= 3 ? 2 : 1);
+  const maxHp = (p, u) => u.hp + bond(p, u)[1];
+  const hpOf = (p, u) => maxHp(p, u) - u.dmg;
+  function damage(p, u, target, tp) {
+    const [c, note] = coef(DEF[u.key].el, DEF[target.key].el);
+    return { d: r10(Math.max(100, atkOf(p, u) - defOf(tp, target)) * c / 1000), note };
+  }
+  const canTargetKeeper = (tp) => tp.field.every((x) => !x);
+  const targetable = (tp, x) => x && !x.hidden;
+
+  /* ----- hành động ----- */
+  function enter(p, slot, key) {
+    const d = DEF[key];
+    const u = { uid: ++uidSeq, key, atk: d.atk, def: d.def, hp: d.hp, dmg: 0, sick: d.skill !== "rush", attacked: false, hidden: rule("Umbryx"), chainTurn: -1, gen: null, mod: null };
+    if (d.el === homeEl()) { u.atk = r10(u.atk * 1.15); u.hp = r10(u.hp * 1.15); u.mod = "home"; }
+    else if (d.el === weakEl()) { u.atk = r10(u.atk * 0.9); u.hp = r10(u.hp * 0.9); u.mod = "weak"; }
+    const src = p.field.find((x) => x && generates(DEF[x.key].el, d.el));
+    if (src) { u.atk += 200; u.hp += 200; u.gen = DEF[src.key].el; }
+    p.field[slot] = u;
+    if (src) L("log.gen", { src: cname(src.key), card: cname(key) });
+    if (d.skill === "heal") { p.keeper = Math.min(KEEPER_HP, p.keeper + 1000); L("log.skillHeal", { card: cname(key) }); }
+    if (d.skill === "wave") { foe(p).field.forEach((x) => x && (x.dmg += 300)); L("log.skillWave", { card: cname(key) }); }
+    checkChain(p);
+    return u;
+  }
+  function checkChain(p) {
+    if (p.chainUsed) return;
+    const els = p.field.filter(Boolean).map((x) => DEF[x.key].el);
+    for (let s = 0; s < 7; s++) {
+      const want = [ORDER[s], ORDER[(s + 1) % 7], ORDER[(s + 2) % 7]];
+      if (want.every((e) => els.includes(e))) {
+        want.forEach((e) => { const u = p.field.find((x) => x && DEF[x.key].el === e); u.chainTurn = G.turn; });
+        p.chainUsed = true; L("log.chain", { a: want[0], b: want[1], c: want[2] }); return;
+      }
+    }
+  }
+  function checkDeaths() {
+    let changed = true;
+    while (changed) {
+      changed = false;
+      G.P.forEach((p) => p.field.forEach((u, i) => {
+        if (u && hpOf(p, u) <= 0) {
+          p.field[i] = null; changed = true; L("log.ko", { card: cname(u.key) });
+          if (rule("Aqualis") && !p.seaUsed && u.key !== "fused") { p.seaUsed = true; p.hand.push({ uid: ++uidSeq, key: u.key }); L("log.sea", { card: cname(u.key) }); }
+          else p.grave.push({ uid: u.uid, key: u.key });
+        }
+      }));
+    }
+    G.P.forEach((p) => { if (p.keeper <= 0 && !G.over) endGame(1 - p.id, "why.keeper"); });
+  }
+
+  function playCard(p, handIdx, target) {
+    const c = p.hand[handIdx], d = DEF[c.key];
+    if (d.cost > p.res) return "hint.noRes";
+    if (d.type === "anima") {
+      const slot = target != null ? target : p.field.findIndex((x) => !x);
+      if (slot < 0 || p.field[slot]) return "hint.full";
+      p.res -= d.cost; p.hand.splice(handIdx, 1); L("log.play", { who: who(p), card: cname(c.key) }); enter(p, slot, c.key);
+    } else if (d.type === "echo") {
+      const u = p.field[target]; if (!u) return "hint.echo";
+      const v = DEF[u.key].el === d.el ? 500 : 300;
+      p.res -= d.cost; p.hand.splice(handIdx, 1); u.atk += v; u.hp += v; p.grave.push(c);
+      L("log.echo", { who: who(p), card: d.name, t: cname(u.key), v: fmt(v) });
+    } else {
+      const slot = target != null ? target : p.traps.findIndex((x) => !x);
+      if (slot < 0 || p.traps[slot]) return "hint.full";
+      p.res -= d.cost; p.hand.splice(handIdx, 1); p.traps[slot] = c; L("log.set", { who: who(p) });
+    }
+    checkDeaths(); return null;
+  }
+
+  function attack(p, slot, tslot) {
+    const u = p.field[slot], tp = foe(p);
+    if (!u) return "hint.noTarget";
+    if (u.sick) return "hint.sick";
+    if (u.attacked) return "hint.used";
+    if (tslot === "K") { if (!canTargetKeeper(tp)) return "hint.noTarget"; }
+    else if (!targetable(tp, tp.field[tslot])) return "hint.noTarget";
+    u.attacked = true;
+    const ti = tp.traps.findIndex((x) => x && DEF[x.key].type === "seal");
+    if (ti >= 0) { tp.grave.push(tp.traps[ti]); tp.traps[ti] = null; u.dmg += 400; L("log.trap", { a: cname(u.key) }); flash(p.id, slot); checkDeaths(); return null; }
+    if (tslot === "K") { const d = atkOf(p, u); tp.keeper = Math.max(0, tp.keeper - d); L("log.hitK", { a: cname(u.key), d: fmt(d) }); }
+    else { const tg = tp.field[tslot]; const { d, note } = damage(p, u, tg, tp); tg.dmg += d; L("log.hit", { a: cname(u.key), b: cname(tg.key), d: fmt(d), x: note ? t(note) : "" }); flash(tp.id, tslot); }
+    checkDeaths(); return null;
+  }
+
+  function canFuse(p) {
+    if (p.fused || p.res < RECIPE.cost) return false;
+    return p.field.some((x) => x && x.key === RECIPE.a) && p.field.some((x) => x && x.key === RECIPE.b);
+  }
+  function fuse(p) {
+    if (!canFuse(p)) return "hint.noRes";
+    const ia = p.field.findIndex((x) => x && x.key === RECIPE.a), ib = p.field.findIndex((x) => x && x.key === RECIPE.b);
+    [ia, ib].forEach((i) => { p.grave.push({ uid: p.field[i].uid, key: p.field[i].key }); p.field[i] = null; });
+    p.res -= RECIPE.cost; p.fused = true;
+    L("log.fuse", { a: cname(RECIPE.a), b: cname(RECIPE.b), c: cname("fused") });
+    enter(p, ia, "fused"); checkDeaths(); return null;
+  }
+
+  function startTurn(pid) {
+    if (G.over) return;
+    G.active = pid; G.turn++; G.sel = null; G.hint = null;
+    const p = G.P[pid];
+    p.n++; p.res = Math.min(p.n, 6); p.chainUsed = false; p.fused = false;
+    p.field.forEach((u) => { if (u) { u.sick = false; u.attacked = false; u.hidden = false; } });
+    L("log.turn", { n: p.n, who: who(p), r: p.res });
+    const sdFrom = rule("Nihilum") ? 8 : 10;
+    if (p.n >= sdFrom) { const d = 500 * (p.n - sdFrom + 1); p.keeper = Math.max(0, p.keeper - d); L("log.sudden", { who: who(p), d: fmt(d) }); }
+    if (rule("Voltaris")) {
+      const all = []; G.P.forEach((q) => q.field.forEach((u) => u && all.push(u)));
+      if (all.length) { const u = all[Math.floor(rng() * all.length)]; u.dmg += 100; L("log.thunder", { card: cname(u.key) }); }
+    }
+    checkDeaths(); if (G.over) return render();
+    if (!draw(p)) return render();
+    G.clock = 20;
+    render();
+    if (pid === 1) runAi();
+  }
+  function endTurn(byTimeout) {
+    if (G.over || G.phase !== "play") return;
+    const p = G.P[G.active];
+    if (!byTimeout) p.timeouts = 0;
+    if (rule("Luminara")) G.P.forEach((q) => {
+      const hurt = q.field.filter((u) => u && u.dmg > 0);
+      if (!hurt.length) return;
+      const u = hurt.reduce((a, b) => (hpOf(q, b) < hpOf(q, a) ? b : a));
+      const h = Math.min(200, u.dmg); u.dmg -= h; L("log.heal", { card: cname(u.key), d: fmt(h) });
+    });
+    startTurn(1 - G.active);
+  }
+  function endGame(winner, why) {
+    if (G.over) return;
+    G.over = { winner, why, ms: Date.now() - G.started }; G.phase = "over"; clearInterval(timerId); aiBusy = false;
+  }
+
+  /* ----- AI: luật tham lam, đủ cho PvE luyện tập (Tech Stack 5.2) ----- */
+  function aiStep(p) {
+    if (canFuse(p)) return fuse(p) === null;
+    // 1. Ra Anima đắt nhất trả được, ưu tiên thẻ được "sinh".
+    const free = p.field.findIndex((x) => !x);
+    if (free >= 0) {
+      const opts = p.hand.map((c, i) => ({ c, i, d: DEF[c.key] })).filter((o) => o.d.type === "anima" && o.d.cost <= p.res);
+      if (opts.length) {
+        opts.sort((a, b) => (b.d.cost - a.d.cost) || (genScore(p, b.d) - genScore(p, a.d)));
+        return playCard(p, opts[0].i, free) === null;
+      }
+    }
+    // 2. Úp Ký ức.
+    const tfree = p.traps.findIndex((x) => !x);
+    const sealIdx = p.hand.findIndex((c) => DEF[c.key].type === "seal");
+    if (tfree >= 0 && sealIdx >= 0 && p.res >= 1) return playCard(p, sealIdx, tfree) === null;
+    // 3. Tiếng vọng lên Anima mạnh nhất.
+    const echoIdx = p.hand.findIndex((c) => DEF[c.key].type === "echo" && DEF[c.key].cost <= p.res);
+    const mine = p.field.map((u, i) => ({ u, i })).filter((o) => o.u);
+    if (echoIdx >= 0 && mine.length) { mine.sort((a, b) => atkOf(p, b.u) - atkOf(p, a.u)); return playCard(p, echoIdx, mine[0].i) === null; }
+    // 4. Tấn công.
+    const tp = foe(p);
+    const ready = p.field.map((u, i) => ({ u, i })).filter((o) => o.u && !o.u.sick && !o.u.attacked).sort((a, b) => atkOf(p, b.u) - atkOf(p, a.u));
+    for (const o of ready) {
+      if (canTargetKeeper(tp)) return attack(p, o.i, "K") === null;
+      const tg = tp.field.map((x, i) => ({ x, i })).filter((q) => targetable(tp, q.x));
+      if (!tg.length) continue;
+      tg.forEach((q) => { q.dm = damage(p, o.u, q.x, tp).d; q.kill = q.dm >= hpOf(tp, q.x); q.val = (q.kill ? 10000 + DEF[q.x.key].cost * 1000 : 0) + q.dm; });
+      tg.sort((a, b) => b.val - a.val);
+      return attack(p, o.i, tg[0].i) === null;
+    }
+    return false;
+  }
+  const genScore = (p, d) => (p.field.some((x) => x && generates(DEF[x.key].el, d.el)) ? 1 : 0);
+  function runAi() {
+    if (aiBusy) return; aiBusy = true;
+    const p = G.P[1];
+    const tick = () => {
+      if (G.over || G.active !== 1) { aiBusy = false; render(); return; }
+      const did = aiStep(p); render();
+      if (G.over) { aiBusy = false; return; }
+      if (did) setTimeout(tick, speed()); else { aiBusy = false; setTimeout(() => endTurn(), speed()); }
+    };
+    setTimeout(tick, speed());
+  }
+  function assist() {
+    if (G.phase !== "play" || G.active !== 0 || G.over) return;
+    const p = G.P[0]; let guard = 0;
+    while (!G.over && aiStep(p) && guard++ < 30) {}
+    render(); if (!G.over) endTurn();
+  }
+
+  /* ----- đồng hồ lượt (BR-BTL-08) ----- */
+  function tickClock() {
+    if (!G || G.phase !== "play" || G.over || G.active !== 0 || !timerOn()) return;
+    if (G.clock > 0) G.clock--; else if (G.bank > 0) G.bank--;
+    if (G.clock <= 0 && G.bank <= 0) {
+      const p = G.P[0]; p.timeouts++; L("log.timeout");
+      if (p.timeouts >= 3) { endGame(1, "why.timeout"); render(); return; }
+      G.bank = 0; endTurn(true); return;
+    }
+    renderClock();
+  }
+
+  /* ---------- Giao diện ---------- */
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const hue = (el) => A.ELEMENTS[el].hue;
+  const glyph = (el) => A.ELEMENTS[el].glyph;
+
+  function unitHtml(p, u, i, side) {
+    const d = DEF[u.key], me = side === "me";
+    const sel = G.sel && G.sel.kind === "unit" && G.sel.slot === i && me;
+    let cls = "u rarity-" + d.rarity, extra = "", act = "";
+    const myTurn = G.phase === "play" && G.active === 0 && !G.over;
+    if (me && myTurn) {
+      const hs = G.sel && G.sel.kind === "hand" && DEF[G.P[0].hand[G.sel.idx].key].type === "echo";
+      if (hs) { cls += " target"; act = `data-act="echo-target" data-slot="${i}"`; }
+      else { act = `data-act="unit" data-slot="${i}"`; if (!u.sick && !u.attacked) cls += " ready"; }
+    }
+    if (!me && myTurn && G.sel && G.sel.kind === "unit") {
+      const att = G.P[0].field[G.sel.slot];
+      if (att && targetable(p, u)) { const { d: dm, note } = damage(G.P[0], att, u, p); cls += " target"; act = `data-act="target" data-slot="${i}"`; extra = `<span class="pred">−${fmt(dm)}${note ? ` <small>${note === "x.strong" ? "×1.25" : note === "x.weak" ? "×0.75" : note === "x.nih" ? "×1.1" : "×1.5"}</small>` : ""}</span>`; }
+      else cls += " dim";
+    }
+    if (sel) cls += " sel";
+    const bds = [];
+    if (u.key === "fused") bds.push(`<span class="bd good">${t("b.fused")}</span>`);
+    if (u.sick) bds.push(`<span class="bd">${t("b.sick")}</span>`); else if (u.attacked) bds.push(`<span class="bd">${t("b.done")}</span>`); else if (me && G.active === 0) bds.push(`<span class="bd good">${t("b.ready")}</span>`);
+    if (u.hidden) bds.push(`<span class="bd">${t("b.hidden")}</span>`);
+    if (u.gen) bds.push(`<span class="bd good">${t("b.gen")} ${glyph(u.gen)}</span>`);
+    if (u.chainTurn === G.turn) bds.push(`<span class="bd good">${t("b.chain")}</span>`);
+    if (bond(p, u)[0]) bds.push(`<span class="bd good">${t("b.bond")}</span>`);
+    if (u.mod === "home") bds.push(`<span class="bd good">${t("b.home")}</span>`);
+    if (u.mod === "weak") bds.push(`<span class="bd bad">${t("b.weak")}</span>`);
+    const tag = act ? "button" : "div";
+    return `<${tag} class="${cls}" ${act} style="--hue:${hue(d.el)}" data-uid="${u.uid}" aria-label="${esc(cname(u.key))}">
+      <div class="top"><span class="glyph">${glyph(d.el)}</span><span class="sub">${d.el}</span><span class="cost">${d.cost}</span></div>
+      <div class="nm">${esc(cname(u.key))}</div>
+      ${d.arc ? `<div class="sub">${t("arc." + d.arc)}</div>` : ""}
+      <div class="badges">${bds.join("")}</div>
+      <div class="stats"><span class="atk">ATK <b>${fmt(atkOf(p, u))}</b></span><span class="def">DEF <b>${fmt(defOf(p, u))}</b></span><span class="hp">HP <b>${fmt(Math.max(0, hpOf(p, u)))}</b>/${fmt(maxHp(p, u))}</span></div>
+      ${extra}</${tag}>`;
+  }
+  function cardText(d) {
+    if (d.type === "echo") return t("sk.echo");
+    if (d.type === "seal") return t("sk.seal");
+    return d.skill ? t("sk." + d.skill) : "";
+  }
+  function handCardHtml(c, i, interactive) {
+    const d = DEF[c.key], p = G.P[0];
+    const can = d.cost <= p.res;
+    let cls = "u rarity-" + d.rarity + (interactive && !can ? " cant" : "") + (G.sel && G.sel.kind === "hand" && G.sel.idx === i ? " sel" : "");
+    const tag = interactive ? "button" : "div";
+    return `<${tag} class="${cls}" ${interactive ? `data-act="hand" data-idx="${i}"` : ""} style="--hue:${hue(d.el)}" aria-label="${esc(cname(c.key))}">
+      <div class="top"><span class="glyph">${glyph(d.el)}</span><span class="sub">${t("type." + d.type)}</span><span class="cost">${d.cost}</span></div>
+      <div class="nm">${esc(cname(c.key))}</div>
+      <div class="sub">${d.el}${d.arc ? " · " + t("arc." + d.arc) : ""}</div>
+      ${cardText(d) ? `<div class="txt">${cardText(d)}</div>` : ""}
+      ${d.type === "anima" ? `<div class="stats"><span class="atk">ATK <b>${fmt(d.atk)}</b></span><span class="def">DEF <b>${fmt(d.def)}</b></span><span class="hp">HP <b>${fmt(d.hp)}</b></span></div>` : ""}
+    </${tag}>`;
+  }
+  function keeperHtml(p, side) {
+    const myTurn = G.phase === "play" && G.active === 0 && !G.over;
+    let cls = "keeper" + (p.keeper <= 2500 ? " low" : ""), act = "";
+    if (side === "foe" && myTurn && G.sel && G.sel.kind === "unit" && canTargetKeeper(p)) { cls += " target"; act = `data-act="target" data-slot="K" role="button" tabindex="0"`; }
+    const pct = Math.max(0, (p.keeper / KEEPER_HP) * 100);
+    const handInfo = side === "foe" ? `<span class="foe-hand" aria-label="${t("hand")} ${p.hand.length}">${p.hand.map(() => "<i></i>").join("")}</span>` : "";
+    return `<div class="${cls}" ${act} id="keeper-${side}">
+      <span class="who">${who(p)}</span>
+      <span class="hpbar"><i style="width:${pct}%"></i></span>
+      <span class="hp">${fmt(p.keeper)}</span>
+      ${act ? `<span class="chip">${t("direct")}</span>` : ""}
+      <span class="meta">${t("deck")} ${p.deck.length} · ${t("hand")} ${p.hand.length} · ${t("grave")} ${p.grave.length}</span>${handInfo}
+    </div>`;
+  }
+  function laneHtml(p, side) {
+    const myTurn = G.phase === "play" && G.active === 0 && !G.over;
+    const hsel = side === "me" && myTurn && G.sel && G.sel.kind === "hand" ? DEF[G.P[0].hand[G.sel.idx].key].type : null;
+    const slots = p.field.map((u, i) => {
+      if (u) return `<div class="slot">${unitHtml(p, u, i, side)}</div>`;
+      if (hsel === "anima") return `<button class="slot open" data-act="slot" data-slot="${i}">+ ${t("empty")}</button>`;
+      return `<div class="slot">${t("empty")}</div>`;
+    }).join("");
+    const traps = p.traps.map((c, i) => {
+      if (c) return `<div class="slot tslot"><div class="faceDown">${side === "me" ? esc(DEF[c.key].name) : t("trapDown")}</div></div>`;
+      if (hsel === "seal") return `<button class="slot tslot open" data-act="trap" data-slot="${i}">+ ${t("trap")}</button>`;
+      return `<div class="slot tslot">${t("trap")}</div>`;
+    }).join("");
+    return `<div class="lane">${slots}<div class="traps">${traps}</div></div>`;
+  }
+  function render() {
+    document.documentElement.lang = locale;
+    document.title = "ANIMA — " + t("title");
+    const me = G.P[0], ai = G.P[1];
+    const myTurn = G.phase === "play" && G.active === 0 && !G.over;
+    const hint = G.hint ? t(G.hint) : myTurn ? (G.sel ? (G.sel.kind === "unit" ? t("hint.attack") : t({ anima: "hint.anima", echo: "hint.echo", seal: "hint.seal" }[DEF[me.hand[G.sel.idx].key].type])) : t("hint.idle")) : "";
+    const p = G.P[G.active];
+    document.getElementById("board").innerHTML = `
+      <section class="side foe">${keeperHtml(ai, "foe")}${laneHtml(ai, "foe")}</section>
+      <div class="mid">
+        <b>${t("turn", { n: Math.max(1, p.n) })}</b>
+        <span>${G.phase === "play" ? (G.active === 0 ? t("yourTurn") : t("aiTurn")) : ""}</span>
+        <span>${t("res")} <span class="pips" aria-label="${p.res}/${Math.min(Math.max(1, p.n), 6)}">${Array.from({ length: Math.min(Math.max(1, p.n), 6) }, (_, i) => `<i class="${i < p.res ? "on" : ""}"></i>`).join("")}</span> ${p.res}</span>
+        <span class="clock" id="clock"></span>
+        <span class="muted" style="font-size:12px">${t("suddenAt", { n: rule("Nihilum") ? 8 : 10 })}</span>
+        <span class="spacer"></span>
+        ${myTurn && canFuse(me) ? `<button class="btn" data-act="fuse">${t("fuse", { c: RECIPE.cost })}</button>` : ""}
+        <button class="btn primary" data-act="end" ${myTurn ? "" : "disabled"}>${t("endTurn")}</button>
+        <button class="btn ghost sm" data-act="surrender" ${G.phase === "play" && !G.over ? "" : "disabled"}>${t("surrender")}</button>
+        <div class="hint" id="hint">${hint}</div>
+      </div>
+      <section class="side me">${laneHtml(me, "me")}${keeperHtml(me, "me")}
+        <div class="hand" aria-label="${t("hand")}">${me.hand.map((c, i) => handCardHtml(c, i, myTurn)).join("")}</div>
+      </section>`;
+    renderClock(); renderSide(); renderOverlay();
+  }
+  function renderClock() {
+    const el = document.getElementById("clock"); if (!el) return;
+    if (G.phase !== "play" || G.active !== 0 || G.over || !timerOn()) { el.textContent = ""; return; }
+    el.textContent = t("clock", { s: G.clock, b: G.bank });
+    el.className = "clock" + (G.clock <= 5 ? " warn" : "");
+  }
+  function renderSide() {
+    const el = G.arena, w = weakEl();
+    document.getElementById("arenaPanel").innerHTML = `<h3>${t("s.arena")}: ${glyph(el)} ${t("ar." + el)}</h3>
+      <p class="side-p">${el === "Nihilum" ? t("s.modN") : t("s.mod", { el, weak: w })}</p>
+      <p class="side-p">${t("rule." + el)}</p>`;
+    document.getElementById("logTitle").textContent = t("s.log");
+    const log = document.getElementById("log");
+    log.innerHTML = G.log.map(([k, v]) => `<div class="${k === "log.turn" ? "turn" : ""}">${esc(t(k, v))}</div>`).join("");
+    log.scrollTop = log.scrollHeight;
+    document.getElementById("rulesPanel").innerHTML = `<h3>${t("s.rules")}</h3>
+      <p class="side-p">${t("s.cycle")}</p>
+      <div class="cycle">${ORDER.concat([ORDER[0]]).map((e, i) => `${i ? "→" : ""}<span class="e" style="--hue:${hue(e)}">${glyph(e)} ${e}</span>`).join(" ")}</div>
+      <p class="side-p">${t("s.counter")}</p><p class="side-p">${t("s.dmg")}</p><p class="side-p">${t("s.bonus")}</p><p class="side-p">${t("s.deck")}</p>`;
+  }
+  function renderOverlay() {
+    const ov = document.getElementById("ov");
+    if (G.phase === "mulligan") {
+      ov.innerHTML = `<div class="ov"><div class="panel"><h2>${t("mull.title")}</h2>
+        <p>${t("mull.text", { order: t(G.first === 0 ? "order.first" : "order.second") })}</p>
+        <div class="hand">${G.P[0].hand.map((c, i) => handCardHtml(c, i, false)).join("")}</div>
+        <div class="row"><button class="btn primary" data-act="keep">${t("mull.keep")}</button><button class="btn" data-act="redraw">${t("mull.redraw")}</button></div></div></div>`;
+      return;
+    }
+    if (G.over) {
+      const win = G.over.winner === 0, s = Math.round(G.over.ms / 1000);
+      ov.innerHTML = `<div class="ov"><div class="panel" id="result">
+        <div class="res-big ${win ? "win" : "lose"}">${t(win ? "r.win" : "r.lose")}</div>
+        <p>${t(G.over.why)} · ${t("r.stats", { t: G.turn, m: Math.floor(s / 60), s: s % 60 })}</p>
+        <code class="seed">${t("r.seed", { seed: G.seed, hash: G.hash.slice(0, 24) + "…" })}</code>
+        <p class="muted" style="font-size:13px">${t("r.note")}</p>
+        <div class="row"><button class="btn primary" data-act="again">${t("r.again")}</button><a class="btn" href="player.html">${t("r.home")}</a></div></div></div>`;
+      return;
+    }
+    ov.innerHTML = "";
+  }
+  function flash(pid, slot) {
+    setTimeout(() => {
+      const p = G.P[pid], u = p.field[slot]; if (!u) return;
+      const el = document.querySelector(`[data-uid="${u.uid}"]`); if (el) el.classList.add("hit");
+    }, 0);
+  }
+
+  /* ----- sự kiện ----- */
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]"); if (!b || !G) return;
+    const act = b.dataset.act, me = G.P[0];
+    if (act === "keep" || act === "redraw") {
+      if (act === "redraw") { me.deck.push(...me.hand.splice(0)); for (let i = me.deck.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [me.deck[i], me.deck[j]] = [me.deck[j], me.deck[i]]; } for (let i = 0; i < (G.first === 0 ? 5 : 6); i++) draw(me, true); L("log.mull", { who: t("you") }); }
+      G.phase = "play"; L("log.start", { arena: t("ar." + G.arena), who: who(G.P[G.first]) });
+      clearInterval(timerId); timerId = setInterval(tickClock, 1000);
+      startTurn(G.first); return;
+    }
+    if (act === "again") { newMatch(); return; }
+    if (act === "surrender") { endGame(1, "why.surrender"); render(); return; }
+    if (G.phase !== "play" || G.active !== 0 || G.over) return;
+    G.hint = null;
+    if (act === "end") { endTurn(); return; }
+    if (act === "fuse") { G.hint = fuse(me); G.sel = null; render(); return; }
+    if (act === "hand") {
+      const i = +b.dataset.idx, d = DEF[me.hand[i].key];
+      if (G.sel && G.sel.kind === "hand" && G.sel.idx === i) { G.sel = null; render(); return; }
+      if (d.cost > me.res) { G.sel = null; G.hint = "hint.noRes"; render(); return; }
+      if (d.type === "anima" && me.field.every(Boolean)) { G.hint = "hint.full"; render(); return; }
+      if (d.type === "seal" && me.traps.every(Boolean)) { G.hint = "hint.full"; render(); return; }
+      if (d.type === "echo" && me.field.every((x) => !x)) { G.hint = "hint.noTarget"; render(); return; }
+      G.sel = { kind: "hand", idx: i }; render(); return;
+    }
+    if (act === "slot" || act === "trap" || act === "echo-target") {
+      if (!G.sel || G.sel.kind !== "hand") return;
+      G.hint = playCard(me, G.sel.idx, +b.dataset.slot); G.sel = null; render(); return;
+    }
+    if (act === "unit") {
+      const i = +b.dataset.slot, u = me.field[i];
+      if (G.sel && G.sel.kind === "unit" && G.sel.slot === i) { G.sel = null; render(); return; }
+      if (u.sick) { G.sel = null; G.hint = "hint.sick"; render(); return; }
+      if (u.attacked) { G.sel = null; G.hint = "hint.used"; render(); return; }
+      const tp = G.P[1];
+      if (!canTargetKeeper(tp) && !tp.field.some((x) => targetable(tp, x))) { G.hint = "hint.noTarget"; render(); return; }
+      G.sel = { kind: "unit", slot: i }; render(); return;
+    }
+    if (act === "target") {
+      if (!G.sel || G.sel.kind !== "unit") return;
+      const s = b.dataset.slot;
+      G.hint = attack(me, G.sel.slot, s === "K" ? "K" : +s); G.sel = null; render(); return;
+    }
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && G && G.sel) { G.sel = null; render(); } });
+
+  /* ----- thanh prototype ----- */
+  const ls = document.getElementById("langSel");
+  ls.innerHTML = I.LOCALES.map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+  ls.value = locale;
+  ls.addEventListener("change", () => {
+    locale = ls.value;
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; s.locale = locale; localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* bỏ qua */ }
+    fillArenaSel(); render();
+  });
+  function fillArenaSel() {
+    const as = document.getElementById("arenaSel"), cur = as.value || qs.get("arena") || "random";
+    as.innerHTML = `<option value="random">${t("s.random")}</option>` + ORDER.concat(["Nihilum"]).map((e) => `<option value="${e}">${glyph(e)} ${t("ar." + e)}</option>`).join("");
+    as.value = cur;
+  }
+  fillArenaSel();
+  if (qs.get("timer") === "0") document.getElementById("timerChk").checked = false;
+  if (qs.get("speed") === "fast") document.getElementById("speedSel").value = "120";
+  document.getElementById("timerChk").addEventListener("change", renderClock);
+  document.getElementById("newBtn").addEventListener("click", newMatch);
+  document.getElementById("assistBtn").addEventListener("click", assist);
+
+  window.ANIMA_BATTLE = { get state() { return G; }, DEF, coef, damage: (a, b, ad, bd) => r10(Math.max(100, a - b) * coef(ad, bd)[0] / 1000), validateDeck, PLAYER_DECK, AI_DECK, assist, render: () => render() };
+  newMatch();
+})();
+</script>
+</body>
+</html>

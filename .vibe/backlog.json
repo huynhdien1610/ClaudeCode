@@ -144,6 +144,36 @@
       "id": "R2-E11",
       "name": "Neo Merkle root hằng ngày lên chuỗi",
       "refs": "BR-PF-06"
+    },
+    {
+      "id": "R2-E12",
+      "name": "Engine trận đấu: module Battle, Decks, BattleHub (SignalR), replay, đồng hồ lượt",
+      "refs": "BR-BTL-*, BR-ELM-*, BR-ARN-*, BR-FUS-*, SAD 19, CR-004"
+    },
+    {
+      "id": "R2-E13",
+      "name": "Xây bộ bài (10 bộ, kiểm tra hợp lệ) trên app và web",
+      "refs": "BR-DECK-*, US-13.4"
+    },
+    {
+      "id": "R2-E14",
+      "name": "Trận hướng dẫn có kịch bản, luyện tập với máy, PvE Act 1, giao hữu",
+      "refs": "BR-NEW-06, US-13.3, US-13.5, US-13.6, Q-54"
+    },
+    {
+      "id": "R3-E1",
+      "name": "Xếp hạng theo mùa (Glicko-2), thể thức Standard/Eternal, danh sách cấm",
+      "refs": "BR-PVP-06..08, US-13.7"
+    },
+    {
+      "id": "R3-E2",
+      "name": "Cược Arena Point, chống thông đồng, theo ma trận quốc gia",
+      "refs": "BR-PVP-03, 04, US-13.8, BR-GEO"
+    },
+    {
+      "id": "R3-E3",
+      "name": "Giải đấu sự kiện, Draft, xem lại trận",
+      "refs": "BR-PVP-05, BR-BTL-10, US-13.9, US-13.10"
     }
   ],
   "tasks": [
@@ -2453,23 +2483,25 @@
     {
       "id": "T084",
       "sprint": "S010",
-      "title": "FTUE + pack tutorial",
+      "title": "FTUE + gói chào mừng 5 Anima Common (CR-004)",
       "workstream": "mobile",
       "owner_skill": "build-full-stack",
       "source_refs": [
         "PRD 7.1",
+        "BR-NEW-01",
         "PQ-02"
       ],
       "dependencies": [
         "T051",
-        "T061"
+        "T061",
+        "T128"
       ],
       "allowed_files": [
         "mobile/AnimaUnity/Assets/Anima/UI/Ftue/**"
       ],
       "expected_outputs": [],
       "acceptance": [
-        "Mở pack đầu tiên < 2 phút"
+        "Mở gói chào mừng < 2 phút từ lúc mở app; giới thiệu nhiệm vụ Tân thủ"
       ],
       "risk_tier": "standard",
       "estimate": "2d",
@@ -3514,6 +3546,298 @@
       "status": "BACKLOG",
       "context_files": [],
       "change_request": "CR-003"
+    },
+    {
+      "id": "T124",
+      "sprint": "S002",
+      "title": "FRD Đấu trường phần R1: loại thẻ, chỉ số, mạch truyện, công thức Hợp thể, gói chào mừng, nhiệm vụ Tân thủ",
+      "workstream": "analysis",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "BR-CARD-01..07",
+        "BR-NEW-01..05",
+        "US-13.1",
+        "US-13.2"
+      ],
+      "dependencies": [
+        "T001"
+      ],
+      "allowed_files": [
+        "docs/frd/FRD-13-arena-r1.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đạt FRD coverage checklist; trả lời hoặc hẹn ngày Q-52, Q-53, Q-56"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T125",
+      "sprint": "S003",
+      "title": "Thiết kế 100 thẻ Awakening: 80 Anima + 20 bài hỗ trợ, chỉ số theo khung chi phí, 15–20 mạch truyện, công thức Hợp thể",
+      "workstream": "content",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "BR-CARD-03",
+        "BR-CARD-07",
+        "BR-FUS-01..05",
+        "Q-56"
+      ],
+      "dependencies": [
+        "T124"
+      ],
+      "allowed_files": [
+        "docs/content/awakening-battle-sheet.csv",
+        "docs/content/awakening-arcs.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Mọi Anima nằm trong khung ±10%; mỗi hệ có đủ Cộng hưởng 1–6; đủ 4 Epic+ mỗi hệ"
+      ],
+      "risk_tier": "high",
+      "estimate": "4d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T126",
+      "sprint": "S004",
+      "title": "Catalog: thêm loại thẻ, Cộng hưởng, ATK/DEF/HP, kỹ năng, mạch truyện, công thức Hợp thể; khóa sửa sau phát hành",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-CARD-02",
+        "BR-CARD-06",
+        "SAD 19.4"
+      ],
+      "dependencies": [
+        "T037",
+        "T124"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Catalog/Catalog.Domain/Battle/**",
+        "backend/src/Modules/Catalog/Catalog.Application/Battle/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-DECK-01; sửa chỉ số thẻ đã phát hành bị chặn và có audit"
+      ],
+      "risk_tier": "high",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T127",
+      "sprint": "S004",
+      "title": "Seed chỉ số chiến đấu set Awakening từ bảng thiết kế",
+      "workstream": "content",
+      "owner_skill": "senior-business-analyst",
+      "source_refs": [
+        "BR-CARD-07"
+      ],
+      "dependencies": [
+        "T125",
+        "T126",
+        "T042"
+      ],
+      "allowed_files": [
+        "backend/seed/awakening/battle/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "100/100 thẻ có chỉ số; script kiểm tra khung chỉ số chạy xanh"
+      ],
+      "risk_tier": "low",
+      "estimate": "0.5d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T128",
+      "sprint": "S004",
+      "title": "Pack Definition gói chào mừng (5 Common, 5 hệ khác nhau trong 7 hệ) và pack cơ bản Tân thủ; công khai quy tắc",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-NEW-01",
+        "BR-NEW-05",
+        "BR-PACK-01"
+      ],
+      "dependencies": [
+        "T037",
+        "T045"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Gacha/Gacha.Application/Starter/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-NEW-01..03, SC-NEW-07"
+      ],
+      "risk_tier": "high",
+      "estimate": "1.5d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T129",
+      "sprint": "S005",
+      "title": "Thẻ gắn chặt tài khoản: chặn niêm yết, rèn, rút NFT",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-NEW-04"
+      ],
+      "dependencies": [
+        "T046",
+        "T102"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Collection/Collection.Domain/Binding/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-NEW-04, SC-NEW-05"
+      ],
+      "risk_tier": "high",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T130",
+      "sprint": "S007",
+      "title": "Nhiệm vụ Tân thủ 7 ngày: nhóm nhiệm vụ, làm bù, phát pack cơ bản",
+      "workstream": "backend",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "BR-NEW-02",
+        "BR-NEW-03",
+        "SAD 19.5"
+      ],
+      "dependencies": [
+        "T061",
+        "T128"
+      ],
+      "allowed_files": [
+        "backend/src/Modules/Rewards/Rewards.Application/NewbieQuest/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "SC-NEW-06, SC-NEW-08"
+      ],
+      "risk_tier": "standard",
+      "estimate": "2d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T131",
+      "sprint": "S007",
+      "title": "App + web: màn nhiệm vụ Tân thủ, thanh tiến độ \"n/30 lá\"",
+      "workstream": "mobile",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-13.2",
+        "PRD 7.1 bước 10"
+      ],
+      "dependencies": [
+        "T130",
+        "T054",
+        "T065"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Rewards/NewbieQuest/**",
+        "web/apps/player/src/app/newbie/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Hiển thị đúng ngày, nhiệm vụ làm bù, trạng thái đã nhận"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1.5d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T132",
+      "sprint": "S006",
+      "title": "App + web: chi tiết thẻ hiện loại, Cộng hưởng, ATK/DEF/HP, kỹ năng, mạch, công thức Hợp thể",
+      "workstream": "web-player",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "US-13.1",
+        "BR-CARD-02"
+      ],
+      "dependencies": [
+        "T126",
+        "T057"
+      ],
+      "allowed_files": [
+        "mobile/AnimaUnity/Assets/Anima/Collection/BattleStats/**",
+        "web/apps/player/src/components/card-stats/**"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Đủ trường theo BR-CARD-02 ở 4 ngôn ngữ"
+      ],
+      "risk_tier": "standard",
+      "estimate": "1d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
+    },
+    {
+      "id": "T133",
+      "sprint": "S011",
+      "title": "Spike: thư viện luật Anima.Battle.Rules + golden replay chạy giống nhau trên .NET và Unity IL2CPP; mô phỏng 100k trận",
+      "workstream": "spike",
+      "owner_skill": "build-full-stack",
+      "source_refs": [
+        "SAD 19.1",
+        "SAD 19.7",
+        "T-13",
+        "Q-51"
+      ],
+      "dependencies": [
+        "T127"
+      ],
+      "allowed_files": [
+        "backend/src/Anima.Battle.Rules/**",
+        "backend/tools/Anima.Battle.Sim/**",
+        "docs/spikes/SPIKE-T133.md"
+      ],
+      "expected_outputs": [],
+      "acceptance": [
+        "Cùng replay cho cùng trạng thái cuối trên 2 runtime; báo cáo tỷ lệ thắng theo hệ"
+      ],
+      "risk_tier": "high",
+      "estimate": "3d",
+      "granularity": "story",
+      "status": "BACKLOG",
+      "context_files": [],
+      "change_request": "CR-004"
     }
   ]
 }

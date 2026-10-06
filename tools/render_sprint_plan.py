@@ -90,7 +90,7 @@ def render(data):
                 acc="; ".join(t["acceptance"]), risk=t["risk_tier"], est=t["estimate"],
                 gran="task" if t["granularity"] == "task" else "story (tách khi lập sprint)"))
         out.append("")
-    out += ["### Release 2 — epic chờ tách task", "", "| ID | Epic | Tham chiếu |", "|---|---|---|"]
+    out += ["### Release 2–3 — epic chờ tách task", "", "| ID | Epic | Tham chiếu |", "|---|---|---|"]
     out += [f"| {e['id']} | {e['name']} | {e['refs']} |" for e in data["r2_epics"]]
     out += ["", END]
     return "\n".join(out)

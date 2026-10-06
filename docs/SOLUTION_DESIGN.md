@@ -3,9 +3,9 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | SAD-ANIMA-001 |
-| Phiên bản | 0.3 (Draft) — thêm quốc tế hóa và tuân thủ theo quốc gia (CR-003); CR-002 |
+| Phiên bản | 0.4 (Draft) — thêm kiến trúc Đấu trường (CR-004); quốc tế hóa (CR-003); CR-002 |
 | Ngày | 2026-10-06 |
-| Đầu vào | [BRD](BRD_ANIMA.md) v0.4, [PRD](PRD_ANIMA.md) v0.3, [BDD](BDD_ANIMA.md) v0.3, [Tech Stack](TECH_STACK.md) v0.4 |
+| Đầu vào | [BRD](BRD_ANIMA.md) v0.6, [PRD](PRD_ANIMA.md) v0.5, [BDD](BDD_ANIMA.md) v0.5, [Tech Stack](TECH_STACK.md) v0.6 |
 | Trạng thái | Chờ Tech Lead review |
 
 Tài liệu mô tả **cách xây** hệ thống. Quy tắc nghiệp vụ nằm ở BRD, lựa chọn công nghệ và lý do nằm ở Tech Stack; ở đây chỉ dẫn chiếu ID.
@@ -126,11 +126,12 @@ Monorepo, mỗi thư mục gốc có một owner chính. Đây là cơ sở cho 
 │  │  ├─ Anima.Worker/               # job: đối soát, xuất analytics, outbox
 │  │  ├─ Anima.Contracts/            # DTO, mã lỗi, enum — netstandard2.1, dùng chung với Unity
 │  │  ├─ Anima.SharedKernel/         # Result, Money, Clock, Idempotency, Outbox
+│  │  ├─ Anima.Battle.Rules/         # (R2, CR-004) luật trận tất định — netstandard2.1, dùng chung với Unity
 │  │  └─ Modules/
 │  │     ├─ Identity/  Wallet/  Catalog/  Gacha/  Collection/
 │  │     ├─ Rewards/   Payments/ Fraud/   Admin/  Analytics/
 │  │     ├─ Fairness/  Forge/   (R2) Chain/
-│  │     └─ (R2) Marketplace/  Social/
+│  │     └─ (R2) Marketplace/  Social/  Battle/  Decks/  (R3) Arena/
 │  └─ tests/
 │     ├─ Anima.UnitTests/  Anima.IntegrationTests/  Anima.Bdd/  Anima.ArchTests/
 ├─ mobile/
@@ -698,6 +699,85 @@ sequenceDiagram
 - Đo NFR-17 từ các thị trường đợt 1 bằng synthetic monitoring.
 - Region thứ hai và nơi lưu dữ liệu theo luật từng nước: quyết định theo Q-50 (T-12).
 - Thời gian: mọi mốc lưu UTC; ngày nghiệp vụ theo múi giờ tài khoản; sự kiện toàn cầu (mùa, pack giới hạn) công bố theo UTC kèm giờ địa phương.
+
+---
+
+## 19. Đấu trường (CR-004)
+
+Luật ở BRD 10.18 → 10.25, kịch bản ở BDD 12D. Phần này mô tả cách xây.
+
+### 19.1. Nguyên tắc
+
+1. **Server quyết định.** Client chỉ gửi ý định (`PlayCard`, `Attack`, `SetTrap`, `Fuse`, `EndTurn`); server kiểm tra, tính kết quả và phát trạng thái mới. Client không bao giờ thấy bài trên tay hoặc bẫy úp của đối thủ.
+2. **Một thư viện luật dùng chung.** `Anima.Battle.Rules` (netstandard2.1, C# thuần, không I/O, không `DateTime.Now`, không `Random` hệ thống) chạy giống hệt trên server và trong Unity. Unity dùng nó để dự đoán (hiện số sát thương trước khi xác nhận) và phát lại replay; kết quả thật vẫn lấy từ server.
+3. **Tất định.** Trạng thái trận = hàm của (bộ bài hai bên, seed trận, danh sách hành động). Xáo bài và mọi lựa chọn ngẫu nhiên dùng HMAC-DRBG từ seed trận theo cơ chế commit–reveal ở mục 8 (hash seed công bố khi bắt đầu, seed công bố khi kết thúc). Nhờ vậy replay chỉ cần lưu danh sách hành động.
+4. **Số nguyên.** Hệ số (1.25, 0.75, +15%…) lưu dưới dạng phần nghìn và tính bằng số nguyên, làm tròn chục theo một quy tắc duy nhất, để server và Unity (IL2CPP, nhiều CPU) cho cùng kết quả.
+5. **Dữ liệu thẻ bất biến.** Engine đọc chỉ số từ `catalog.card_definition` theo phiên bản; không có cơ chế sửa chỉ số sau phát hành (BR-CARD-06). Cân bằng bằng `battle.format` và danh sách cấm.
+
+### 19.2. Thành phần
+
+| Thành phần | Vị trí | Vai trò |
+|---|---|---|
+| `Anima.Battle.Rules` | `backend/src/Anima.Battle.Rules` | Mô hình trạng thái, kiểm tra hành động hợp lệ, tính sát thương, khắc hệ, sàn, Cộng minh, Hợp thể, bẫy, đột tử |
+| Module `Battle` | `backend/src/Modules/Battle` | Vòng đời trận, đồng hồ lượt, lưu hành động, kết thúc trận, ghi kết quả |
+| Module `Decks` | `backend/src/Modules/Decks` | CRUD bộ bài, kiểm tra hợp lệ (BR-DECK), bộ mặc định |
+| Module `Arena` (R3) | `backend/src/Modules/Arena` | Ghép trận, rating Glicko-2, mùa, Arena Point ledger, giải đấu |
+| `BattleHub` | SignalR | Kênh realtime: gửi hành động, nhận trạng thái và sự kiện hiển thị |
+| Bot | `Battle.Application/Bots` | AI cho tutorial (kịch bản), PvE (theo độ khó), luyện tập |
+| Simulation harness | `backend/tools/Anima.Battle.Sim` | Cho máy đấu máy hàng trăm nghìn trận để chỉnh hệ số trước khi phát hành set (Q-51) |
+| Unity `Battle` | `mobile/AnimaUnity/Assets/Anima/Battle/` | Bàn đấu, kéo thả, animation sát thương, kết nối hub, replay |
+
+### 19.3. Vòng đời trận
+
+```
+Queued ─► Matched ─► DeckSelect (15 s) ─► InProgress ─► Finished
+                         │                    │
+                         └─ hết giờ: bộ mặc định / hủy ghép   └─ mất kết nối > 60 s: thua (BR-PVP)
+```
+
+- Mỗi trận chạy trên **một node** (actor trong bộ nhớ, khóa phân tán bằng Redis theo `match_id`). Mỗi hành động được ghi vào `battle.match_action` trước khi phát trạng thái, nên node chết thì node khác dựng lại trận bằng cách phát lại hành động.
+- Đồng hồ lượt do server giữ (20 s + 30 s dự trữ). Hết giờ: server tự `EndTurn`.
+- Kết thúc: ghi `battle.match` (kết quả, lý do), phát integration event `MatchFinished`; Arena cập nhật rating và AP trong cùng transaction với ledger.
+
+### 19.4. Dữ liệu
+
+| Bảng | Cột chính | Ghi chú |
+|---|---|---|
+| `catalog.card_definition` (thêm cột) | `card_type`, `resonance_cost`, `atk`, `def`, `hp`, `skill_id`, `arc_id`, `stats_version` | Bất biến sau phát hành |
+| `catalog.fusion_recipe` | `id`, `input_a`, `input_b`, `output_card_definition_id`, `cost` | |
+| `catalog.arena` | `id`, `home_element`, `rule_id` | 8 sàn |
+| `decks.deck` | `id`, `account_id`, `name`, `is_default`, `format`, `cards jsonb`, `valid_at` | Tối đa 10 bộ |
+| `battle.match` | `id`, `mode`, `format`, `arena_id`, `p1`, `p2`, `seed_hash`, `seed`, `status`, `result`, `end_reason`, `rules_version` | `seed` chỉ lộ khi kết thúc |
+| `battle.match_action` | `match_id`, `seq`, `actor`, `action jsonb`, `at` | Append-only; replay |
+| `arena.rating` (R3) | `account_id`, `season_id`, `format`, `rating`, `rd`, `volatility` | Glicko-2 |
+| `arena.ap_ledger` (R3) | `id`, `account_id`, `delta`, `reason`, `match_id`, `idempotency_key` | Append-only như ví; AP tách hẳn khỏi Gem/Coin |
+| `rewards.newbie_quest` | `account_id`, `day`, `completed_at`, `claimed_at` | BR-NEW-03 |
+| `collection.card_instance` (thêm cột) | `bound_to_account` | Thẻ Tân thủ: chặn niêm yết, rèn, rút NFT (BR-NEW-04) |
+
+### 19.5. API
+
+| Endpoint | Mô tả |
+|---|---|
+| `GET/POST/PUT/DELETE /v1/decks` | Bộ bài; `POST /v1/decks/{id}:validate` trả danh sách vi phạm theo mã lỗi `DECK_*` |
+| `POST /v1/matches` | Tạo trận luyện tập, PvE, giao hữu (mã mời) |
+| `POST /v1/arena/queue` (R3) | Vào hàng chờ xếp hạng; `DELETE` để rời |
+| `GET /v1/matches/{id}` | Trạng thái (đã che bài đối thủ) hoặc kết quả và seed nếu đã kết thúc |
+| `GET /v1/matches/{id}/replay` | Danh sách hành động + seed để phát lại bằng `Anima.Battle.Rules` |
+| Hub `/hubs/battle` | `SendAction(matchId, seq, action)` có idempotency theo `seq`; server đẩy `StateDelta`, `Event`, `Clock` |
+| `GET /v1/newbie-quest`, `POST /v1/newbie-quest/{day}:claim` | Nhiệm vụ Tân thủ |
+
+### 19.6. Chống gian lận
+
+- Bot farm và thông đồng (R3): phát hiện cặp đấu lặp lại, đầu hàng sớm có hệ thống, chênh rating bất thường; giới hạn số trận cược AP giữa cùng một cặp mỗi ngày; AP không chuyển được giữa tài khoản.
+- Client sửa đổi: vô hại vì server tính; chỉ cần rate limit hành động và ngắt kết nối khi `seq` sai lặp lại.
+- Độ trễ: mục tiêu p95 < 150 ms từ hành động tới `StateDelta` trong cùng region; trận ghép ưu tiên cùng region.
+
+### 19.7. Kiểm thử
+
+- Unit test thư viện luật cho mọi kịch bản BDD 12D (Reqnroll gọi thẳng `Anima.Battle.Rules`).
+- **Golden replay:** bộ replay cố định phải cho đúng trạng thái cuối trên cả .NET server và Unity IL2CPP (iOS, Android) trong CI.
+- Property test: HP không âm sau khi xử lý, tổng lá luôn bằng 30, không lộ bài ẩn trong `StateDelta`.
+- Mô phỏng cân bằng chạy trước mỗi lần phát hành set; cảnh báo nếu tỷ lệ thắng theo hệ, theo đi trước/đi sau lệch > 5 điểm %.
 
 ---
 

@@ -261,6 +261,7 @@
           <div class="panel web-only"><h3>${t("home.streak", { n: S.streak })}</h3>
             <div class="note">${t("home.webOnlyApp")}</div></div>
         </div>
+        <div class="panel"><div class="row"><div><h3>${t("home.arena")}</h3><p style="margin:0">${t("home.arenaDesc")}</p></div><span class="spacer"></span><a class="btn" href="battle.html">${t("btn.enterArena")}</a></div></div>
         <div class="panel"><div class="row"><div><h3>${t("nav.forge")}</h3><p style="margin:0">${t("home.forgeDesc")}</p></div><span class="spacer"></span><a class="btn" href="#forge">${t("btn.enterForge")}</a></div></div>
         <div class="panel"><h3>${t("home.recent")}</h3>${best.length ? `<div class="card-grid">${best.map((c) => cardHTML(c)).join("")}</div>` : `<p>${t("home.noPulls")}</p>`}</div>
       </div>`;

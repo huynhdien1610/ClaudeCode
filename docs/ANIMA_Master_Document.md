@@ -1,9 +1,9 @@
 # ANIMA: Echoes of the Heart
 ## Master Document — Dự án App Thẻ bài Số hóa
 
-**Version:** 1.3
+**Version:** 1.4
 **Ngày tạo:** 2026-10-05
-**Cập nhật:** 2026-10-06 — v1.1: thêm mục 9 Kiến trúc & Tech Stack. v1.2: mô hình tài sản số (mục 2.4, 5.7) theo CR-002. v1.3: phát hành toàn cầu, 3 ngôn ngữ (CR-003)
+**Cập nhật:** 2026-10-06 — v1.1: thêm mục 9 Kiến trúc & Tech Stack. v1.2: mô hình tài sản số (mục 2.4, 5.7) theo CR-002. v1.3: phát hành toàn cầu, 3 ngôn ngữ (CR-003). v1.4: Đấu trường — đấu bài theo hệ, sàn đấu, Hợp thể (mục 3.11, CR-004)
 **Trạng thái:** Concept & Design Phase
 
 ---
@@ -200,6 +200,37 @@ Giá: **1 pack 5 thẻ = $1** (100 Gem hoặc 1,000 Coin). Chi tiết quy tắc 
 | NFR-08 | Ngôn ngữ | Tiếng Việt, Anh, Trung (giản thể và phồn thể) — CR-003 |
 | NFR-09 | Accessibility | Screen reader, font size |
 | NFR-10 | Offline mode | Xem bộ sưu tập offline |
+
+## 3.11. Module Đấu trường (CR-004)
+
+> Chi tiết luật: BRD mục 10.18 → 10.25 (BR-CARD, BR-DECK, BR-BTL, BR-ELM, BR-ARN, BR-FUS, BR-PVP, BR-NEW); kịch bản: BDD mục 12D. Hệ số cuối cùng chốt sau mô phỏng (BRD Q-51).
+
+**Thẻ.** 3 loại: Anima (chiến đấu: Cộng hưởng 1–6, ATK, DEF, HP, tối đa 1 kỹ năng), Tiếng vọng (Buff) và Ký ức phong ấn (Bẫy, tự kích hoạt). Chỉ số bất biến sau phát hành vì gắn với NFT. Khung chỉ số theo chi phí như nhau cho mọi rarity: rarity cao khác ở kỹ năng, không ở tổng chỉ số. Set Awakening = 80 Anima + 20 bài hỗ trợ.
+
+**Bộ bài.** 30 lá: ≥ 24 Anima, ≤ 6 bài hỗ trợ; tối đa 2 bản mỗi thẻ (Legendary, Secret: 1); mỗi bộ tối đa 4 Epic, 2 Legendary, 1 Secret; lưu được 10 bộ.
+
+**Trận đấu.** Keeper 8,000 HP; 3 ô Anima + 2 ô Ký ức mỗi bên. Cộng hưởng lượt n = min(n, 6). 20 giây mỗi lượt + 30 giây dự trữ. Từ lượt 10 đột tử: −500, −1,000, … mỗi lượt. Mục tiêu trận 3–5 phút. Kết quả do server quyết định.
+
+**Sát thương** = max(100, ATK − DEF) × hệ số hệ, làm tròn chục. Khắc ×1.25, bị khắc ×0.75, còn lại ×1.0; Nihilum ×1.1 với mọi hệ; Luminara đánh Nihilum ×1.5.
+
+**Vòng nhân quả 7 hệ.** Sinh: Umbryx → Pyraxis → Aqualis → Terrakin → Ventara → Voltaris → Luminara → Umbryx. Mỗi hệ khắc hệ đứng sau nó 2 bước. Đặt Anima được hệ đứng trước "sinh" ra: +200 ATK, +200 HP. Ba hệ liên tiếp trên sân (chuỗi nhân quả): +300 ATK.
+
+**Sàn đấu.** 8 sàn, mỗi sàn một hệ chủ: hệ chủ +15% ATK/HP; hệ bị hệ chủ khắc −10%; mỗi sàn có thêm 1 luật riêng. Xếp hạng: sàn ngẫu nhiên công bố trước, có 15 giây chọn bộ.
+
+**Cộng minh và Hợp thể.** 2 lá cùng mạch truyện trên sân: +100 ATK/+200 HP; 3 lá: +200/+400. Hợp thể theo công thức in trên thẻ: thẻ Hợp thể ≈ 70% tổng ATK/HP, DEF lấy cao hơn. Bản art đặc biệt của thẻ Hợp thể là phần thưởng sưu tầm.
+
+**Chế độ chơi.** R2: trận hướng dẫn, PvE Act 1, luyện tập, giao hữu, xây bộ bài. R3: xếp hạng theo mùa (Glicko-2), cược **Arena Point** (10–1,000 AP; AP không mua được và không đổi ra tiền hay vật phẩm có giá), giải đấu, Draft. Hai thể thức: Standard (các mùa gần) và Eternal (mọi mùa); cân bằng bằng thể thức và danh sách cấm.
+
+**Người mới.** Gói chào mừng 5 Anima Common thuộc 5 hệ khác nhau; nhiệm vụ Tân thủ 7 ngày cho 5 pack cơ bản (đủ 30 lá); thẻ Tân thủ gắn chặt tài khoản. Trận hướng dẫn có kịch bản với bộ bài mượn.
+
+| ID | Tính năng | Mô tả | Ưu tiên | Release |
+|---|---|---|---|---|
+| FR-60 | Chỉ số chiến đấu trên thẻ | Loại, Cộng hưởng, ATK/DEF/HP, kỹ năng, mạch, công thức Hợp thể | Must | R1 |
+| FR-61 | Gói chào mừng, nhiệm vụ Tân thủ | 5 + 25 lá gắn chặt tài khoản | Must | R1 |
+| FR-62 | Xây bộ bài | 10 bộ, kiểm tra hợp lệ | Must | R2 |
+| FR-63 | Engine trận đấu | Server-authoritative, luật dùng chung | Must | R2 |
+| FR-64 | Trận hướng dẫn, PvE, luyện tập, giao hữu | Không thưởng có giá trị ngoài phần công ty cấp | Must | R2 |
+| FR-65 | Xếp hạng, cược AP, giải đấu, Draft, xem lại | Theo ma trận quốc gia | Should | R3 |
 
 ---
 
@@ -564,7 +595,7 @@ Ví dụ con số: 1 slot thẻ ≈ 200 Coin. Rèn tốn 2 thẻ + 50 Coin, nên
 - Cộng đồng, backend
 
 ### Out of Scope (giai đoạn đầu)
-- Chơi game đối kháng
+- ~~Chơi game đối kháng~~ → đưa vào phạm vi từ R2 (CR-004, mục 3.11)
 - Blockchain/NFT
 - Livestream trong app
 - AR/3D

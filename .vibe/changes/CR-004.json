@@ -1,0 +1,31 @@
+{
+  "id": "CR-004",
+  "title": "Đấu trường: đấu bài với chỉ số chiến đấu, bộ bài 30 lá, sàn đấu, nhân quả cảm xúc, Hợp thể, Arena Point",
+  "requested_by": "Product owner (người dùng phiên làm việc)",
+  "requested_at": "2026-10-06",
+  "stage_at_request": "BACKLOG (trước READY_FOR_DEV)",
+  "decisions": [
+    "Bộ bài 30 lá; Tiếng vọng + Ký ức phong ấn tối đa 6 lá; lưu tối đa 10 bộ",
+    "Trận 3–5 phút: 20 giây/lượt, đột tử từ lượt 10",
+    "Vòng sinh và vòng khắc theo nhân quả cảm xúc; Nihilum ngoài vòng",
+    "8 sàn đấu, mỗi sàn có hệ chủ nhà và luật riêng",
+    "Cộng minh và Hợp thể theo công thức (A); thẻ Hợp thể bản art đặc biệt là phần thưởng",
+    "Cược chỉ bằng Arena Point không có giá trị quy đổi",
+    "Set Awakening 100 = 80 Anima + 20 bài hỗ trợ; bài hỗ trợ ra ngẫu nhiên từ pack",
+    "Gói chào mừng 5 Common thuộc 5 hệ khác nhau trong 7 hệ vòng nhân quả; không tặng bộ khởi đầu",
+    "Nhiệm vụ Tân thủ 7 ngày tặng 5 pack cơ bản; thẻ tặng gắn chặt tài khoản",
+    "Trận hướng dẫn có kịch bản bằng bộ bài mượn",
+    "Ghi kèm: Q-44 không phát hành ở Trung Quốc đại lục; Q-47 giữ nguyên tên riêng"
+  ],
+  "impact": {
+    "documents": ["BRD v0.6", "BDD v0.5", "PRD v0.5", "SOLUTION_DESIGN v0.4", "TECH_STACK v0.6", "Master Document v1.4", "SPRINT_PLAN"],
+    "business_rules_added": ["BR-CARD-01..07", "BR-DECK-01..09", "BR-BTL-01..11", "BR-ELM-01..06", "BR-ARN-01..04", "BR-FUS-01..05", "BR-PVP-01..09", "BR-NEW-01..06"],
+    "open_questions_added": ["Q-51..Q-57"],
+    "questions_resolved": ["Q-44", "Q-47"],
+    "risks_added": ["RK-22..RK-25"],
+    "schedule": "R1: chỉ số trên thẻ, gói chào mừng, nhiệm vụ Tân thủ. R2: battle engine, hướng dẫn, cốt truyện Act 1, luyện tập, giao hữu, xây bộ bài. R3: xếp hạng, cược AP, giải đấu, Draft"
+  },
+  "decision_owner": "Product Owner",
+  "decision": "APPROVED_BY_PO_IN_SESSION (cần định danh PO chính thức — Q-01)",
+  "invalidated_gates": []
+}
