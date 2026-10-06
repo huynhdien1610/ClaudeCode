@@ -4,12 +4,15 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BRD-ANIMA-001 |
-| Phiên bản | 0.1 (Draft) |
+| Phiên bản | 0.2 (Draft) |
 | Ngày | 2026-10-06 |
 | Nguồn | [ANIMA_Master_Document.md](ANIMA_Master_Document.md) v1.0 (2026-10-05) |
 | Trạng thái | **DRAFT — Chờ Product Owner xác nhận** |
 | Business owner | Product Owner (chưa định danh — xem Q-01) |
 | Người soạn | Business Analyst |
+| Tài liệu liên quan | [PRD](PRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md) |
+
+**Thay đổi v0.2 (2026-10-06):** tách lý do hạn chế tài khoản thành `FRAUD` và `NEGATIVE_GEM`. Tài khoản bị hạn chế vì số dư Gem âm được nạp bù và tự gỡ hạn chế khi số dư ≥ 0. Bản v0.1 chặn nạp với mọi tài khoản Restricted nên người chơi bị âm Gem không có cách thoát. Bộ kịch bản BDD đầy đủ chuyển sang [BDD_ANIMA.md](BDD_ANIMA.md).
 
 > **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn và mục 16 có 30 câu hỏi mở cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
 
@@ -381,7 +384,8 @@ flowchart TD
 | — | Unverified | Player đăng ký |
 | Unverified | Verified | OTP thành công |
 | Unverified / Verified | Restricted | Fraud Analyst hoặc hệ thống phát hiện nghi vấn; số dư Gem âm |
-| Restricted | Trạng thái trước đó (Unverified/Verified) | Fraud Analyst gỡ hạn chế; số dư Gem ≥ 0 |
+| Restricted (FRAUD) | Trạng thái trước đó (Unverified/Verified) | Fraud Analyst gỡ hạn chế; số dư Gem ≥ 0 |
+| Restricted (NEGATIVE_GEM) | Trạng thái trước đó | Tự động khi số dư Gem ≥ 0 sau khi nạp bù |
 | Bất kỳ (trừ Deleted) | Banned | Fraud Analyst, kèm lý do bắt buộc |
 | Banned | Verified | Chỉ Super Admin, sau khi khiếu nại được chấp nhận |
 | Bất kỳ (trừ Banned) | Pending Deletion | Player yêu cầu xóa tài khoản |
@@ -390,7 +394,7 @@ flowchart TD
 
 Chuyển trạng thái bị từ chối: Banned → Pending Deletion (phải giữ dữ liệu phục vụ điều tra — Q-25); Deleted → bất kỳ.
 
-**Restricted:** vẫn đăng nhập, xem bộ sưu tập, mở pack đã mua; **không** được nạp, mua pack, niêm yết, mua trên chợ, đấu giá, nhận thưởng ads.
+**Restricted:** có hai lý do. `FRAUD` (do Fraud Analyst hoặc hệ thống phát hiện gian lận) và `NEGATIVE_GEM` (do thu hồi Gem khi hoàn tiền). Cả hai vẫn đăng nhập, xem bộ sưu tập, mở pack đã mua; **không** được mua pack, niêm yết, mua trên chợ, đấu giá, nhận thưởng ads. Riêng `NEGATIVE_GEM` **được nạp Gem** để bù số âm; `FRAUD` không được nạp.
 
 ## 8.2. Card Instance
 
@@ -562,7 +566,7 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 | BR-WAL-01 | Mọi biến động Gem/Coin ghi thành bút toán ledger bất biến (append-only). Số dư = tổng bút toán. Không sửa/xóa bút toán; điều chỉnh bằng bút toán đảo. | BA |
 | BR-WAL-02 | Gem chỉ được cộng sau khi server xác thực receipt với store. Mỗi store transaction ID chỉ được ghi nhận một lần. | BA |
 | BR-WAL-03 | Số dư Coin không bao giờ âm. Số dư Gem chỉ có thể âm do thu hồi khi hoàn tiền (BR-WAL-04). | BA |
-| BR-WAL-04 | Khi store thông báo hoàn tiền/chargeback: thu hồi đúng số Gem của giao dịch đó. Nếu số dư không đủ, số dư Gem âm và tài khoản chuyển sang Restricted cho đến khi số dư ≥ 0. | BA |
+| BR-WAL-04 | Khi store thông báo hoàn tiền/chargeback: thu hồi đúng số Gem của giao dịch đó. Nếu số dư không đủ, số dư Gem âm và tài khoản chuyển sang Restricted với lý do `NEGATIVE_GEM`; tự gỡ khi nạp bù đến số dư ≥ 0. | BA |
 | BR-WAL-05 | Đổi Gem → Coin theo tỷ lệ cấu hình (đề xuất 1 Gem = 9 Coin). Không đổi Coin → Gem. | MD FR-10 + BA (Q-05) |
 
 ## 10.3. Kinh tế chung (ECO)
@@ -672,7 +676,7 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 
 # 11. KỊCH BẢN BDD TRỌNG YẾU
 
-Phạm vi BRD: kịch bản cho các rule liên quan đến tiền, xác suất và phân quyền. Kịch bản cho các rule còn lại được viết ở giai đoạn FRD.
+Đây là trích đoạn. Bộ kịch bản đầy đủ, phủ mọi Business Rule, nằm ở [BDD_ANIMA.md](BDD_ANIMA.md). Khi hai nơi khác nhau, BDD_ANIMA.md là bản chuẩn.
 
 ```gherkin
 Tính năng: EP-03/EP-04 — Mua và mở pack
@@ -701,10 +705,10 @@ Tính năng: EP-03/EP-04 — Mua và mở pack
       Thì Pack Instance vẫn ở trạng thái "Unopened"
       Và không có thẻ mới nào được thêm
 
-    Kịch bản: SC-PACK-04 — Từ chối mở lại pack đã mở
+    Kịch bản: SC-PACK-04 — Mở lại pack đã mở
       Cho trước Pack Instance của P1 ở trạng thái "Opened"
       Khi P1 gửi lại yêu cầu mở pack đó
-      Thì server từ chối với mã lỗi PACK_ALREADY_OPENED
+      Thì server trả lại đúng kết quả đã ghi lần đầu với mã PACK_ALREADY_OPENED
       Và không có thẻ mới nào được thêm
 
   Quy tắc: US-03.1 — Mua pack idempotent
@@ -947,7 +951,7 @@ Mọi quyền được kiểm tra ở backend; client chỉ ẩn/hiện theo quy
 | Hành động | Guest | Player (chưa xác thực) | Verified Player | Restricted | Banned |
 |---|---|---|---|---|---|
 | Xem cửa hàng, tỷ lệ rơi | ✔ | ✔ | ✔ | ✔ | ✘ |
-| Nạp Gem | ✘ | ✔ | ✔ | ✘ | ✘ |
+| Nạp Gem | ✘ | ✔ | ✔ | ✘ (✔ nếu lý do NEGATIVE_GEM) | ✘ |
 | Mua pack | ✘ | ✔ | ✔ | ✘ | ✘ |
 | Mở pack đã mua | ✘ | ✔ | ✔ | ✔ | ✘ |
 | Xem bộ sưu tập | ✘ | ✔ | ✔ | ✔ | ✘ |
@@ -1197,7 +1201,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Traceability requirement → rule → AC | ✔ | Mục 18.1 |
 | Đánh dấu cần UI | ✔ | `ui_required = true` |
 | Rủi ro, phụ thuộc, câu hỏi có owner | ✔ | Mục 16, 17 |
-| BDD phủ mọi rule (happy, biên, negative) | ⚠ Một phần | Đã phủ rule tiền, xác suất, phân quyền; rule ACC, REF, FRD, MKT-07/08/10/11 viết ở FRD |
+| BDD phủ mọi rule (happy, biên, negative) | ✔ | [BDD_ANIMA.md](BDD_ANIMA.md) mục 14; EP-08 cộng đồng chưa có rule |
 | FRD mức màn hình và mức trường | ✘ Chưa làm | Bước tiếp theo sau khi PO duyệt BRD |
 
 **Kết luận:** Chưa đạt Analysis Ready. Trạng thái: `DRAFT — NEEDS_PO_DECISION`.
