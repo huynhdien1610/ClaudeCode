@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANIMA — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Playfair+Display:wght@700&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 16px 60px; display: grid; gap: 22px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .tile { text-decoration: none; color: inherit; display: grid; gap: 8px; }
+  .tile:hover { border-color: var(--accent); }
+  .tile .row .card { --w: 54px; }
+  ul { margin: 0; padding-left: 18px; color: var(--text-2); }
+  li { margin: 3px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>ANIMA: Echoes of the Heart — Prototype giao diện</h1>
+    <p>Prototype HTML tĩnh để thống nhất luồng và cảm giác sản phẩm trước khi vào thiết kế chi tiết. Đây <b>chưa phải</b> design handoff: bố cục, component cuối cùng do Product Designer quyết định (task T003, T004, T021…).</p>
+    <div class="row wrap"><span class="chip">Dữ liệu giả</span><span class="chip">Không gọi backend</span><span class="chip">Tỷ lệ rơi theo đề xuất BRD DT-01 phương án A</span></div>
+  </div>
+
+  <div class="tiles">
+    <a class="tile panel" href="player.html">
+      <h2>App mobile</h2>
+      <p>Khung điện thoại, tab dưới. Đủ vòng lặp: điểm danh, xem ads, mua pack, mở pack 6 giai đoạn, bộ sưu tập, story, ví.</p>
+      <span class="btn primary" style="justify-self:start">Mở app mobile →</span>
+    </a>
+    <a class="tile panel" href="player.html?mode=web">
+      <h2>Website người chơi</h2>
+      <p>Cùng tài khoản và dữ liệu với app. Nạp Gem qua cổng thanh toán; không có điểm danh/ads ở bản đầu (BR-WEB-03).</p>
+      <span class="btn primary" style="justify-self:start">Mở website →</span>
+    </a>
+    <a class="tile panel" href="admin.html">
+      <h2>Website admin</h2>
+      <p>Đổi vai trò ở góc trên để thấy phân quyền, che dữ liệu cá nhân, maker-checker khi đổi tỷ lệ rơi, bồi thường, audit log.</p>
+      <span class="btn primary" style="justify-self:start">Mở admin →</span>
+    </a>
+  </div>
+
+  <div class="panel">
+    <h2>Gợi ý trải nghiệm</h2>
+    <ul>
+      <li><b>Mở pack:</b> Trang chủ → Mở pack → Mua bằng Coin → vuốt lên hoặc chạm vào pack để xé. Thẻ lật từ thấp đến cao; Epic trở lên có làm tối nền, Legendary trở lên có flash và rung màn hình, sau đó là phần Climax.</li>
+      <li><b>Bỏ qua / Fast mode / Giảm chuyển động:</b> nút trên thanh prototype; kết quả không đổi vì đã được "server" quyết định trước.</li>
+      <li><b>Điểm danh và ads:</b> tab Nhận thưởng; dùng "Sang ngày mới (demo)" để thử streak, Streak Freeze và reset lượt ads.</li>
+      <li><b>Website:</b> chuyển sang Website, thử điểm danh để thấy mã lỗi <code class="err">PLATFORM_NOT_SUPPORTED</code>; nạp Gem đi qua trạng thái "Chờ xác nhận" tới khi có IPN.</li>
+      <li><b>Admin:</b> chọn "Hà — Economy Manager" rồi bấm Duyệt ở Pack & Tỷ lệ (bị chặn vì tự duyệt); đổi sang "Sơn — Super Admin" để duyệt.</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h2>Truy vết tới tài liệu</h2>
+    <ul>
+      <li>Animation mở pack: Master Document mục 4; BRD BR-PACK-02, BR-PACK-06 → 08</li>
+      <li>Ma trận tính năng theo nền tảng: BRD mục 4.4; quy tắc BR-WEB-01 → 07</li>
+      <li>Phân quyền admin: BRD mục 12.2; kịch bản SC-ADM-*</li>
+      <li>Mã lỗi hiển thị: <a href="../docs/BDD_ANIMA.md">BDD_ANIMA.md</a></li>
+      <li>Kế hoạch triển khai: <a href="../docs/SPRINT_PLAN.md">SPRINT_PLAN.md</a> · Kiến trúc: <a href="../docs/SOLUTION_DESIGN.md">SOLUTION_DESIGN.md</a></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

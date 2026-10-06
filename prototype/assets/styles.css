@@ -1,0 +1,136 @@
+/* ANIMA prototype — design token dùng chung cho app, web người chơi và admin. */
+:root {
+  --bg: #0b0a14;
+  --bg-2: #13111f;
+  --surface: #1b1830;
+  --surface-2: #24203d;
+  --line: #34305a;
+  --text: #ece9ff;
+  --text-2: #b4aed6;
+  --text-3: #7f79a6;
+  --accent: #c4a7ff;
+  --accent-2: #7c5cff;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --danger: #f87171;
+
+  --r-common: #9ca3af;
+  --r-uncommon: #22c55e;
+  --r-rare: #3b82f6;
+  --r-epic: #a855f7;
+  --r-legendary: #f59e0b;
+  --r-secret: linear-gradient(90deg, #f87171, #fbbf24, #34d399, #60a5fa, #a78bfa, #f472b6);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --font: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: radial-gradient(1200px 600px at 20% -10%, #241a4a 0%, transparent 60%), var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; margin: 0 0 8px; letter-spacing: 0.2px; }
+h1 { font-size: 28px; }
+h2 { font-size: 21px; }
+h3 { font-size: 17px; }
+p { margin: 0 0 10px; color: var(--text-2); }
+small, .muted { color: var(--text-3); }
+.row { display: flex; gap: 10px; align-items: center; }
+.row.wrap { flex-wrap: wrap; }
+.spacer { flex: 1; }
+.grid { display: grid; gap: 12px; }
+.hidden { display: none !important; }
+
+.btn {
+  appearance: none; border: 1px solid var(--line); background: var(--surface-2); color: var(--text);
+  padding: 10px 16px; border-radius: 999px; font: inherit; font-weight: 600; cursor: pointer;
+  transition: transform 0.12s, background 0.2s, border-color 0.2s;
+}
+.btn:hover { border-color: var(--accent); }
+.btn:active { transform: scale(0.97); }
+.btn.primary { background: linear-gradient(135deg, var(--accent-2), #b46cff); border-color: transparent; }
+.btn.ghost { background: transparent; }
+.btn.danger { border-color: var(--danger); color: var(--danger); background: transparent; }
+.btn.sm { padding: 6px 12px; font-size: 13px; }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--line); font-size: 12px; color: var(--text-2);
+}
+.badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.3px; }
+
+.rarity-common { --rc: var(--r-common); }
+.rarity-uncommon { --rc: var(--r-uncommon); }
+.rarity-rare { --rc: var(--r-rare); }
+.rarity-epic { --rc: var(--r-epic); }
+.rarity-legendary { --rc: var(--r-legendary); }
+.rarity-secret { --rc: #f472b6; }
+.rarity-text { color: var(--rc); font-weight: 700; }
+.rarity-secret .rarity-text, .rarity-text.secret {
+  background: var(--r-secret); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* Thẻ bài */
+.card {
+  --w: 120px;
+  width: var(--w); aspect-ratio: 2 / 3; border-radius: 12px; position: relative; perspective: 900px;
+  flex: none; container-type: inline-size;
+}
+.card .inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform var(--flip, 0.5s) cubic-bezier(0.34, 1.56, 0.64, 1); }
+.card.flipped .inner { transform: rotateY(180deg); }
+.card .face, .card .back {
+  position: absolute; inset: 0; border-radius: 12px; backface-visibility: hidden; overflow: hidden;
+}
+.card .back {
+  background: repeating-linear-gradient(45deg, #2a2350 0 8px, #221c44 8px 16px);
+  border: 2px solid #4b3f8a; display: grid; place-items: center; font-family: var(--font-display); color: #8f80d6; font-size: 22px;
+}
+.card .face {
+  transform: rotateY(180deg); border: 2px solid var(--rc); background: linear-gradient(160deg, hsl(var(--hue) 45% 22%), #120f22 70%);
+  box-shadow: 0 0 calc(var(--glow, 0) * 1px) var(--rc); display: flex; flex-direction: column; padding: 8px;
+}
+.rarity-secret.card .face { border-image: var(--r-secret) 1; border-radius: 0; }
+.card .art { flex: 1; display: grid; place-items: center; font-size: 36cqw; color: hsl(var(--hue) 80% 72%); text-shadow: 0 0 18px hsl(var(--hue) 90% 60%); }
+.card .name { font-size: 8.5cqw; font-weight: 700; line-height: 1.2; }
+.card .meta { font-size: 7cqw; color: var(--text-2); display: flex; justify-content: space-between; }
+.card.holo .face::after {
+  content: ""; position: absolute; inset: 0; mix-blend-mode: color-dodge; opacity: 0.35;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.55) 40%, transparent 60%);
+  background-size: 250% 100%; animation: holo 2.6s linear infinite;
+}
+.card.locked .face { filter: grayscale(1) brightness(0.35); }
+@keyframes holo { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+
+/* Bảng */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--text-3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+input, select, textarea {
+  font: inherit; color: var(--text); background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 9px 12px;
+}
+label { font-size: 13px; color: var(--text-2); display: grid; gap: 6px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--surface-2); border: 1px solid var(--line);
+  padding: 10px 16px; border-radius: 999px; box-shadow: var(--shadow); z-index: 100; font-size: 14px; max-width: calc(100% - 32px);
+}
+.toast.err { border-color: var(--danger); }
+code.err { color: var(--danger); font-size: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card .inner { transition-duration: 0.01s !important; }
+  .card.holo .face::after { animation: none; }
+}

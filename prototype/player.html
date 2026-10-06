@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANIMA — Prototype người chơi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Playfair+Display:wght@700&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  /* Thanh điều khiển của prototype (không thuộc sản phẩm) */
+  .proto-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 16px; background: rgba(11,10,20,.92); border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
+  .proto-bar .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .proto-bar .seg button { border: 0; background: transparent; color: var(--text-2); padding: 7px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+  .proto-bar .seg button.on { background: var(--accent-2); color: #fff; }
+  .proto-bar .tag { font-size: 12px; color: var(--text-3); }
+
+  /* Khung chung */
+  .stage { padding: 20px 16px 40px; display: flex; justify-content: center; }
+  .shell { width: 100%; background: var(--bg); position: relative; }
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--bg-2); }
+  .logo { font-family: var(--font-display); font-size: 20px; letter-spacing: 2px; background: linear-gradient(90deg,#fde68a,#c4a7ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .wallet-pill { display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-weight: 700; font-size: 13px; cursor: pointer; }
+  .nav { display: flex; gap: 4px; }
+  .nav a { text-decoration: none; color: var(--text-2); padding: 8px 12px; border-radius: 10px; font-weight: 600; font-size: 14px; display: flex; gap: 6px; align-items: center; }
+  .nav a.on { color: var(--text); background: var(--surface-2); }
+  .content { padding: 16px; }
+  .screen { display: grid; gap: 14px; }
+
+  /* Chế độ app mobile */
+  body.mode-app .shell { max-width: 390px; height: 800px; border-radius: 38px; border: 10px solid #000; box-shadow: 0 0 0 2px #2a2546, var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+  body.mode-app .content { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+  body.mode-app .nav { order: 3; justify-content: space-around; border-top: 1px solid var(--line); background: var(--bg-2); padding: 6px 4px 14px; }
+  body.mode-app .nav a { flex-direction: column; gap: 2px; font-size: 11px; padding: 6px 4px; }
+  body.mode-app .nav a .ic { font-size: 18px; }
+  body.mode-app .topbar .nav { display: none; }
+  body.mode-app .web-only { display: none !important; }
+  /* Chế độ website */
+  body.mode-web .shell { max-width: 1180px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; min-height: 760px; }
+  body.mode-web .bottom-nav { display: none; }
+  body.mode-web .content { padding: 24px 28px; }
+  body.mode-web .app-only { display: none !important; }
+  body.mode-web .cols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 760px) { body.mode-web .cols { grid-template-columns: 1fr; } body.mode-web .topbar .nav { overflow-x: auto; } }
+
+  .hero { border-radius: var(--radius); padding: 18px; background: radial-gradient(400px 200px at 80% 0%, rgba(245,158,11,.25), transparent 70%), linear-gradient(135deg, #2a1f5c, #15122b); border: 1px solid var(--line); display: flex; gap: 14px; align-items: center; }
+  .pack-art { width: 92px; aspect-ratio: 2/3; border-radius: 12px; flex: none; position: relative; overflow: hidden; background: linear-gradient(160deg,#4c2d91,#1e1640 60%,#f59e0b 160%); border: 2px solid #f5c26b; box-shadow: 0 0 24px rgba(245,158,11,.35); display: grid; place-items: center; font-family: var(--font-display); color: #fde68a; text-align: center; font-size: 13px; line-height: 1.2; padding: 6px; }
+  .pack-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.4) 45%, transparent 60%); background-size: 250% 100%; animation: holo 1.5s linear infinite; }
+  .progress { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .progress > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-2), #f5c26b); }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal div { border: 1px solid var(--line); border-radius: 10px; padding: 8px 2px; text-align: center; font-size: 12px; background: var(--surface); }
+  .cal div.done { border-color: var(--ok); color: var(--ok); }
+  .cal div.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+  .card-grid .card { --w: 100%; width: 100%; cursor: pointer; }
+  .card-grid .count { position: absolute; right: 6px; top: 6px; z-index: 2; background: rgba(0,0,0,.6); border-radius: 999px; font-size: 11px; padding: 1px 7px; }
+  .odds td, .odds th { padding: 7px 8px; }
+  .list { display: grid; gap: 8px; }
+  .list .item { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 14px; }
+  .note { border-left: 3px solid var(--accent); padding: 8px 12px; background: rgba(124,92,255,.08); border-radius: 6px; font-size: 13px; color: var(--text-2); }
+  .note.warn { border-color: var(--warn); background: rgba(251,191,36,.08); }
+
+  /* Mở pack */
+  .opening { position: absolute; inset: 0; z-index: 80; display: none; overflow: hidden; container-type: size; background: radial-gradient(800px 500px at 50% 40%, #2a1f5c, #07060d 70%); }
+  .opening.on { display: block; }
+  .opening .dim { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity .3s; pointer-events: none; }
+  .opening .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+  .opening .caption { position: absolute; left: 0; right: 0; top: 14%; text-align: center; color: var(--text-2); font-size: 15px; padding: 0 16px; }
+  .opening .controls { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 5; }
+  .opening .world { position: absolute; inset: 0; display: grid; place-items: center; }
+  .opening .bigpack { width: 170px; aspect-ratio: 2/3; position: relative; cursor: pointer; touch-action: none; }
+  .opening .bigpack .half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; }
+  .opening .bigpack .half.top { top: 0; }
+  .opening .bigpack .half.bottom { bottom: 0; }
+  .opening .bigpack .half .pack-art { width: 170px; position: absolute; left: 0; font-size: 20px; }
+  .opening .bigpack .half.bottom .pack-art { bottom: 0; }
+  .opening .bigpack .light { position: absolute; left: -40%; right: -40%; top: 48%; height: 4%; border-radius: 50%; background: var(--lc, #fff); filter: blur(10px); opacity: 0; }
+  .opening .row { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; justify-content: center; gap: 2cqw; padding: 0 3cqw; flex-wrap: wrap; }
+  .opening .row .card { --w: min(16cqw, 120px); transition: opacity .3s; }
+  .opening .row .card.faded { opacity: .3; }
+  .opening .row .card.best { outline: 2px solid var(--rc); outline-offset: 4px; border-radius: 12px; }
+  .opening .showcase { position: absolute; inset: 0; display: none; place-items: center; text-align: center; }
+  .opening .showcase .card { --w: min(46cqw, 230px); }
+  .opening .showcase .title { margin-top: 18px; font-family: var(--font-display); font-size: 24px; min-height: 34px; }
+  .opening .showcase .rlabel { font-weight: 800; letter-spacing: 6px; font-size: 18px; text-shadow: 0 0 18px var(--rc); }
+  .opening .summary { position: absolute; left: 0; right: 0; bottom: 8%; display: none; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 16px; }
+  .particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; }
+  .shake { animation: shake .3s ease-out; }
+  @keyframes shake { 0%{transform:translate(0,0)} 20%{transform:translate(-10px,4px)} 40%{transform:translate(9px,-6px)} 60%{transform:translate(-6px,5px)} 80%{transform:translate(4px,-2px)} 100%{transform:translate(0,0)} }
+  @keyframes bob { 0%,100% { transform: translateY(-4px) rotate(-5deg); } 50% { transform: translateY(4px) rotate(-5deg); } }
+  @keyframes tease { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-2px)} 75%{transform:translateX(2px)} }
+  .fake-ad { position: fixed; inset: 0; z-index: 90; background: #000; display: none; place-items: center; text-align: center; color: #fff; }
+  .fake-ad.on { display: grid; }
+  @media (max-width: 480px) { .stage { padding: 0; } body.mode-app .shell { border: 0; border-radius: 0; height: calc(100vh - 54px); box-shadow: none; max-width: none; } }
+</style>
+</head>
+<body class="mode-app">
+
+<div class="proto-bar">
+  <a href="index.html" class="btn sm ghost">← Prototype</a>
+  <span class="seg" role="group" aria-label="Nền tảng">
+    <button data-mode="app" class="on">App mobile</button>
+    <button data-mode="web">Website</button>
+  </span>
+  <label class="row" style="font-size:13px;display:flex"><input type="checkbox" id="reduced"> Giảm chuyển động</label>
+  <label class="row" style="font-size:13px;display:flex"><input type="checkbox" id="fast"> Fast mode</label>
+  <button class="btn sm ghost" id="newday">Sang ngày mới (demo)</button>
+  <button class="btn sm ghost" id="reset">Đặt lại dữ liệu</button>
+  <span class="tag">Dữ liệu giả, lưu trên trình duyệt này</span>
+</div>
+
+<div class="stage">
+  <div class="shell" id="shell">
+    <header class="topbar">
+      <span class="logo">ANIMA</span>
+      <nav class="nav" id="topnav"></nav>
+      <span class="spacer"></span>
+      <span class="wallet-pill" data-go="wallet" title="Ví"><span style="color:#f5c26b">◆</span><span id="gemv">0</span></span>
+      <span class="wallet-pill" data-go="wallet" title="Ví"><span style="color:#c4a7ff">●</span><span id="coinv">0</span></span>
+    </header>
+    <main class="content" id="content"></main>
+    <nav class="nav bottom-nav" id="bottomnav"></nav>
+<!-- Màn mở pack -->
+<section class="opening" id="opening" aria-live="polite">
+  <div class="dim" id="dim"></div>
+  <div class="controls">
+    <button class="btn sm" id="skipBtn">Bỏ qua ⏭</button>
+  </div>
+  <div class="caption" id="caption"></div>
+  <div class="world" id="world">
+    <div class="bigpack" id="bigpack">
+      <div class="half top"><div class="pack-art">AWAKENING<br><small>Standard</small></div></div>
+      <div class="half bottom"><div class="pack-art">AWAKENING<br><small>Standard</small></div></div>
+      <div class="light" id="light"></div>
+    </div>
+  </div>
+  <div class="row" id="row"></div>
+  <div class="showcase" id="showcase"></div>
+  <div class="summary" id="summary">
+    <button class="btn primary" id="sumAgain">Mở pack khác</button>
+    <button class="btn" id="sumCollection">Xem bộ sưu tập</button>
+    <button class="btn" id="sumShare">Chia sẻ</button>
+    <button class="btn ghost" id="sumClose">Đóng</button>
+  </div>
+  <div class="flash" id="flash"></div>
+  <div id="particles"></div>
+</section>
+  </div>
+</div>
+
+
+
+<div class="fake-ad" id="fakead"><div><h2>Quảng cáo (giả lập)</h2><p id="adtimer">3</p><small>Phần thưởng chỉ được cộng khi server nhận xác nhận từ ad network (SSV)</small></div></div>
+
+<script src="assets/data.js"></script>
+<script>
+(() => {
+  const A = window.ANIMA;
+  const $ = (s, el = document) => el.querySelector(s);
+  const KEY = "anima-proto-v1";
+  const fresh = () => ({ coin: 1300, gem: 120, pity: 17, unopened: 0, collection: {}, streak: 4, checkedToday: false, day: 5,
+    freeze: 1, adsToday: 0, lastAdAt: 0, ledger: [["Thưởng đăng nhập lần đầu", "+100 Coin"], ["Hoàn thành tutorial", "+200 Coin"], ["Điểm danh ngày 4", "+50 Coin"]],
+    recent: [], phoneVerified: false, deletion: false });
+  let S;
+  try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch (e) { S = fresh(); }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  const fmt = (n) => n.toLocaleString("vi-VN");
+  const mode = () => (document.body.classList.contains("mode-web") ? "web" : "app");
+  const reduced = () => $("#reduced").checked;
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) $("#reduced").checked = true;
+
+  function toast(msg, err) {
+    const t = document.createElement("div");
+    t.className = "toast" + (err ? " err" : "");
+    t.innerHTML = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2600);
+  }
+  const NAV = [["home", "⌂", "Trang chủ"], ["store", "◈", "Cửa hàng"], ["collection", "▦", "Bộ sưu tập"], ["rewards", "✧", "Nhận thưởng"], ["account", "☺", "Tài khoản"]];
+  function renderNav(cur) {
+    const html = NAV.map(([k, ic, l]) => `<a href="#${k}" class="${cur === k ? "on" : ""}"><span class="ic">${ic}</span>${l}</a>`).join("");
+    $("#topnav").innerHTML = html;
+    $("#bottomnav").innerHTML = html;
+    $("#gemv").textContent = fmt(S.gem);
+    $("#coinv").textContent = fmt(S.coin);
+  }
+  function cardHTML(c, { flipped = true, locked = false, count = 0, w = "" } = {}) {
+    const el = A.ELEMENTS[c.element], r = A.RARITIES[A.rarityIndex(c.rarity)];
+    const holo = A.rarityIndex(c.rarity) >= 2 && !locked ? " holo" : "";
+    const glow = [0, 4, 8, 14, 22, 30][A.rarityIndex(c.rarity)];
+    return `<div class="card rarity-${c.rarity}${flipped ? " flipped" : ""}${locked ? " locked" : ""}${holo}" data-card="${c.id}" style="--hue:${el.hue};--glow:${glow};${w ? "--w:" + w : ""}">
+      ${count > 1 ? `<span class="count">×${count}</span>` : ""}
+      <div class="inner"><div class="back">✦</div>
+      <div class="face"><div class="art">${locked ? "?" : el.glyph}</div>
+      <div class="name">${locked ? "???" : c.name}</div>
+      <div class="meta"><span>${c.element}</span><span class="rarity-text${c.rarity === "secret" ? " secret" : ""}">${r.name}</span></div></div></div></div>`;
+  }
+  const owned = () => Object.keys(S.collection).length;
+  const total = A.cards.length;
+
+  /* ---------- Màn hình ---------- */
+  const screens = {
+    home() {
+      const best = S.recent.slice(0, 5).map((id) => A.cards.find((c) => c.id === id));
+      return `<div class="screen">
+        <div><h1>Chào Keeper 👋</h1><p>Heart-Song hôm nay vang lên từ hệ <b>Luminara</b>.</p></div>
+        <div class="hero"><div class="pack-art">AWAKENING<br><small>Standard</small></div>
+          <div><h2>Set Awakening</h2><p>5 thẻ mỗi pack · 1,000 Coin hoặc 100 Gem</p>
+          <div class="row wrap"><a class="btn primary" href="#pack">Mở pack</a><span class="chip">Pity ${S.pity}/50</span></div></div></div>
+        <div class="cols">
+          <div class="panel"><div class="row"><h3>Tiến độ bộ sưu tập</h3><span class="spacer"></span><b>${owned()}/${total}</b></div>
+            <div class="progress"><i style="width:${(owned() / total) * 100}%"></i></div>
+            <small>Prototype dùng ${total} thẻ mẫu; set thật có 100 thẻ (BRD CF-06).</small></div>
+          <div class="panel app-only"><div class="row"><h3>Streak ${S.streak} ngày 🔥</h3><span class="spacer"></span><a class="btn sm" href="#rewards">${S.checkedToday ? "Đã điểm danh" : "Điểm danh"}</a></div>
+            <small>Ads hôm nay: ${S.adsToday}/10</small></div>
+          <div class="panel web-only"><h3>Streak ${S.streak} ngày 🔥</h3>
+            <div class="note">Điểm danh và xem quảng cáo nhận Coin chỉ có trên app mobile ở bản đầu (BR-WEB-03).</div></div>
+        </div>
+        <div class="panel"><h3>Vừa mở được</h3>${best.length ? `<div class="card-grid">${best.map((c) => cardHTML(c)).join("")}</div>` : "<p>Chưa mở pack nào. Thử mở một pack nhé!</p>"}</div>
+      </div>`;
+    },
+    store() {
+      return `<div class="screen"><h1>Cửa hàng</h1>
+        <div class="hero"><div class="pack-art">AWAKENING<br><small>Standard</small></div>
+          <div><h2>Awakening Standard</h2><p>5 thẻ · đủ 6 bậc rarity · pity 50 pack</p>
+          <div class="row wrap"><a class="btn primary" href="#pack">Xem chi tiết</a><span class="chip">● 1,000</span><span class="chip">◆ 100</span></div></div></div>
+        <div class="panel"><div class="row"><div class="pack-art" style="width:64px;font-size:10px;border-color:#a78bfa">PREMIUM</div>
+          <div><h3>Awakening Premium <span class="chip">Đề xuất — PQ-07</span></h3><p>Chờ số liệu beta để quyết định.</p></div></div></div>
+        <div class="panel"><h3>Gói Gem</h3><p>Nạp trong <a href="#wallet">Ví</a>. ${mode() === "web" ? "Website thanh toán qua cổng thanh toán." : "App thanh toán qua App Store / Google Play."}</p></div>
+      </div>`;
+    },
+    pack() {
+      const rows = A.RARITIES.map((r) => `<tr class="rarity-${r.key}"><td><span class="rarity-text${r.key === "secret" ? " secret" : ""}">${r.name}</span></td><td>${r.vi}</td><td style="text-align:right">${r.odds}%</td></tr>`).join("");
+      return `<div class="screen"><a href="#store" class="muted">← Cửa hàng</a>
+        <div class="cols">
+          <div class="panel"><div class="row"><div class="pack-art">AWAKENING<br><small>Standard</small></div>
+            <div><h2>Awakening Standard</h2><p>5 thẻ mỗi pack. Kết quả do server quyết định trước khi trình diễn.</p>
+            <span class="chip">Bạn còn ${S.unopened} pack chưa mở</span></div></div>
+            <div class="grid" style="margin-top:14px">
+              <div class="row wrap"><button class="btn primary" id="buyCoin">Mua bằng ● 1,000 Coin</button><button class="btn" id="buyGem">Mua bằng ◆ 100 Gem</button></div>
+              ${S.unopened ? `<button class="btn" id="openNow">Mở pack đang có (${S.unopened})</button>` : ""}
+            </div></div>
+          <div class="panel"><div class="row"><h3>Tỷ lệ rơi mỗi thẻ</h3><span class="spacer"></span><span class="chip">Version v1</span></div>
+            <table class="odds"><tbody>${rows}</tbody></table>
+            <div style="margin-top:10px"><div class="row"><b>Bảo đảm (pity)</b><span class="spacer"></span>${S.pity}/50</div>
+            <div class="progress"><i style="width:${(S.pity / 50) * 100}%"></i></div>
+            <small>Sau 49 pack liên tiếp không có Legendary trở lên, pack thứ 50 chắc chắn có ít nhất 1 Legendary.</small></div>
+            <div class="note warn" style="margin-top:10px">Tỷ lệ là bản đề xuất (BRD DT-01 phương án A), chờ PO chốt.</div></div>
+        </div></div>`;
+    },
+    collection() {
+      const f = screens._filter || { el: "", r: "", q: "" };
+      const list = A.cards.slice().sort((a, b) => (!!S.collection[b.id] - !!S.collection[a.id]) || (A.rarityIndex(b.rarity) - A.rarityIndex(a.rarity))).filter((c) => (!f.el || c.element === f.el) && (!f.r || c.rarity === f.r) && (!f.q || c.name.toLowerCase().includes(f.q.toLowerCase())));
+      const els = Object.keys(A.ELEMENTS).map((e) => `<option ${f.el === e ? "selected" : ""}>${e}</option>`).join("");
+      const rs = A.RARITIES.map((r) => `<option value="${r.key}" ${f.r === r.key ? "selected" : ""}>${r.name}</option>`).join("");
+      return `<div class="screen"><div class="row"><h1>Bộ sưu tập</h1><span class="spacer"></span><b>${owned()}/${total}</b></div>
+        <div class="progress"><i style="width:${(owned() / total) * 100}%"></i></div>
+        <div class="row wrap"><input id="q" placeholder="Tìm theo tên" value="${f.q}" style="flex:1;min-width:140px">
+          <select id="fel"><option value="">Mọi hệ</option>${els}</select><select id="fr"><option value="">Mọi rarity</option>${rs}</select></div>
+        <div class="card-grid">${list.map((c) => cardHTML(c, { locked: !S.collection[c.id], count: S.collection[c.id] || 0 })).join("")}</div>
+        <small class="app-only">Bộ sưu tập xem được khi offline (dữ liệu đồng bộ lần cuối).</small></div>`;
+    },
+    card(id) {
+      const c = A.cards.find((x) => x.id === +id);
+      if (!c) return screens.collection();
+      const has = S.collection[c.id];
+      const el = A.ELEMENTS[c.element];
+      return `<div class="screen"><a href="#collection" class="muted">← Bộ sưu tập</a>
+        <div class="cols"><div style="display:grid;place-items:center">${cardHTML(c, { locked: !has, w: "min(70vw,240px)" })}</div>
+        <div class="panel"><h2>${has ? c.name : "Chưa sở hữu"}</h2>
+          <div class="row wrap"><span class="chip">${el.glyph} ${c.element} · ${el.label}</span><span class="chip rarity-${c.rarity}"><span class="rarity-text${c.rarity === "secret" ? " secret" : ""}">${A.RARITIES[A.rarityIndex(c.rarity)].name}</span></span>${has ? `<span class="chip">Đang có ×${has}</span>` : ""}</div>
+          <h3 style="margin-top:14px">Story Fragment</h3>
+          ${has ? `<p style="font-style:italic;color:var(--text)">“${c.story}”</p>` : `<div class="note">Sở hữu thẻ này để mở câu chuyện. <code class="err">CARD_NOT_COLLECTED</code></div>`}
+        </div></div></div>`;
+    },
+    rewards() {
+      const vals = [20, 30, 40, 50, 60, 80, 150];
+      const pos = S.streak % 7;
+      const cal = vals.map((v, i) => `<div class="${i < pos ? "done" : ""} ${i === pos && !S.checkedToday ? "today" : ""}">Ngày ${i + 1}<br><b>${v}</b></div>`).join("");
+      const next = [14, 30, 100].find((m) => m > S.streak);
+      const cd = Math.max(0, 60 - Math.floor((Date.now() - S.lastAdAt) / 1000));
+      return `<div class="screen"><h1>Nhận thưởng</h1>
+        <div class="web-only note warn">Website không có điểm danh và quảng cáo ở bản đầu (BR-WEB-03). Mở app mobile để nhận Coin. Gửi yêu cầu từ web sẽ bị server từ chối với mã <code class="err">PLATFORM_NOT_SUPPORTED</code>.</div>
+        <div class="panel"><div class="row"><h3>Điểm danh · Streak ${S.streak} ngày</h3><span class="spacer"></span><span class="chip">❄ Freeze ×${S.freeze}</span></div>
+          <div class="cal">${cal}</div>
+          <p style="margin-top:8px">Mốc kế tiếp: <b>${next} ngày</b> (+${{ 14: "200", 30: "1,000", 100: "5,000 + thẻ độc quyền" }[next]} Coin)</p>
+          <div class="row wrap"><button class="btn primary" id="checkin" ${S.checkedToday ? "disabled" : ""}>${S.checkedToday ? "Đã điểm danh hôm nay" : `Điểm danh +${vals[pos]} Coin`}</button>
+          <button class="btn" id="buyFreeze">Mua Freeze (200 Coin)</button></div>
+          <small>Bỏ lỡ 1 ngày mà không có Freeze thì streak về 0.</small></div>
+        <div class="panel"><div class="row"><h3>Xem quảng cáo</h3><span class="spacer"></span><b>${S.adsToday}/10</b></div>
+          <p>Mỗi video +8 Coin · lượt thứ 5 thêm +10 · lượt thứ 10 thêm +20. Cách nhau tối thiểu 60 giây.</p>
+          <div class="row wrap"><button class="btn primary" id="watchAd" ${S.adsToday >= 10 || cd > 0 ? "disabled" : ""}>${S.adsToday >= 10 ? "Hết lượt hôm nay" : cd > 0 ? `Chờ ${cd}s` : "Xem quảng cáo"}</button>
+          ${cd > 0 && S.adsToday < 10 ? `<button class="btn ghost sm" id="skipCd">Bỏ cooldown (demo)</button>` : ""}</div></div>
+      </div>`;
+    },
+    wallet() {
+      const app = mode() === "app";
+      const skus = [["100 Gem", "$0.99"], ["550 Gem", "$4.99"], ["1,200 Gem", "$9.99"], ["2,600 Gem", "$19.99"]];
+      return `<div class="screen"><h1>Ví</h1>
+        <div class="cols"><div class="panel"><div class="row"><div><small>Gem</small><h2 style="color:#f5c26b">◆ ${fmt(S.gem)}</h2></div><span class="spacer"></span><div><small>Coin</small><h2 style="color:#c4a7ff">● ${fmt(S.coin)}</h2></div></div>
+          <small>Gem và Coin không rút ra tiền thật và không chuyển cho người khác.</small></div>
+        <div class="panel"><h3>Nạp Gem</h3><p>${app ? "Thanh toán qua App Store / Google Play." : "Thanh toán qua cổng thanh toán (VNPay / MoMo — chờ chốt Q-31)."}</p>
+          <div class="grid" style="grid-template-columns:1fr 1fr">${skus.map(([g, p]) => `<button class="btn" data-sku="${g}">${g}<br><small>${p}</small></button>`).join("")}</div>
+          <small>Bảng giá là đề xuất (PRD PQ-04).</small></div></div>
+        <div class="panel"><h3>Lịch sử giao dịch</h3><div class="list">${S.ledger.slice().reverse().slice(0, 12).map(([a, b]) => `<div class="item"><span>${a}</span><b>${b}</b></div>`).join("")}</div></div>
+      </div>`;
+    },
+    account() {
+      return `<div class="screen"><h1>Tài khoản</h1>
+        <div class="panel"><h3>Keeper #2049</h3><p>keeper2049@example.com · Đăng nhập bằng Google</p>
+          <div class="row wrap"><span class="chip">${S.phoneVerified ? "✓ Đã xác thực SĐT 090****123" : "Chưa xác thực SĐT"}</span>${S.phoneVerified ? "" : `<button class="btn sm primary" id="verify">Xác thực SĐT</button>`}</div>
+          <small>Cần xác thực SĐT để giao dịch trên chợ (bản sau) và bảo vệ tài khoản.</small></div>
+        <div class="panel"><h3>Thiết bị và phiên đăng nhập</h3><div class="list">
+          <div class="item"><span>📱 iPhone 13 (app) — thiết bị đang gắn</span><small>Đổi thiết bị: tối đa 2 lần / 30 ngày</small></div>
+          <div class="item"><span>💻 Chrome trên Windows (website)</span><small>Phiên web 1/3</small></div></div></div>
+        <div class="panel"><h3>Cài đặt</h3><p>Ngôn ngữ: Tiếng Việt · Âm thanh: bật · Rung: bật · Giảm chuyển động: dùng nút trên thanh prototype</p></div>
+        <div class="panel"><h3>Xóa tài khoản</h3>${S.deletion ? `<p>Tài khoản sẽ bị xóa sau 30 ngày. Đăng nhập lại và hủy yêu cầu trước thời hạn để giữ tài khoản.</p><button class="btn" id="undoDel">Hủy yêu cầu xóa</button>` : `<p>Dữ liệu cá nhân bị xóa sau 30 ngày kể từ khi yêu cầu.</p><button class="btn danger" id="del">Yêu cầu xóa tài khoản</button>`}</div>
+      </div>`;
+    },
+  };
+
+  /* ---------- Router ---------- */
+  function route() {
+    const [name, arg] = (location.hash.slice(1) || "home").split("/");
+    const fn = screens[name] && name[0] !== "_" ? screens[name] : screens.home;
+    renderNav(name === "card" ? "collection" : name === "pack" ? "store" : name === "wallet" ? "" : name);
+    $("#content").innerHTML = fn(arg);
+    $("#content").scrollTop = 0;
+    bind(name);
+  }
+  function addCoin(n, why) { S.coin += n; S.ledger.push([why, (n >= 0 ? "+" : "") + fmt(n) + " Coin"]); }
+  function addGem(n, why) { S.gem += n; S.ledger.push([why, (n >= 0 ? "+" : "") + fmt(n) + " Gem"]); }
+  function bind(name) {
+    document.querySelectorAll("[data-go]").forEach((e) => (e.onclick = () => (location.hash = e.dataset.go)));
+    document.querySelectorAll("[data-card]").forEach((e) => { if (e.closest(".card-grid")) e.onclick = () => (location.hash = "card/" + e.dataset.card); });
+    const on = (id, f) => { const e = document.getElementById(id); if (e) e.onclick = f; };
+    on("buyCoin", () => buy("coin"));
+    on("buyGem", () => buy("gem"));
+    on("openNow", () => startOpening());
+    on("checkin", () => {
+      if (mode() === "web") return toast("Server từ chối: <code class='err'>PLATFORM_NOT_SUPPORTED</code>", true);
+      const vals = [20, 30, 40, 50, 60, 80, 150];
+      const v = vals[S.streak % 7];
+      S.streak += 1; S.checkedToday = true;
+      const bonus = { 14: 200, 30: 1000, 100: 5000 }[S.streak] || 0;
+      addCoin(v + bonus, `Điểm danh ngày ${S.streak}`);
+      save(); route(); toast(`+${v + bonus} Coin · streak ${S.streak} ngày`);
+    });
+    on("buyFreeze", () => {
+      if (S.freeze >= 2) return toast("Đã giữ tối đa 2 Freeze <code class='err'>FREEZE_LIMIT</code>", true);
+      if (S.coin < 200) return toast("Không đủ Coin <code class='err'>INSUFFICIENT_BALANCE</code>", true);
+      addCoin(-200, "Mua Streak Freeze"); S.freeze += 1; save(); route();
+    });
+    on("watchAd", watchAd);
+    on("skipCd", () => { S.lastAdAt = 0; save(); route(); });
+    on("verify", () => { S.phoneVerified = true; save(); route(); toast("Đã xác thực SĐT (OTP giả lập)"); });
+    on("del", () => { S.deletion = true; save(); route(); });
+    on("undoDel", () => { S.deletion = false; save(); route(); });
+    document.querySelectorAll("[data-sku]").forEach((b) => (b.onclick = () => topup(b.dataset.sku)));
+    if (name === "collection") {
+      const upd = () => { screens._filter = { q: $("#q").value, el: $("#fel").value, r: $("#fr").value }; const pos = $("#q").selectionStart; route(); const q = $("#q"); q.focus(); q.setSelectionRange(pos, pos); };
+      $("#q").oninput = upd; $("#fel").onchange = upd; $("#fr").onchange = upd;
+    }
+    if (name === "rewards" && Date.now() - S.lastAdAt < 60000) setTimeout(() => location.hash.startsWith("#rewards") && route(), 1000);
+  }
+  function buy(cur) {
+    if (cur === "coin") { if (S.coin < 1000) return toast("Không đủ Coin <code class='err'>INSUFFICIENT_BALANCE</code>", true); addCoin(-1000, "Mua pack Awakening Standard"); }
+    else { if (S.gem < 100) return toast("Không đủ Gem <code class='err'>INSUFFICIENT_BALANCE</code>", true); addGem(-100, "Mua pack Awakening Standard"); }
+    S.unopened += 1; save(); renderNav("store"); startOpening();
+  }
+  function topup(sku) {
+    const n = parseInt(sku.replace(/\D/g, ""), 10);
+    if (mode() === "app") { toast("Đang xác thực receipt với store…"); setTimeout(() => { addGem(n, `Nạp ${sku} (IAP)`); save(); route(); toast(`Đã cộng ${sku}`); }, 1200); }
+    else { toast("Chuyển tới cổng thanh toán… Đơn ở trạng thái <b>Chờ xác nhận</b> đến khi server nhận IPN"); setTimeout(() => { addGem(n, `Nạp ${sku} (cổng thanh toán)`); save(); route(); toast(`IPN hợp lệ — đã cộng ${sku}`); }, 2200); }
+  }
+  function watchAd() {
+    if (mode() === "web") return toast("Server từ chối: <code class='err'>PLATFORM_NOT_SUPPORTED</code>", true);
+    const ad = $("#fakead"); ad.classList.add("on");
+    let t = 3; $("#adtimer").textContent = t;
+    const iv = setInterval(() => {
+      t -= 1; $("#adtimer").textContent = t;
+      if (t <= 0) {
+        clearInterval(iv); ad.classList.remove("on");
+        S.adsToday += 1; S.lastAdAt = Date.now();
+        const bonus = S.adsToday === 5 ? 10 : S.adsToday === 10 ? 20 : 0;
+        addCoin(8 + bonus, `Xem quảng cáo lượt ${S.adsToday}`);
+        save(); route(); toast(`SSV hợp lệ · +${8 + bonus} Coin`);
+      }
+    }, 1000);
+  }
+
+  /* ---------- Trình diễn mở pack (Master Document §4) ---------- */
+  let skipped = false;
+  const wait = (ms) => new Promise((res) => { const s = Date.now(); const tick = () => (skipped || Date.now() - s >= ms ? res() : requestAnimationFrame(tick)); tick(); });
+  let liveParticles = 0;
+  function burst(x, y, color, n) {
+    if (reduced() || skipped) return;
+    const layer = $("#particles");
+    const o = $("#opening").getBoundingClientRect(); x -= o.left; y -= o.top;
+    n = Math.min(n, 200 - liveParticles);
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement("span");
+      p.className = "particle";
+      const c = color === "rainbow" ? `hsl(${Math.random() * 360} 90% 65%)` : color;
+      p.style.cssText = `left:${x}px;top:${y}px;background:${c};box-shadow:0 0 8px ${c}`;
+      layer.appendChild(p); liveParticles++;
+      const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 260;
+      p.animate([{ transform: "translate(0,0) scale(1)", opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px) scale(.2)`, opacity: 0 }],
+        { duration: 600 + Math.random() * 700, easing: "cubic-bezier(.2,.8,.2,1)" }).onfinish = () => { p.remove(); liveParticles--; };
+    }
+  }
+  function flash() {
+    if (reduced() || skipped) return;
+    $("#flash").animate([{ opacity: 0.95 }, { opacity: 0.95, offset: 0.2 }, { opacity: 0 }], { duration: 450 });
+  }
+  function shake() {
+    if (reduced() || skipped) return;
+    const w = $("#opening"); w.classList.remove("shake"); void w.offsetWidth; w.classList.add("shake");
+  }
+  const cxO = () => { const r = $("#opening").getBoundingClientRect(); return r.left + r.width / 2; };
+  const cyO = () => { const r = $("#opening").getBoundingClientRect(); return r.top + r.height / 2; };
+  const colorOf = (key) => { const c = A.RARITIES[A.rarityIndex(key)].color; return c; };
+
+  async function startOpening() {
+    if (S.unopened <= 0) return;
+    const res = A.openPack(S.pity);            // server quyết định trước
+    S.unopened -= 1; S.pity = res.pityAfter;
+    res.cards.forEach((c) => { S.collection[c.id] = (S.collection[c.id] || 0) + 1; });
+    S.recent = res.cards.map((c) => c.id).reverse().concat(S.recent).slice(0, 10);
+    save();
+    skipped = false;
+    const O = $("#opening"), row = $("#row"), show = $("#showcase"), pack = $("#bigpack"), cap = $("#caption");
+    O.classList.add("on"); $("#summary").style.display = "none"; $("#skipBtn").style.display = ""; show.style.display = "none"; row.innerHTML = ""; $("#dim").style.opacity = 0;
+    pack.style.display = "block"; pack.style.animation = ""; pack.style.transform = "";
+    pack.getAnimations({ subtree: true }).forEach((an) => an.cancel());
+    pack.querySelectorAll(".half").forEach((h) => (h.style.transform = ""));
+    $("#light").style.opacity = 0;
+    cap.textContent = mode() === "web" ? "Website: phần này chạy bản Unity Web (prototype mô phỏng bằng HTML)" : "";
+
+    // Giai đoạn 0 — Entry
+    if (!reduced()) await pack.animate([{ transform: "translateY(120cqh) rotate(0deg)" }, { transform: "translateY(0) rotate(355deg)" }], { duration: 800, easing: "cubic-bezier(.34,1.56,.64,1)" }).finished.catch(() => {});
+    burst(cxO(), cyO(), "#fde68a", 20);
+    // Giai đoạn 1 — Presentation: chờ người chơi xé
+    if (!skipped) {
+      if (!reduced()) pack.style.animation = "bob 2s ease-in-out infinite";
+      cap.textContent = "Vuốt lên hoặc chạm vào pack để xé";
+      await new Promise((resolve) => {
+        let y0 = null;
+        const done = () => { pack.onpointerdown = pack.onpointerup = null; clearInterval(chk); resolve(); };
+        pack.onpointerdown = (e) => (y0 = e.clientY);
+        pack.onpointerup = (e) => { if (y0 === null || y0 - e.clientY > 30 || Math.abs(y0 - e.clientY) < 8) done(); };
+        const chk = setInterval(() => skipped && done(), 100);
+      });
+    }
+    // Giai đoạn 2 — Tearing: ánh sáng theo rarity cao nhất
+    pack.style.animation = "";
+    cap.textContent = "";
+    const lc = res.maxRarity === "secret" ? "#fff" : colorOf(res.maxRarity);
+    const light = $("#light"); light.style.setProperty("--lc", lc);
+    if (!skipped && !reduced()) {
+      await light.animate([{ opacity: 0, transform: "scaleX(.2)" }, { opacity: 1, transform: "scaleX(1)" }], { duration: 700, fill: "forwards" }).finished.catch(() => {});
+      const [top, bot] = pack.querySelectorAll(".half");
+      top.animate([{ transform: "translateY(0)" }, { transform: "translateY(-60vh) rotate(-12deg)" }], { duration: 700, easing: "ease-in", fill: "forwards" });
+      bot.animate([{ transform: "translateY(0)" }, { transform: "translateY(60vh) rotate(8deg)" }], { duration: 700, easing: "ease-in", fill: "forwards" });
+      burst(cxO(), cyO(), lc === "#fff" ? "rainbow" : lc, 40);
+      await wait(500);
+    }
+    pack.style.display = "none"; light.style.opacity = 0;
+    row.innerHTML = res.cards.map((c) => cardHTML(c, { flipped: false })).join("");
+    const els = [...row.children];
+    if (!skipped && !reduced()) els.forEach((e, i) => e.animate([{ transform: "translateY(40vh) scale(.6)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 450, delay: i * 90, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "backwards" }));
+    await wait(900);
+
+    // Giai đoạn 3 — Reveal: lật từ thấp đến cao
+    const fast = $("#fast").checked;
+    if (fast && !skipped) { els.forEach((e) => { e.style.setProperty("--flip", "0.5s"); e.classList.add("flipped"); }); await wait(700); }
+    for (let i = 0; i < els.length && !fast; i++) {
+      if (skipped) break;
+      const e = els[i], c = res.cards[i], ri = A.rarityIndex(c.rarity), r = A.RARITIES[ri];
+      const rect = e.getBoundingClientRect(), cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+      if (ri >= 3) { $("#dim").style.opacity = 0.55; els.forEach((o) => o !== e && o.classList.add("faded")); }
+      if (ri >= 4 && !reduced()) { e.style.animation = "tease .1s linear 5"; cap.textContent = "…"; await wait(600); e.style.animation = ""; }
+      e.style.setProperty("--flip", (reduced() ? 0.2 : Math.min(r.flip, ri >= 3 ? 1.5 : r.flip)) + "s");
+      e.classList.add("flipped");
+      await wait(ri >= 3 ? 800 : r.flip * 500);
+      if (ri >= 4) { flash(); shake(); }
+      burst(cx, cy, r.color === "rainbow" ? "rainbow" : r.color, [6, 10, 18, 40, 80, 120][ri]);
+      await wait(ri >= 3 ? 700 : 250);
+      $("#dim").style.opacity = 0; cap.textContent = ""; els.forEach((o) => o.classList.remove("faded"));
+    }
+    els.forEach((e) => { e.style.setProperty("--flip", "0.01s"); e.classList.add("flipped"); });
+
+    // Giai đoạn 4 — Climax (chỉ khi có Epic+)
+    if (res.climax && !skipped) {
+      const best = res.cards[res.cards.length - 1], ri = A.rarityIndex(best.rarity);
+      row.style.opacity = 0.15; $("#dim").style.opacity = 0.7;
+      show.style.display = "grid";
+      show.innerHTML = `<div><div style="display:grid;place-items:center">${cardHTML(best).replace('class="card', 'class="card holo')}</div>
+        <div class="title" id="typew"></div><div class="rlabel rarity-${best.rarity}"><span class="rarity-text${best.rarity === "secret" ? " secret" : ""}">${A.RARITIES[ri].name.toUpperCase()}</span></div></div>`;
+      const sc = show.firstElementChild;
+      if (!reduced()) await sc.animate([{ transform: "scale(.4)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }], { duration: fast ? 300 : 900, easing: "ease-in-out" }).finished.catch(() => {});
+      const tw = $("#typew");
+      for (const ch of best.name) { if (skipped) break; tw.textContent += ch; await wait(fast ? 10 : 45); }
+      tw.textContent = best.name;
+      await wait(fast ? 300 : 900);
+      flash(); shake(); burst(cxO(), cyO(), A.RARITIES[ri].color === "rainbow" ? "rainbow" : A.RARITIES[ri].color, ri >= 4 ? 200 : 120);
+      await wait(fast ? 400 : 1200);
+      show.style.display = "none"; row.style.opacity = 1; $("#dim").style.opacity = 0;
+    }
+    // Giai đoạn 5 — Summary
+    finish(res);
+  }
+  function finish(res) {
+    const O = $("#opening");
+    $("#showcase").style.display = "none"; $("#row").style.opacity = 1; $("#dim").style.opacity = 0; $("#bigpack").style.display = "none";
+    const row = $("#row");
+    if (!row.children.length) row.innerHTML = res.cards.map((c) => cardHTML(c)).join("");
+    [...row.children].forEach((e) => { e.style.setProperty("--flip", "0.01s"); e.classList.add("flipped"); });
+    row.lastElementChild.classList.add("best");
+    $("#caption").innerHTML = res.pityTriggered ? "Pity kích hoạt: bảo đảm 1 Legendary" : `Pity hiện tại: ${S.pity}/50`;
+    $("#summary").style.display = "flex";
+    $("#skipBtn").style.display = "none";
+    $("#sumAgain").textContent = S.unopened ? `Mở pack tiếp (${S.unopened})` : "Mua & mở pack khác";
+    $("#sumAgain").onclick = () => { if (S.unopened) startOpening(); else { close(); location.hash = "pack"; } };
+    $("#sumCollection").onclick = () => { close(); location.hash = "collection"; };
+    $("#sumShare").onclick = () => toast("Ảnh kết quả đã sẵn sàng để chia sẻ (giả lập)");
+    $("#sumClose").onclick = close;
+    function close() { O.classList.remove("on"); route(); }
+    skipped = true; // các wait còn treo kết thúc ngay
+  }
+  $("#skipBtn").onclick = () => { skipped = true; };
+
+  /* ---------- Thanh prototype ---------- */
+  document.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => {
+    document.querySelectorAll("[data-mode]").forEach((x) => x.classList.toggle("on", x === b));
+    document.body.className = "mode-" + b.dataset.mode;
+    route();
+  }));
+  $("#newday").onclick = () => {
+    if (!S.checkedToday) {
+      if (S.freeze > 0) { S.freeze -= 1; toast("Bỏ lỡ 1 ngày — đã dùng 1 Streak Freeze"); }
+      else { S.streak = 0; toast("Bỏ lỡ 1 ngày — streak về 0"); }
+    }
+    S.checkedToday = false; S.adsToday = 0; S.lastAdAt = 0; save(); route();
+  };
+  $("#reset").onclick = () => { S = fresh(); save(); route(); toast("Đã đặt lại dữ liệu demo"); };
+  if (/[?&]mode=web/.test(location.search)) document.querySelector('[data-mode="web"]').click();
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+</body>
+</html>
