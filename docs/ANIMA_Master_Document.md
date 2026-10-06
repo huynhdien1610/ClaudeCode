@@ -1,8 +1,9 @@
 # ANIMA: Echoes of the Heart
 ## Master Document — Dự án App Thẻ bài Số hóa
 
-**Version:** 1.0
+**Version:** 1.1
 **Ngày tạo:** 2026-10-05
+**Cập nhật:** 2026-10-06 — thêm mục 9 Kiến trúc & Tech Stack; cập nhật mục 8.3 theo quyết định công nghệ
 **Trạng thái:** Concept & Design Phase
 
 ---
@@ -17,6 +18,7 @@
 6. [Tổng hợp BRD](#6-tổng-hợp-brd)
 7. [Thiết kế IP & Câu chuyện](#7-thiết-kế-ip--câu-chuyện)
 8. [Roadmap & Next Steps](#8-roadmap--next-steps)
+9. [Kiến trúc & Tech Stack](#9-kiến-trúc--tech-stack)
 
 ---
 
@@ -509,6 +511,8 @@ Chỉ kích hoạt nếu có Epic trở lên.
 
 # 6. TỔNG HỢP BRD
 
+> Bản BRD đầy đủ (quy tắc nghiệp vụ, trạng thái, phân quyền, dữ liệu, câu hỏi mở) nằm ở [BRD_ANIMA.md](BRD_ANIMA.md). Mục này giữ bản tóm tắt ban đầu.
+
 ## 6.1. Business Objectives
 
 | # | Mục tiêu | KPI | Thời hạn |
@@ -888,17 +892,96 @@ Mỗi thẻ có **Story Fragment** — mẩu chuyện ngắn về Anima đó.
 - [ ] Thiết kế Battle Pass
 - [ ] Thiết kế hệ thống livestream
 
-## 8.3. Công cụ gợi ý
+## 8.3. Công cụ
 
-| Thành phần | Công cụ |
+Bảng gợi ý ban đầu đã được thay bằng quyết định công nghệ ở [mục 9](#9-kiến-trúc--tech-stack). Điểm thay đổi chính: backend dùng **.NET** thay cho Node.js/Go; toàn bộ app dùng **Unity**.
+
+| Thành phần | Công cụ đã chọn |
 |---|---|
-| Animation | Unity + DOTween, Rive, Lottie |
-| Particle | Unity Particle System, Effekseer |
-| Sound | FMOD, Wwise, Unity Audio |
-| Haptic | CoreHaptics (iOS), Vibrator (Android) |
-| Prototype | Figma + Principle, Rive |
-| Backend | Node.js, Go, PostgreSQL, Redis |
-| Ad network | AdMob, Unity Ads, AppLovin |
+| App, animation | Unity 6 LTS + Timeline + Cinemachine + DOTween Pro |
+| Particle | Unity Particle System (Shuriken) |
+| Sound | FMOD Studio |
+| Haptic | Nice Vibrations (bọc CoreHaptics và Vibrator) |
+| Prototype | Figma; prototype mở pack làm trực tiếp trên Unity |
+| Backend | ASP.NET Core (.NET 10), PostgreSQL, Redis |
+| Ad network | AppLovin MAX (mediation) + AdMob + Unity Ads |
+
+---
+
+# 9. KIẾN TRÚC & TECH STACK
+
+Chi tiết đầy đủ (thư viện, tích hợp, CI/CD, kiểm thử, ánh xạ NFR, đội ngũ) nằm ở [TECH_STACK.md](TECH_STACK.md). Mục này tóm tắt các quyết định và nguyên tắc để mọi tài liệu dự án dùng chung một nguồn.
+
+## 9.1. Quyết định đã chốt
+
+| Ngày | Quyết định | Trạng thái |
+|---|---|---|
+| 2026-10-06 | Unity cho toàn bộ app iOS và Android | Đã chốt |
+| 2026-10-06 | Backend .NET (ASP.NET Core, .NET 10 LTS) | Đã chốt |
+| 2026-10-06 | Nhà cung cấp cloud và region dữ liệu | Hoãn, quyết định sau |
+
+## 9.2. Tech stack theo lớp
+
+| Lớp | Công nghệ | Lý do |
+|---|---|---|
+| App mobile | Unity 6 LTS (C#), URP, UI Toolkit, Addressables, Unity Localization | Mở pack cinematic là giá trị cốt lõi; sẵn lộ trình AR/3D và game đối kháng |
+| Animation mở pack | Timeline, Cinemachine (zoom, shake), DOTween Pro, Shuriken, Shader Graph (thẻ holo) | Thực hiện được timeline từng frame ở mục 4.5 |
+| Âm thanh, rung | FMOD Studio (5 layer, sidechain), Nice Vibrations | Theo mục 4.6 và 4.7 |
+| Backend | ASP.NET Core (.NET 10), modular monolith, EF Core + Npgsql | Cùng C# với Unity, dùng chung contract; kiểu `decimal` cho tiền |
+| Dữ liệu | PostgreSQL (ledger, thẻ, pack, chợ), Redis (cooldown, rate limit, leaderboard) | Giao dịch ACID cho tiền và chuyển thẻ |
+| Realtime (R2) | SignalR + Redis backplane | Đấu giá, chat, feed |
+| Admin web | React + TypeScript + Vite + Refine + Ant Design | Nhiều màn quản trị |
+| Đăng nhập, OTP | Firebase Authentication | Email, SĐT, Google, Apple, Facebook |
+| Thanh toán | Unity IAP + xác thực server với App Store và Google Play | Chỉ cộng Gem sau khi server xác thực |
+| Quảng cáo | AppLovin MAX + AdMob + Unity Ads, bật server-side verification | Chỉ cộng thưởng khi có xác nhận từ ad network |
+| Chống gian lận thiết bị | Play Integrity API, App Attest/DeviceCheck | Phát hiện root, emulator, app bị sửa |
+| Analytics, crash | Firebase Analytics → BigQuery, Firebase Crashlytics | Funnel, retention, kinh tế |
+| Giám sát backend | OpenTelemetry, Sentry | Không phụ thuộc cloud |
+| CI/CD | GitHub Actions, GameCI, fastlane, Terraform | Build Unity, deploy backend, đẩy lên store |
+| Hạ tầng | Container + PostgreSQL/Redis managed; cloud chưa chốt (GCP hoặc AWS, region Singapore là phương án tham khảo) | Chọn cloud sau không cần sửa code |
+
+## 9.3. Kiến trúc tổng thể
+
+```mermaid
+flowchart LR
+    App[Unity App] -->|HTTPS / JSON| API[ASP.NET Core API]
+    Admin[Admin Web] -->|HTTPS| API
+    Store[App Store / Google Play] -->|Thông báo giao dịch, hoàn tiền| API
+    Ads[Ad networks] -->|Xác nhận server-side| API
+    API --> PG[(PostgreSQL)]
+    API --> RD[(Redis)]
+    API --> WK[Worker: đối soát, đấu giá, analytics]
+    App --> FB[Firebase: Auth, Analytics, Crashlytics, Push]
+    App --> CDN[CDN: art thẻ, asset animation]
+```
+
+Backend gồm các module: Identity, Wallet (ledger), Catalog (thẻ, pack, tỷ lệ rơi), Gacha (mua/mở pack, pity), Collection, Rewards (điểm danh, ads, nhiệm vụ), Marketplace (R2), Social (R2), Fraud, Admin.
+
+## 9.4. Nguyên tắc kỹ thuật bắt buộc
+
+| Nguyên tắc | Ý nghĩa | Liên quan |
+|---|---|---|
+| Server quyết định kết quả | Kết quả mở pack, số dư, phần thưởng đều do server tính và ghi trước; client chỉ trình diễn | BRD BR-PACK-02 |
+| Ledger bất biến | Mọi biến động Gem/Coin là bút toán chỉ thêm; sửa sai bằng bút toán đảo | BRD BR-WAL-01 |
+| Idempotency | Mua pack, nạp Gem, nhận thưởng ads, mua trên chợ đều chống xử lý trùng | BRD BR-WAL-02, BR-ADS-04 |
+| Snapshot cấu hình | Tỷ lệ rơi, giá, thưởng có version; bản ghi cũ giữ giá trị đã chốt | BRD BR-ECO-03, BR-PACK-04 |
+| Bộ quay an toàn | Dùng CSPRNG; kiểm định thống kê mỗi version tỷ lệ trong CI | BRD NFR-12 |
+| Không phụ thuộc cloud | Container, PostgreSQL/Redis chuẩn, OpenTelemetry, Terraform | 9.1 |
+| Fallback máy yếu | Profile chất lượng giảm particle, tắt shake, giảm glow | Mục 4.4 |
+
+## 9.5. Đội ngũ tối thiểu cho MVP
+
+2 Unity developer, 1 technical artist, 2 backend .NET developer, 1 frontend admin web (bán thời gian), 1 DevOps (bán thời gian), 1 QA.
+
+## 9.6. Quyết định kỹ thuật còn mở
+
+| # | Quyết định | Người quyết |
+|---|---|---|
+| T-02 | Cloud: GCP hay AWS | Tech Lead + Finance |
+| T-03 | Region lưu dữ liệu (Singapore hay trong nước) | Legal |
+| T-04 | Mediation quảng cáo cuối cùng | PO |
+| T-05 | Phiên bản iOS tối thiểu theo yêu cầu của Unity 6 | Mobile Lead |
+| T-06 | License Unity, FMOD, DOTween Pro | PO + Finance |
 
 ---
 
@@ -911,6 +994,13 @@ Tài liệu này là **bản thiết kế tổng thể** cho dự án ANIMA: Ech
 - Hệ thống kinh tế & nhiệm vụ
 - Tổng hợp BRD
 - Thiết kế IP & câu chuyện
+- Kiến trúc & tech stack
+
+**Tài liệu chi tiết đi kèm:**
+- [PRD_ANIMA.md](PRD_ANIMA.md) — yêu cầu sản phẩm, phạm vi MVP, đo lường, kế hoạch phát hành
+- [BRD_ANIMA.md](BRD_ANIMA.md) — yêu cầu nghiệp vụ, business rules, phân quyền, dữ liệu
+- [BDD_ANIMA.md](BDD_ANIMA.md) — kịch bản hành vi phủ mọi business rule
+- [TECH_STACK.md](TECH_STACK.md) — chi tiết công nghệ và kiến trúc
 
 **Phiên bản tiếp theo cần bổ sung:**
 - Chi tiết 100 thẻ Set 1

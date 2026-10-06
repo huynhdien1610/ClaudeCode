@@ -1149,6 +1149,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 - Thanh toán hàng hóa số trong app tuân thủ chính sách App Store và Google Play.
 - Độ tuổi tối thiểu 13+ (BR-ACC-01).
 - Tuân thủ quy định bảo vệ dữ liệu cá nhân tại VN (NFR-15).
+- Công nghệ đã chốt: Unity cho toàn bộ app, backend .NET; cloud chưa chốt (Master Document mục 9, [TECH_STACK.md](TECH_STACK.md)).
 
 ## 17.3. Phụ thuộc
 

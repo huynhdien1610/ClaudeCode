@@ -332,6 +332,18 @@ Mốc tháng tính từ khi bắt đầu phát triển, khớp với Roadmap MVP
 
 ---
 
+### 10.2. Ràng buộc kỹ thuật ảnh hưởng tới sản phẩm
+
+Công nghệ đã chốt (Master Document mục 9, [TECH_STACK.md](TECH_STACK.md)): Unity cho toàn bộ app, backend .NET; cloud chưa chốt. Hệ quả cho sản phẩm:
+
+| Ràng buộc | Hệ quả |
+|---|---|
+| Một codebase Unity cho iOS và Android | Hai nền tảng phát hành cùng lúc, cùng tính năng |
+| Asset thẻ tải sau qua Addressables | Lần đầu mở một set cần tải thêm; cần màn hình tải có tiến độ |
+| Animation chạy trên engine game | Đạt được spec từng frame; các màn nhiều form (ví, lịch sử) cần thiết kế gọn vì làm trên Unity tốn công hơn |
+| Screen reader trên Unity cần làm thêm | Ước lượng công sức accessibility riêng khi lập kế hoạch sprint |
+| Kết quả do server quyết định | Mở pack cần có mạng; offline chỉ xem bộ sưu tập |
+
 ## 11. Phụ thuộc và rủi ro sản phẩm
 
 | # | Rủi ro / phụ thuộc | Ảnh hưởng | Giảm thiểu | Tham chiếu |
