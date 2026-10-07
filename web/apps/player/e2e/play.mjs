@@ -253,6 +253,22 @@ try {
     await page.screenshot({ path: `${SHOTS}/quests.png` });
   });
 
+  await step("Nạp Gem qua cổng thanh toán (sandbox): mua gói → trang cổng → thanh toán → Gem tăng đúng gói; có dòng \"Nạp Gem\" trong lịch sử", async () => {
+    await goto("/wallet");
+    const before = (await balances()).gem;
+    await page.getByTestId("buy-gem_100").click();
+    await page.waitForURL("**/pay/sandbox?order=*");
+    const box = page.getByTestId("sandbox-order"); await box.waitFor();
+    eq(await box.getAttribute("data-status"), "Created", "đơn mới chờ thanh toán");
+    await page.getByTestId("sandbox-pay").click();
+    await page.locator('[data-testid="sandbox-order"][data-status="Paid"]').waitFor();
+    await page.getByTestId("back-wallet").click();
+    await page.waitForURL("**/wallet");
+    await page.waitForFunction((v) => { const m = document.querySelector('[data-testid="gem"]')?.textContent?.replace(/\D/g, ""); return Number(m) === v; }, before + 100, { timeout: 8000 });
+    ok((await page.getByTestId("ledger").innerText()).includes("Nạp Gem"), "thiếu dòng Nạp Gem trong lịch sử");
+    await page.screenshot({ path: `${SHOTS}/payment.png` });
+  });
+
   await step("Sai mật khẩu hiện thông báo lỗi theo mã (tiếng Việt)", async () => {
     await page.getByRole("button", { name: "Đăng xuất" }).click();
     await page.waitForURL("**/login");

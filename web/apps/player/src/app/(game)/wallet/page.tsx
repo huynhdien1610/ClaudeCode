@@ -1,21 +1,28 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { api, type LedgerEntry } from "@/lib/api";
+import { api, type GemPackage, type LedgerEntry } from "@/lib/api";
 import { useAction, useApp } from "@/lib/app";
 import { PageTitle } from "@/components/Shell";
 
 export default function WalletPage() {
   const { t, n, balances, setBalances, notify, fail, locale } = useApp(); const { busy, run } = useAction();
+  const [pkgs, setPkgs] = useState<GemPackage[]>([]);
   const [eco, setEco] = useState<Record<string, number> | null>(null);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [dir, setDir] = useState<"GEM_TO_COIN" | "COIN_TO_GEM">("GEM_TO_COIN");
   const [amount, setAmount] = useState(10);
   const load = useCallback(() => { api.ledger().then(setLedger).catch(fail); }, [fail]);
-  useEffect(() => { api.economy().then(setEco).catch(fail); load(); }, [load, fail]);
+  useEffect(() => { api.economy().then(setEco).catch(fail); api.gemPackages().then(setPkgs).catch(fail); load(); }, [load, fail]);
 
   const convert = () => run(async () => {
     const r = await api.convert(dir, amount);
     setBalances(r.balances); notify("ok", t("wallet.converted", { s: n(r.spent), r: n(r.received) })); load();
+  });
+  const price = (p: GemPackage) => new Intl.NumberFormat(locale, { style: "currency", currency: p.currency, maximumFractionDigits: 0 }).format(p.priceMinor);
+  const buy = (code: string) => run(async () => {
+    const r = await api.createOrder(code);
+    const u = new URL(r.checkoutUrl, window.location.origin);
+    window.location.assign(u.origin === window.location.origin ? u.pathname + u.search : r.checkoutUrl);   // cổng thật nằm ở miền khác
   });
   const devTopUp = process.env.NEXT_PUBLIC_DEV_TOPUP === "1";
 
@@ -37,6 +44,11 @@ export default function WalletPage() {
           </div>
           <p className="note">{t("wallet.coinGemNote")}</p>
         </section>
+        {pkgs.length > 0 && (
+          <section className="panel grid" data-testid="gem-packages"><h3>{t("wallet.buyGem")}</h3><p className="muted">{t("wallet.buyGemNote")}</p>
+            <div className="row wrap">{pkgs.map((p) => <button key={p.code} className="btn" disabled={busy} data-testid={`buy-${p.code}`} onClick={() => void buy(p.code)}><b className="cur gem">{n(p.gem)}</b>&nbsp;{t("common.gem")} · {price(p)}</button>)}</div>
+          </section>
+        )}
         {devTopUp && (
           <section className="panel grid"><h3>{t("wallet.topup")}</h3><p className="muted">{t("wallet.topupNote")}</p>
             <div className="row wrap">{[100, 1000].map((g) => <button key={g} className="btn" disabled={busy} data-testid={`topup-${g}`} onClick={() => run(async () => { setBalances(await api.devTopUp(g)); load(); })}>{t("wallet.topupGo", { n: g })}</button>)}</div>

@@ -2,6 +2,8 @@
 export const en = {
   "app.tagline": "Collect the echoes of the heart.",
   "nav.home": "Home", "nav.store": "Store", "nav.packs": "Packs", "nav.collection": "Collection", "nav.forge": "Forge", "nav.wallet": "Wallet", "nav.account": "Account", "nav.logout": "Log out",
+  "wallet.buyGem": "Buy Gem", "wallet.buyGemNote": "Pay with the online gateway. Gem is added only after the gateway confirms your payment.", "wallet.buyGo": "Buy", "pay.sandboxTitle": "Sandbox payment", "pay.sandboxNote": "This is a test gateway: no real money is charged. In production you are sent to the real payment page instead.", "pay.order": "Order", "pay.success": "Pay (simulate success)", "pay.fail": "Simulate failure", "pay.status": "Status", "pay.back": "Back to wallet",
+  "pay.state.Created": "Waiting for payment", "pay.state.Paid": "Paid — Gem added", "pay.state.Failed": "Payment failed", "pay.state.Refunded": "Refunded", "reason.GEM_TOPUP": "Gem top-up", "reason.GEM_REFUND": "Gem refund", "err.PAYMENT_UNAVAILABLE": "Online top-up is not available right now.",
   "nav.quests": "Quests",
   "quests.title": "Newbie quests", "quests.sub": "Finish each day's tasks within 7 days of creating your account. Missed days can be made up until the end of day 7.", "quests.day": "Day {n}", "quests.today": "Today", "quests.claim": "Claim reward", "quests.claimed": "Claimed", "quests.locked": "Not started", "quests.expired": "The newbie quests have ended.",
   "quests.rewardPack": "1 basic pack (5 Common cards, account-bound)", "quests.rewardCoin": "{n} Coin", "quests.claimedOk": "Reward claimed: {r}", "quests.task.OPEN_PACK": "Open {n} pack(s) in total", "quests.task.VERIFY_PHONE": "Verify your phone number", "quests.progress": "{a}/{b}", "packs.basic": "Basic Pack", "reason.NEWBIE_QUEST": "Newbie quest reward",
@@ -46,6 +48,8 @@ type Dict = Record<Key, string>;
 export const vi: Dict = {
   "app.tagline": "Sưu tầm tiếng vọng của trái tim.",
   "nav.home": "Trang chủ", "nav.store": "Cửa hàng", "nav.packs": "Pack", "nav.collection": "Bộ sưu tập", "nav.forge": "Lò rèn", "nav.wallet": "Ví", "nav.account": "Tài khoản", "nav.logout": "Đăng xuất",
+  "wallet.buyGem": "Mua Gem", "wallet.buyGemNote": "Thanh toán qua cổng trực tuyến. Gem chỉ được cộng sau khi cổng xác nhận thanh toán của bạn.", "wallet.buyGo": "Mua", "pay.sandboxTitle": "Thanh toán thử (sandbox)", "pay.sandboxNote": "Đây là cổng thử nghiệm: không trừ tiền thật. Ở môi trường thật bạn sẽ được chuyển sang trang thanh toán của cổng.", "pay.order": "Đơn hàng", "pay.success": "Thanh toán (giả lập thành công)", "pay.fail": "Giả lập thất bại", "pay.status": "Trạng thái", "pay.back": "Về ví",
+  "pay.state.Created": "Chờ thanh toán", "pay.state.Paid": "Đã thanh toán — đã cộng Gem", "pay.state.Failed": "Thanh toán thất bại", "pay.state.Refunded": "Đã hoàn tiền", "reason.GEM_TOPUP": "Nạp Gem", "reason.GEM_REFUND": "Hoàn tiền nạp Gem", "err.PAYMENT_UNAVAILABLE": "Hiện chưa nạp được Gem trực tuyến.",
   "nav.quests": "Nhiệm vụ",
   "quests.title": "Nhiệm vụ Tân thủ", "quests.sub": "Hoàn thành nhóm nhiệm vụ mỗi ngày trong 7 ngày kể từ khi tạo tài khoản. Ngày đã qua làm bù được đến hết ngày 7.", "quests.day": "Ngày {n}", "quests.today": "Hôm nay", "quests.claim": "Nhận thưởng", "quests.claimed": "Đã nhận", "quests.locked": "Chưa đến", "quests.expired": "Nhiệm vụ Tân thủ đã kết thúc.",
   "quests.rewardPack": "1 pack cơ bản (5 thẻ Common, gắn chặt tài khoản)", "quests.rewardCoin": "{n} Coin", "quests.claimedOk": "Đã nhận thưởng: {r}", "quests.task.OPEN_PACK": "Mở tổng cộng {n} pack", "quests.task.VERIFY_PHONE": "Xác thực số điện thoại", "quests.progress": "{a}/{b}", "packs.basic": "Pack cơ bản", "reason.NEWBIE_QUEST": "Thưởng nhiệm vụ Tân thủ",
@@ -88,6 +92,8 @@ export const vi: Dict = {
 export const zhHans: Dict = {
   "app.tagline": "收集心之回响。",
   "nav.home": "首页", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔炼炉", "nav.wallet": "钱包", "nav.account": "账户", "nav.logout": "退出登录",
+  "wallet.buyGem": "购买宝石", "wallet.buyGemNote": "通过在线支付网关付款。只有网关确认付款后才会发放宝石。", "wallet.buyGo": "购买", "pay.sandboxTitle": "沙盒支付", "pay.sandboxNote": "这是测试网关，不会扣除真实款项。正式环境会跳转到真实的支付页面。", "pay.order": "订单", "pay.success": "支付（模拟成功）", "pay.fail": "模拟失败", "pay.status": "状态", "pay.back": "返回钱包",
+  "pay.state.Created": "等待付款", "pay.state.Paid": "已付款，宝石已到账", "pay.state.Failed": "付款失败", "pay.state.Refunded": "已退款", "reason.GEM_TOPUP": "宝石充值", "reason.GEM_REFUND": "宝石充值退款", "err.PAYMENT_UNAVAILABLE": "暂时无法在线充值。",
   "nav.quests": "任务",
   "quests.title": "新手任务", "quests.sub": "创建账户后的 7 天内完成每天的任务。错过的天数可在第 7 天结束前补做。", "quests.day": "第 {n} 天", "quests.today": "今天", "quests.claim": "领取奖励", "quests.claimed": "已领取", "quests.locked": "未开始", "quests.expired": "新手任务已结束。",
   "quests.rewardPack": "1 个基础卡包（5 张普通卡，绑定账户）", "quests.rewardCoin": "{n} 金币", "quests.claimedOk": "已领取奖励：{r}", "quests.task.OPEN_PACK": "累计开启 {n} 个卡包", "quests.task.VERIFY_PHONE": "验证手机号", "quests.progress": "{a}/{b}", "packs.basic": "基础卡包", "reason.NEWBIE_QUEST": "新手任务奖励",
@@ -130,6 +136,8 @@ export const zhHans: Dict = {
 export const zhHant: Dict = {
   "app.tagline": "收集心之迴響。",
   "nav.home": "首頁", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔煉爐", "nav.wallet": "錢包", "nav.account": "帳戶", "nav.logout": "登出",
+  "wallet.buyGem": "購買寶石", "wallet.buyGemNote": "透過線上支付閘道付款。只有閘道確認付款後才會發放寶石。", "wallet.buyGo": "購買", "pay.sandboxTitle": "沙盒支付", "pay.sandboxNote": "這是測試閘道，不會扣除真實款項。正式環境會跳轉到真實的支付頁面。", "pay.order": "訂單", "pay.success": "支付（模擬成功）", "pay.fail": "模擬失敗", "pay.status": "狀態", "pay.back": "返回錢包",
+  "pay.state.Created": "等待付款", "pay.state.Paid": "已付款，寶石已到帳", "pay.state.Failed": "付款失敗", "pay.state.Refunded": "已退款", "reason.GEM_TOPUP": "寶石儲值", "reason.GEM_REFUND": "寶石儲值退款", "err.PAYMENT_UNAVAILABLE": "目前無法線上儲值。",
   "nav.quests": "任務",
   "quests.title": "新手任務", "quests.sub": "建立帳戶後的 7 天內完成每天的任務。錯過的天數可在第 7 天結束前補做。", "quests.day": "第 {n} 天", "quests.today": "今天", "quests.claim": "領取獎勵", "quests.claimed": "已領取", "quests.locked": "未開始", "quests.expired": "新手任務已結束。",
   "quests.rewardPack": "1 個基礎卡包（5 張普通卡，綁定帳戶）", "quests.rewardCoin": "{n} 金幣", "quests.claimedOk": "已領取獎勵：{r}", "quests.task.OPEN_PACK": "累計開啟 {n} 個卡包", "quests.task.VERIFY_PHONE": "驗證手機號", "quests.progress": "{a}/{b}", "packs.basic": "基礎卡包", "reason.NEWBIE_QUEST": "新手任務獎勵",

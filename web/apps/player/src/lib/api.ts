@@ -77,6 +77,9 @@ export type QuestDay = { day: number; available: boolean; complete: boolean; cla
 export type Quests = { currentDay: number; expired: boolean; endsAt: string; days: QuestDay[] };
 export type QuestClaim = { day: number; rewardType: "BASIC_PACK" | "COIN"; rewardCoin: number; packInstanceId: string | null; balances: Balances };
 
+export type GemPackage = { code: string; gem: number; priceMinor: number; currency: string };
+export type PaymentOrder = { id: string; packageCode: string; gem: number; amountMinor: number; currency: string; status: "Created" | "Paid" | "Failed" | "Refunded"; createdAt: string; paidAt: string | null; refundedAt: string | null };
+
 export const api = {
   register: (b: { email: string; password: string; birthDate: string; country: string; locale: string; timezone: string }) => request<AuthResponse>("POST", "/v1/accounts", b),
   login: (b: { email: string; password: string }) => request<AuthResponse>("POST", "/v1/auth/login", b),
@@ -89,6 +92,11 @@ export const api = {
   wallet: () => request<Balances>("GET", "/v1/wallet"),
   ledger: (before?: number) => request<LedgerEntry[]>("GET", `/v1/wallet/ledger?limit=30${before ? `&before=${before}` : ""}`),
   convert: (direction: "GEM_TO_COIN" | "COIN_TO_GEM", amount: number) => request<{ spent: number; received: number; balances: Balances }>("POST", "/v1/wallet/convert", { direction, amount }, { idem: true }),
+  gemPackages: () => request<GemPackage[]>("GET", "/v1/payments/packages"),
+  createOrder: (packageCode: string) => request<{ order: PaymentOrder; checkoutUrl: string }>("POST", "/v1/payments/orders", { packageCode }, { idem: true }),
+  order: (id: string) => request<PaymentOrder>("GET", `/v1/payments/orders/${id}`),
+  /** Chỉ sandbox: mô phỏng cổng gửi IPN cho đơn của mình. */
+  simulatePayment: (id: string, outcome: "succeeded" | "failed" | "refunded") => request<{ outcome: string; order: PaymentOrder }>("POST", `/v1/payments/sandbox/${id}/simulate`, { outcome }),
   devTopUp: (gem: number) => request<Balances>("POST", "/v1/dev/topup", { gem }, { idem: true }),
   economy: () => request<Record<string, number>>("GET", "/v1/economy"),
 
