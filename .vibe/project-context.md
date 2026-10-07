@@ -23,7 +23,7 @@
 
 ## Commands
 
-> Trạng thái: **backend đã kiểm chứng** (2026-10-07: build, test, format chạy được; `infra/dev-postgres.sh` thay cho Docker khi không có Docker). Lệnh web và Unity vẫn dự kiến.
+> Trạng thái: **backend đã kiểm chứng** (2026-10-07: build, test, format chạy được; `infra/dev-postgres.sh` thay cho Docker khi không có Docker). Web người chơi cũng đã kiểm chứng (typecheck, test, build, E2E bằng `web/apps/player/e2e/run.sh`). Lệnh web admin và Unity vẫn dự kiến.
 
 | Mục đích | Lệnh |
 |---|---|

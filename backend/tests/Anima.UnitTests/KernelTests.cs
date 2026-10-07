@@ -22,6 +22,23 @@ public class KernelTests
         Assert.Equal(TimeSpan.FromDays(1), to - from);
     }
 
+    [Theory(DisplayName = "Trình duyệt báo tên múi giờ cũ (Chromium: Asia/Saigon) vẫn được chấp nhận")]
+    [InlineData("Asia/Saigon", "Asia/Ho_Chi_Minh")]
+    [InlineData("Asia/Calcutta", "Asia/Kolkata")]
+    [InlineData("Europe/Kiev", "Europe/Kyiv")]
+    [InlineData("Asia/Ho_Chi_Minh", "Asia/Ho_Chi_Minh")]
+    public void TimezoneAliasesResolve(string reported, string expectedId)
+    {
+        Assert.True(TimeZones.TryResolve(reported, out var tz));
+        Assert.Equal(TimeZoneInfo.FindSystemTimeZoneById(expectedId).BaseUtcOffset, tz.BaseUtcOffset);
+    }
+
+    [Theory(DisplayName = "Múi giờ không tồn tại bị từ chối")]
+    [InlineData("Mars/Olympus")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void UnknownTimezoneRejected(string? id) => Assert.False(TimeZones.TryResolve(id, out _));
+
     [Fact(DisplayName = "FieldCipher: mã hóa khứ hồi, mỗi lần mã hóa khác nhau, bản mã bị sửa thì từ chối")]
     public void FieldCipherRoundTrip()
     {

@@ -14,6 +14,17 @@ Nền tảng sưu tầm thẻ bài số (app mobile + website người chơi + w
 - [Solution Design](docs/SOLUTION_DESIGN.md) — v0.4: kiến trúc, cấu trúc repo, module backend, engine Đấu trường, mô hình dữ liệu, API, luồng xử lý, bảo mật, Git contract, chiến lược kiểm thử.
 - [Sprint Plan](docs/SPRINT_PLAN.md) — 12 sprint × 2 tuần, 132 task, DoR/DoD, đường găng; dữ liệu gốc ở `.vibe/backlog.json`.
 
+## Chạy thử (backend + website)
+
+```bash
+infra/dev-postgres.sh start                        # PostgreSQL cục bộ (không cần Docker)
+dotnet run --project backend/src/Anima.Api         # API: http://localhost:5080 (tự migrate + seed 100 thẻ tạm)
+pnpm -C web install && pnpm -C web dev             # Website người chơi: http://localhost:3000
+web/apps/player/e2e/run.sh                         # hoặc chạy cả bộ E2E trên trình duyệt thật
+```
+
+Chi tiết: [backend/README.md](backend/README.md), [web/apps/player/README.md](web/apps/player/README.md). Website hiện chơi được vòng R1: đăng ký, gói chào mừng, mua và mở pack, bộ sưu tập, Lò rèn, ví, kiểm chứng công bằng, 4 ngôn ngữ.
+
 ## Prototype giao diện
 
 Mở `prototype/index.html` trong trình duyệt: app mobile, website người chơi (cùng file `player.html`, đổi chế độ ở thanh trên cùng) và website admin, cùng `battle.html` — một trận Đấu trường mẫu với máy (CR-004). Giao diện sáng, phẳng; chuyển được 4 ngôn ngữ (vi, en, zh-Hans, zh-Hant). Dữ liệu giả, không cần backend.

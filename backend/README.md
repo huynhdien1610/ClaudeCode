@@ -1,6 +1,6 @@
 # ANIMA — Backend (.NET 10)
 
-Modular monolith theo [SOLUTION_DESIGN.md](../docs/SOLUTION_DESIGN.md). Phạm vi hiện có: **vòng chơi R1 trên website** — đăng ký, ví, mua và mở pack có thể kiểm chứng, bộ sưu tập, Lò rèn, quy đổi Gem ↔ Coin, gói chào mừng. Chưa có: chợ, đấu giá, NFT, điểm danh/ads (chỉ app), thanh toán thật, trận đấu (R2).
+Modular monolith theo [SOLUTION_DESIGN.md](../docs/SOLUTION_DESIGN.md). Phạm vi hiện có: **vòng chơi R1 trên website** — đăng ký, ví, mua và mở pack có thể kiểm chứng, bộ sưu tập, Lò rèn, quy đổi Gem ↔ Coin, gói chào mừng. Chưa có: chợ, đấu giá, NFT, điểm danh/ads (chỉ app), thanh toán thật, trận đấu (R2). Website người chơi dùng backend này: xem [web/apps/player](../web/apps/player/README.md).
 
 ## Chạy thử
 
@@ -15,7 +15,7 @@ Development bật `Dev:MockTopUp` (nạp Gem giả: `POST /v1/dev/topup`) và `I
 | Lệnh | Việc |
 |---|---|
 | `dotnet build backend/Anima.sln` | Build (cảnh báo là lỗi) |
-| `dotnet test backend/Anima.sln` | 128 test: đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
+| `dotnet test backend/Anima.sln` | 136 test: đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
 | `dotnet format backend/Anima.sln --verify-no-changes` | Kiểm tra định dạng |
 | `UPDATE_OPENAPI=1 dotnet test backend/tests/Anima.IntegrationTests --filter OpenApiContract` | Cập nhật snapshot hợp đồng API khi cố ý đổi API |
 

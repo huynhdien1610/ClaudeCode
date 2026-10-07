@@ -7,6 +7,8 @@ TestResults/
 # Node
 node_modules/
 .next/
+next-env.d.ts
+*.tsbuildinfo
 dist/
 # Secrets / local
 .env

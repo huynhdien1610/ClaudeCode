@@ -14,7 +14,9 @@ case "${1:-start}" in
       mkdir -p "$DATA"; [ -n "$RUN" ] && chown postgres:postgres "$DATA"
       $RUN "$PGBIN/initdb" -D "$DATA" -A trust -U postgres >/dev/null
     fi
-    $RUN "$PGBIN/pg_ctl" -D "$DATA" -o "-p $PORT -k /tmp -c fsync=off -c listen_addresses=127.0.0.1" -l "$DATA/server.log" -w start >/dev/null || true
+    if ! $RUN "$PGBIN/pg_ctl" -D "$DATA" status >/dev/null 2>&1; then
+      $RUN "$PGBIN/pg_ctl" -D "$DATA" -o "-p $PORT -k /tmp -c fsync=off -c listen_addresses=127.0.0.1" -l "$DATA/server.log" -w start >/dev/null
+    fi
     echo "Host=127.0.0.1;Port=$PORT;Username=postgres;Database=postgres"
     ;;
   stop) $RUN "$PGBIN/pg_ctl" -D "$DATA" -m fast stop ;;

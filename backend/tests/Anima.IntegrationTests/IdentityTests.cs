@@ -141,6 +141,15 @@ public sealed class IdentityTests(ApiFixture fx) : IClassFixture<ApiFixture>
         Assert.Equal("OTP_DAILY_LIMIT", sixth.Code);
     }
 
+    [Fact(DisplayName = "Đăng ký với tên múi giờ cũ của trình duyệt (Asia/Saigon) được lưu thành tên chuẩn; múi giờ lạ bị từ chối")]
+    public async Task RegisterAcceptsBrowserTimezoneAliases()
+    {
+        var p = await fx.NewPlayer(tz: "Asia/Saigon");
+        Assert.Equal("Asia/Ho_Chi_Minh", (await p.Get("/v1/me"))["timezone"].GetString());
+        var bad = await Register(Body(tz: "Mars/Olympus"));
+        Assert.Equal("VALIDATION_FAILED", bad.Code);
+    }
+
     [Fact(DisplayName = "BR-I18N-01: đổi ngôn ngữ lưu theo tài khoản; ngôn ngữ lạ bị từ chối")]
     public async Task Locale()
     {

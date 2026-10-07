@@ -103,8 +103,12 @@ public sealed partial class IdentityService(IUnitOfWork uow, IFieldCipher cipher
         var today = DateOnly.FromDateTime(clock.UtcNow.UtcDateTime);
         var age = today.Year - birth.Year - (today < birth.AddYears(today.Year - birth.Year) ? 1 : 0);
         if (age < _o.MinAge) throw new DomainException(ErrorCodes.AgeBelowMinimum, $"Minimum age is {_o.MinAge}", 403);
-        var tz = string.IsNullOrWhiteSpace(r.Timezone) ? "UTC" : r.Timezone!;
-        try { TimeZoneInfo.FindSystemTimeZoneById(tz); } catch (Exception e) when (e is TimeZoneNotFoundException or InvalidTimeZoneException) { throw DomainException.Validation("Unknown timezone"); }
+        var tz = "UTC";
+        if (!string.IsNullOrWhiteSpace(r.Timezone))
+        {
+            if (!TimeZones.TryResolve(r.Timezone, out var resolved)) throw DomainException.Validation("Unknown timezone");
+            tz = resolved.Id;       // lưu tên mà máy chủ hiểu được, kể cả khi trình duyệt báo tên cũ
+        }
         var locale = Locales.Normalize(r.Locale);
 
         var id = Guid.NewGuid();

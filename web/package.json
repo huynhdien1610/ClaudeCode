@@ -1,0 +1,12 @@
+{
+  "name": "anima-web",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --filter @anima/player dev",
+    "build": "pnpm --filter @anima/player build",
+    "test": "pnpm --filter @anima/player test",
+    "lint": "pnpm --filter @anima/player lint",
+    "typecheck": "pnpm --filter @anima/player typecheck"
+  }
+}
