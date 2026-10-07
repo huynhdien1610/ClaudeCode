@@ -66,6 +66,12 @@ namespace Anima.Contracts
         public const string PaymentAmountMismatch = "PAYMENT_AMOUNT_MISMATCH";
         public const string DeckInvalid = "DECK_INVALID";
         public const string DeckLimitReached = "DECK_LIMIT_REACHED";
+        public const string AttackNotAllowed = "ATTACK_NOT_ALLOWED";
+        public const string DirectAttackNotAllowed = "DIRECT_ATTACK_NOT_ALLOWED";
+        public const string MulliganUsed = "MULLIGAN_USED";
+        public const string NotYourTurn = "NOT_YOUR_TURN";
+        public const string InsufficientResonance = "INSUFFICIENT_RESONANCE";
+        public const string MatchFinished = "MATCH_FINISHED";
         public const string QuestExpired = "QUEST_EXPIRED";
         public const string QuestNotAvailable = "QUEST_NOT_AVAILABLE";
         public const string QuestNotComplete = "QUEST_NOT_COMPLETE";

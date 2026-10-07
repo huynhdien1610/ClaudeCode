@@ -8,7 +8,7 @@ namespace Anima.IntegrationTests;
 public sealed class DeckTests(ApiFixture fx) : IClassFixture<ApiFixture>
 {
     /// <summary>Chọn tham lam 30 thẻ thỏa luật từ bộ sưu tập; null nếu không đủ.</summary>
-    private static List<Guid>? PickValid(IEnumerable<JsonElement> items)
+    internal static List<Guid>? PickValid(IEnumerable<JsonElement> items)
     {
         var picked = new List<Guid>(); var support = 0; var perDef = new Dictionary<int, int>(); var perRarity = new Dictionary<string, int>();
         foreach (var i in items)

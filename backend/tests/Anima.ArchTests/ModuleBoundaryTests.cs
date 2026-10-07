@@ -22,6 +22,7 @@ public class ModuleBoundaryTests
         ["Quest"] = (typeof(Anima.Quest.QuestModule).Assembly, ["Identity", "Gacha", "Wallet"]),
         ["Payment"] = (typeof(Anima.Payment.PaymentModule).Assembly, ["Identity", "Wallet"]),
         ["Deck"] = (typeof(Anima.Deck.DeckModule).Assembly, ["Catalog", "Collection"]),
+        ["Battle"] = (typeof(Anima.Battle.BattleModule).Assembly, ["Catalog", "Deck"]),
         ["Admin"] = (typeof(Anima.Admin.AdminModule).Assembly, ["Identity", "Catalog", "Economy", "Wallet"]),
     };
 
