@@ -20,7 +20,11 @@ public sealed class ForgeModule : IModule
 {
     public string Name => "forge";
     public System.Reflection.Assembly MigrationAssembly => typeof(ForgeModule).Assembly;
-    public void ConfigureServices(IServiceCollection s, IConfiguration c) => s.AddScoped<ForgeService>();
+    public void ConfigureServices(IServiceCollection s, IConfiguration c)
+    {
+        s.AddScoped<ForgeService>();
+        s.AddScoped<IStatsContributor, ForgeStats>();
+    }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
@@ -123,5 +127,14 @@ public sealed class ForgeService(IUnitOfWork uow, IClock clock, ICatalogApi cata
             usedToday = used,
             odds = new { odds.Version, entries = odds.Entries },
         };
+    }
+}
+
+internal sealed class ForgeStats(IUnitOfWork uow) : IStatsContributor
+{
+    public async Task<IReadOnlyDictionary<string, long>> CollectAsync(CancellationToken ct)
+    {
+        var v = (await uow.QueryAsync("SELECT count(*), count(*) FILTER (WHERE status='Sealed') FROM forge.sealed_card", r => new[] { r.GetInt64(0), r.GetInt64(1) }, ct))[0];
+        return new Dictionary<string, long> { ["forges_total"] = v[0], ["sealed_cards_pending"] = v[1] };
     }
 }

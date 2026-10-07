@@ -26,7 +26,11 @@ public sealed class EconomyModule : IModule
 {
     public string Name => "economy";
     public System.Reflection.Assembly MigrationAssembly => typeof(EconomyModule).Assembly;
-    public void ConfigureServices(IServiceCollection s, IConfiguration c) => s.AddScoped<IEconomyApi, EconomyService>();
+    public void ConfigureServices(IServiceCollection s, IConfiguration c)
+    {
+        s.AddScoped<IEconomyApi, EconomyService>();
+        s.AddScoped<IEconomyAdminApi, EconomyAdminService>();
+    }
 
     public void MapEndpoints(IEndpointRouteBuilder app) =>
         app.MapGet("/v1/economy", async (IEconomyApi e, CancellationToken ct) => Results.Ok(await e.GetAllAsync(ct)));

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using Anima.Admin;
 using Anima.Catalog;
 using Anima.Collection;
 using Anima.Contracts;
@@ -17,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 var isDev = builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Testing";
 
 // Thứ tự module = thứ tự chạy migration.
-IModule[] modules = [new IdentityModule(), new FairnessModule(), new EconomyModule(), new WalletModule(), new CatalogModule(), new CollectionModule(), new GachaModule(), new ForgeModule()];
+IModule[] modules = [new IdentityModule(), new FairnessModule(), new EconomyModule(), new WalletModule(), new CatalogModule(), new CollectionModule(), new GachaModule(), new ForgeModule(), new AdminModule()];
 
 builder.Services.AddSharedKernel(builder.Configuration, isDev);
 foreach (var m in modules) m.ConfigureServices(builder.Services, builder.Configuration);
@@ -25,27 +26,59 @@ builder.Services.AddSingleton<IReadOnlyList<IModule>>(modules);
 
 var idOpt = new IdentityOptions(); builder.Configuration.GetSection("Identity").Bind(idOpt);
 if (!isDev && idOpt.JwtKey.Contains("dev", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Identity:JwtKey must be configured outside Development");
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
+var adminOpt = new AdminOptions(); builder.Configuration.GetSection("Admin").Bind(adminOpt);
+if (!isDev && adminOpt.JwtKey.Contains("dev", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Admin:JwtKey must be configured outside Development");
+
+static TokenValidationParameters Validation(string issuer, string audience, string key) => new()
 {
-    o.MapInboundClaims = false;
-    o.TokenValidationParameters = new TokenValidationParameters
+    ValidIssuer = issuer,
+    ValidAudience = audience,
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+    ClockSkew = TimeSpan.FromSeconds(30),
+};
+static async Task Unauthorized(JwtBearerChallengeContext ctx)
+{
+    ctx.HandleResponse();
+    ctx.Response.StatusCode = 401;
+    await ctx.Response.WriteAsJsonAsync(new { code = ErrorCodes.Unauthorized, message = "Authentication is required" });
+}
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    // Người chơi: token chỉ hợp lệ khi tài khoản chưa bị ban/xóa (ban có hiệu lực ngay, không chờ token hết hạn).
+    .AddJwtBearer(o =>
     {
-        ValidIssuer = idOpt.JwtIssuer,
-        ValidAudience = idOpt.JwtAudience,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(idOpt.JwtKey)),
-        ClockSkew = TimeSpan.FromSeconds(30),
-    };
-    o.Events = new JwtBearerEvents
-    {
-        OnChallenge = async ctx =>
+        o.MapInboundClaims = false;
+        o.TokenValidationParameters = Validation(idOpt.JwtIssuer, idOpt.JwtAudience, idOpt.JwtKey);
+        o.Events = new JwtBearerEvents
         {
-            ctx.HandleResponse();
-            ctx.Response.StatusCode = 401;
-            await ctx.Response.WriteAsJsonAsync(new { code = ErrorCodes.Unauthorized, message = "Authentication is required" });
-        },
-    };
-});
+            OnChallenge = Unauthorized,
+            OnTokenValidated = async ctx =>
+            {
+                try
+                {
+                    var info = await ctx.HttpContext.RequestServices.GetRequiredService<Anima.Identity.Contracts.IIdentityApi>().GetAsync(ctx.Principal!.AccountId(), ctx.HttpContext.RequestAborted);
+                    if (info.Status is "Banned" or "Deleted") ctx.Fail("Account is not allowed");
+                }
+                catch (DomainException) { ctx.Fail("Unknown account"); }
+            },
+        };
+    })
+    // Quản trị: audience riêng nên token người chơi không dùng được ở /admin và ngược lại.
+    .AddJwtBearer("Admin", o =>
+    {
+        o.MapInboundClaims = false;
+        o.TokenValidationParameters = Validation(adminOpt.JwtIssuer, adminOpt.JwtAudience, adminOpt.JwtKey);
+        o.Events = new JwtBearerEvents
+        {
+            OnChallenge = Unauthorized,
+            OnTokenValidated = async ctx =>
+            {
+                if (!Guid.TryParse(ctx.Principal?.FindFirst("sub")?.Value, out var id) || !await ctx.HttpContext.RequestServices.GetRequiredService<AdminService>().IsActiveAsync(id, ctx.HttpContext.RequestAborted))
+                    ctx.Fail("Admin is not active");
+            },
+        };
+    });
 builder.Services.AddAuthorization();
 builder.Services.AddOpenApi();
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
@@ -93,6 +126,8 @@ if (app.Configuration.GetValue("Database:AutoMigrate", true))
     var all = new List<(string, System.Reflection.Assembly)> { ("shared", typeof(DomainException).Assembly) };
     all.AddRange(modules.Select(m => (m.Name, m.MigrationAssembly)));
     await Migrator.RunAsync(ds, all, log);
+    await using (var startup = app.Services.CreateAsyncScope())
+        foreach (var task in startup.ServiceProvider.GetServices<IStartupTask>()) await task.RunAsync(CancellationToken.None);
     if (app.Configuration.GetValue("Seed:Enabled", isDev))
     {
         await using var scope = app.Services.CreateAsyncScope();

@@ -19,6 +19,7 @@ public class ModuleBoundaryTests
         ["Collection"] = (typeof(Anima.Collection.CollectionModule).Assembly, ["Catalog"]),
         ["Gacha"] = (typeof(Anima.Gacha.GachaModule).Assembly, ["Fairness", "Wallet", "Catalog", "Collection", "Economy", "Identity"]),
         ["Forge"] = (typeof(Anima.Forge.ForgeModule).Assembly, ["Fairness", "Wallet", "Gacha", "Catalog", "Collection", "Economy", "Identity"]),
+        ["Admin"] = (typeof(Anima.Admin.AdminModule).Assembly, ["Identity", "Catalog", "Economy", "Wallet"]),
     };
 
     private static string[] AnimaRefs(Assembly a) => a.GetReferencedAssemblies().Select(r => r.Name!).Where(n => n.StartsWith("Anima.", StringComparison.Ordinal)).ToArray();

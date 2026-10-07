@@ -11,5 +11,6 @@
     <ProjectReference Include="../Anima.Modules.Collection/Anima.Modules.Collection.csproj" />
     <ProjectReference Include="../Anima.Modules.Gacha/Anima.Modules.Gacha.csproj" />
     <ProjectReference Include="../Anima.Modules.Forge/Anima.Modules.Forge.csproj" />
+    <ProjectReference Include="../Anima.Modules.Admin/Anima.Modules.Admin.csproj" />
   </ItemGroup>
 </Project>

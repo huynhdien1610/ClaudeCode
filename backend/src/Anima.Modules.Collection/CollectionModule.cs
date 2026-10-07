@@ -19,7 +19,12 @@ public sealed class CollectionModule : IModule
 {
     public string Name => "collection";
     public System.Reflection.Assembly MigrationAssembly => typeof(CollectionModule).Assembly;
-    public void ConfigureServices(IServiceCollection s, IConfiguration c) { s.AddScoped<CollectionService>(); s.AddScoped<ICollectionApi>(sp => sp.GetRequiredService<CollectionService>()); }
+    public void ConfigureServices(IServiceCollection s, IConfiguration c)
+    {
+        s.AddScoped<CollectionService>();
+        s.AddScoped<ICollectionApi>(sp => sp.GetRequiredService<CollectionService>());
+        s.AddScoped<IStatsContributor, CollectionStats>();
+    }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
@@ -94,5 +99,14 @@ public sealed class CollectionService(IUnitOfWork uow, IClock clock) : ICollecti
         var owned = await uow.QueryAsync("SELECT DISTINCT card_definition_id FROM collection.card_instance WHERE owner_id=@a AND state <> 'Burned'", r => r.GetInt32(0), ct, ("a", acc));
         var total = (await cat.ListCardsAsync(ct)).Count;
         return new { owned = owned.Count, total, percent = total == 0 ? 0 : Math.Round(100.0 * owned.Count / total, 1) };
+    }
+}
+
+internal sealed class CollectionStats(IUnitOfWork uow) : IStatsContributor
+{
+    public async Task<IReadOnlyDictionary<string, long>> CollectAsync(CancellationToken ct)
+    {
+        var v = (await uow.QueryAsync("SELECT count(*), count(*) FILTER (WHERE state='Burned'), count(*) FILTER (WHERE soulbound) FROM collection.card_instance", r => new[] { r.GetInt64(0), r.GetInt64(1), r.GetInt64(2) }, ct))[0];
+        return new Dictionary<string, long> { ["cards_issued"] = v[0], ["cards_burned"] = v[1], ["cards_soulbound"] = v[2] };
     }
 }

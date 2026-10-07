@@ -36,6 +36,7 @@ public sealed class CatalogModule : IModule
     public void ConfigureServices(IServiceCollection s, IConfiguration c)
     {
         s.AddScoped<ICatalogApi, CatalogService>();
+        s.AddScoped<ICatalogAdminApi, CatalogAdminService>();
         s.AddScoped<IModuleSeeder, CatalogSeeder>();
     }
 
@@ -82,7 +83,7 @@ internal sealed class CatalogService(IUnitOfWork uow) : ICatalogApi
         new(r.GetInt32(0), r.GetString(1), r.GetInt32(2), JsonSerializer.Deserialize<List<RarityOdds>>(r.GetString(3), J)!);
 
     public async Task<OddsVersion> GetActiveOddsAsync(string packCode, CancellationToken ct) =>
-        (await uow.QueryAsync("SELECT id,pack_code,version,entries::text FROM catalog.odds_version WHERE pack_code=@p AND status='active' AND effective_from <= now() ORDER BY version DESC LIMIT 1", MapOdds, ct, ("p", packCode)))
+        (await uow.QueryAsync("SELECT id,pack_code,version,entries::text FROM catalog.odds_version WHERE pack_code=@p AND status IN ('approved','active') AND effective_from <= now() ORDER BY effective_from DESC, version DESC LIMIT 1", MapOdds, ct, ("p", packCode)))
         .FirstOrDefault() ?? throw DomainException.NotFound("Odds version");
 
     public async Task<OddsVersion> GetOddsAsync(int id, CancellationToken ct) =>
@@ -90,7 +91,7 @@ internal sealed class CatalogService(IUnitOfWork uow) : ICatalogApi
 
     public async Task<IReadOnlyList<int>> AvailableCardIdsAsync(string rarity, CancellationToken ct, string? cardType = null, string? element = null) =>
         await uow.QueryAsync(@"SELECT d.id FROM catalog.card_definition d JOIN catalog.edition e ON e.card_definition_id=d.id JOIN catalog.season s ON s.id=d.season_id
-            WHERE d.rarity=@r AND d.published AND s.status='open' AND e.issued < e.max_supply AND (@t::text IS NULL OR d.card_type=@t) AND (@el::text IS NULL OR d.element=@el) ORDER BY d.id",
+            WHERE d.rarity=@r AND d.published AND NOT d.discontinued AND s.status='open' AND e.issued < e.max_supply AND (@t::text IS NULL OR d.card_type=@t) AND (@el::text IS NULL OR d.element=@el) ORDER BY d.id",
             r => r.GetInt32(0), ct, ("r", rarity), ("t", cardType), ("el", element));
 
     public async Task<int?> TryIssueAsync(int id, CancellationToken ct) =>

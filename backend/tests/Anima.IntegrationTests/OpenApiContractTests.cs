@@ -23,7 +23,7 @@ public sealed class OpenApiContractTests(ApiFixture fx) : IClassFixture<ApiFixtu
         var node = JsonNode.Parse(raw)!;
         // Endpoint vận hành và endpoint chỉ có ở dev không thuộc hợp đồng công khai.
         var paths = node["paths"]!.AsObject();
-        foreach (var k in paths.Select(p => p.Key).Where(k => !k.StartsWith("/v1/", StringComparison.Ordinal) || k.StartsWith("/v1/dev/", StringComparison.Ordinal)).ToList()) paths.Remove(k);
+        foreach (var k in paths.Select(p => p.Key).Where(k => !(k.StartsWith("/v1/", StringComparison.Ordinal) || k.StartsWith("/admin/v1/", StringComparison.Ordinal)) || k.StartsWith("/v1/dev/", StringComparison.Ordinal)).ToList()) paths.Remove(k);
         return node.ToJsonString(new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }) + "\n";
     }
 
@@ -43,7 +43,7 @@ public sealed class OpenApiContractTests(ApiFixture fx) : IClassFixture<ApiFixtu
     {
         var doc = JsonNode.Parse(await Generate())!;
         var paths = doc["paths"]!.AsObject().Select(p => p.Key).ToList();
-        Assert.All(paths, p => Assert.StartsWith("/v1/", p));
+        Assert.All(paths, p => Assert.True(p.StartsWith("/v1/", StringComparison.Ordinal) || p.StartsWith("/admin/v1/", StringComparison.Ordinal), p));
         foreach (var expected in new[] { "/v1/accounts", "/v1/auth/login", "/v1/wallet", "/v1/wallet/convert", "/v1/packs/{code}/purchase", "/v1/pack-instances/{id}/open", "/v1/forge", "/v1/fairness/verify", "/v1/collection" })
             Assert.Contains(expected, paths);
     }

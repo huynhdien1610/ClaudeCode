@@ -57,6 +57,8 @@ public sealed class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
         b.UseSetting("Seed:Enabled", "true");
         b.UseSetting("Dev:MockTopUp", "true");
         b.UseSetting("Identity:Pbkdf2Iterations", "1000");
+        b.UseSetting("Admin:Pbkdf2Iterations", "1000");
+        b.UseSetting("Admin:SeedDemoUsers", "true");
         b.ConfigureServices(s => { s.RemoveAll<IOtpSender>(); s.AddSingleton<IOtpSender>(Otp); });
     }
 
@@ -175,4 +177,54 @@ public sealed class Player
     }
     public async Task<List<JsonElement>> Collection() => (await Get("/v1/collection"))["items"].EnumerateArray().ToList();
     public async Task<Guid> OpenWelcomePackAsync() { var l = await Get("/v1/me/packs"); var id = l.Body.EnumerateArray().First(x => x.GetProperty("kind").GetString() == "welcome").GetProperty("id").GetGuid(); Assert.True((await Open(id)).Ok); return id; }
+}
+
+/// <summary>Client quản trị đã đăng nhập (tài khoản mẫu theo vai trò do AdminBootstrap tạo khi Admin:SeedDemoUsers).</summary>
+public sealed class AdminClient
+{
+    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    public HttpClient Http { get; }
+    public string Email { get; private set; } = "";
+    private AdminClient(ApiFixture fx) { Http = fx.CreateClient(); }
+    public const string DemoPassword = "admin-demo-pass";
+
+    public static async Task<AdminClient> LoginAsync(ApiFixture fx, string role, string? password = null)
+    {
+        var c = new AdminClient(fx) { Email = $"{role}@anima.local" };
+        var r = await c.Anonymous(HttpMethod.Post, "/admin/v1/auth/login", new { email = c.Email, password = password ?? DemoPassword });
+        if (!r.Ok) throw new InvalidOperationException($"Admin login failed for {role}: {r.Status} {r.Body}");
+        c.Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", r["accessToken"].GetString());
+        return c;
+    }
+
+    public async Task<Resp> Anonymous(HttpMethod m, string url, object? body = null)
+    {
+        using var req = new HttpRequestMessage(m, url);
+        if (body is not null) req.Content = JsonContent.Create(body, options: Json);
+        using var res = await Http.SendAsync(req);
+        var text = await res.Content.ReadAsStringAsync();
+        return new Resp(res.StatusCode, text.Length == 0 ? default : JsonDocument.Parse(text).RootElement.Clone());
+    }
+    public Task<Resp> Get(string url) => Anonymous(HttpMethod.Get, url);
+    public Task<Resp> Post(string url, object? body = null) => Anonymous(HttpMethod.Post, url, body ?? new { });
+    public Task<Resp> Put(string url, object body) => Anonymous(HttpMethod.Put, url, body);
+    public Task<Resp> Delete(string url) => Anonymous(HttpMethod.Delete, url);
+
+    /// <summary>Đăng nhập bằng email/mật khẩu bất kỳ (thử khóa đăng nhập, tài khoản admin mới tạo).</summary>
+    public sealed class Raw(ApiFixture fx)
+    {
+        private readonly AdminClient _c = new(fx);
+        public Task<Resp> Attempt(string email, string password) => _c.Anonymous(HttpMethod.Post, "/admin/v1/auth/login", new { email, password });
+        public async Task<AdminClient> LoginAsync(string email, string password)
+        {
+            var r = await Attempt(email, password);
+            Assert.True(r.Ok, r.Body.ToString());
+            var c = new AdminClient(fx) { Email = email };
+            c.Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", r["accessToken"].GetString());
+            return c;
+        }
+    }
+
+    public async Task<List<JsonElement>> Audit(string? action = null, int limit = 200)
+        => (await Get($"/admin/v1/audit?limit={limit}" + (action is null ? "" : $"&action={action}"))).Body.EnumerateArray().ToList();
 }

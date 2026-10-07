@@ -24,6 +24,9 @@ public sealed class IdentityModule : IModule
         });
         s.AddScoped<IdentityService>();
         s.AddScoped<IIdentityApi>(sp => sp.GetRequiredService<IdentityService>());
+        s.AddScoped<IdentityAdminService>();
+        s.AddScoped<IIdentityAdminApi>(sp => sp.GetRequiredService<IdentityAdminService>());
+        s.AddScoped<IStatsContributor>(sp => sp.GetRequiredService<IdentityAdminService>());
         s.AddSingleton<IOtpSender, LoggingOtpSender>();
     }
 
@@ -234,20 +237,8 @@ public sealed partial class IdentityService(IUnitOfWork uow, IFieldCipher cipher
         return await GetAsync(id, ct);
     }
 
-    // ---- Mật khẩu: PBKDF2-SHA256 ----
-    private static readonly string DummyHash = HashWith("dummy-password", 1000);
-    private string HashPassword(string pw) => HashWith(pw, _o.Pbkdf2Iterations);
-    private static string HashWith(string pw, int iter)
-    {
-        var salt = RandomNumberGenerator.GetBytes(16);
-        var h = Rfc2898DeriveBytes.Pbkdf2(pw, salt, iter, HashAlgorithmName.SHA256, 32);
-        return $"pbkdf2${iter}${Convert.ToBase64String(salt)}${Convert.ToBase64String(h)}";
-    }
-    private static bool VerifyPassword(string pw, string stored)
-    {
-        var p = stored.Split('$');
-        if (p.Length != 4 || p[0] != "pbkdf2") return false;
-        var h = Rfc2898DeriveBytes.Pbkdf2(pw, Convert.FromBase64String(p[2]), int.Parse(p[1], CultureInfo.InvariantCulture), HashAlgorithmName.SHA256, 32);
-        return CryptographicOperations.FixedTimeEquals(h, Convert.FromBase64String(p[3]));
-    }
+    // ---- Mật khẩu: PBKDF2-SHA256 (dùng chung với quản trị viên) ----
+    private static readonly string DummyHash = PasswordHasher.Hash("dummy-password", 1000);
+    private string HashPassword(string pw) => PasswordHasher.Hash(pw, _o.Pbkdf2Iterations);
+    private static bool VerifyPassword(string pw, string stored) => PasswordHasher.Verify(pw, stored);
 }

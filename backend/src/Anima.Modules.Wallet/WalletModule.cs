@@ -29,6 +29,7 @@ public sealed class WalletModule : IModule
     {
         s.AddScoped<WalletService>();
         s.AddScoped<IWalletApi>(sp => sp.GetRequiredService<WalletService>());
+        s.AddScoped<IStatsContributor, WalletStats>();
         s.AddScoped<IDomainEventHandler<AccountRegistered>, FirstLoginReward>();
     }
 
@@ -130,4 +131,16 @@ public sealed class WalletService(IUnitOfWork uow, IClock clock, IEconomyApi eco
         }
         return new ConvertResult(direction, spent, received, await GetBalancesAsync(acc, ct));
     }, ct);
+}
+
+internal sealed class WalletStats(IUnitOfWork uow) : IStatsContributor
+{
+    public async Task<IReadOnlyDictionary<string, long>> CollectAsync(CancellationToken ct)
+    {
+        var v = (await uow.QueryAsync(@"SELECT count(*),
+            COALESCE(sum(amount) FILTER (WHERE currency='COIN' AND amount>0),0)::bigint, COALESCE(-sum(amount) FILTER (WHERE currency='COIN' AND amount<0),0)::bigint,
+            COALESCE(sum(amount) FILTER (WHERE currency='GEM' AND amount>0),0)::bigint, COALESCE(-sum(amount) FILTER (WHERE currency='GEM' AND amount<0),0)::bigint,
+            COALESCE(sum(amount) FILTER (WHERE reason='DEV_TOPUP'),0)::bigint FROM wallet.ledger_entry", r => new[] { r.GetInt64(0), r.GetInt64(1), r.GetInt64(2), r.GetInt64(3), r.GetInt64(4), r.GetInt64(5) }, ct))[0];
+        return new Dictionary<string, long> { ["ledger_entries"] = v[0], ["coin_issued"] = v[1], ["coin_spent"] = v[2], ["gem_issued"] = v[3], ["gem_spent"] = v[4], ["gem_dev_topup"] = v[5] };
+    }
 }

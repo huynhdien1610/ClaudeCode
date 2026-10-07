@@ -26,6 +26,7 @@ public sealed class GachaModule : IModule
     {
         s.AddScoped<ICardIssuer, CardIssuer>();
         s.AddScoped<GachaService>();
+        s.AddScoped<IStatsContributor, GachaStats>();
         s.AddScoped<IDomainEventHandler<AccountRegistered>, WelcomePackGrant>();
     }
 
@@ -182,5 +183,15 @@ public sealed class GachaService(IUnitOfWork uow, IClock clock, ICatalogApi cata
             cards.Add(new { instanceId = t.GetProperty("instanceId").GetGuid(), serial = t.GetProperty("serial").GetInt64(), edition = $"#{t.GetProperty("editionNo").GetInt32()}/{def.MaxSupply}", trace = t.GetProperty("trace").Clone(), card = await catalog.ToPublicAsync(def, loc, true, ct) });
         }
         return new { packInstanceId, packCode = row.Code, openedAt = row.At, fairness = new { seedHash = row.Hash, clientSeed = row.Client, nonce = row.Nonce }, pity = new { before = row.PB, after = row.PA, triggered = row.PT }, cards, raw = doc.RootElement.Clone() };
+    }
+}
+
+internal sealed class GachaStats(IUnitOfWork uow) : IStatsContributor
+{
+    public async Task<IReadOnlyDictionary<string, long>> CollectAsync(CancellationToken ct)
+    {
+        var v = (await uow.QueryAsync(@"SELECT count(*) FILTER (WHERE kind='standard'), count(*) FILTER (WHERE status='Opened'), count(*) FILTER (WHERE status='Unopened'),
+            count(*) FILTER (WHERE kind='welcome') FROM gacha.pack_instance", r => new[] { r.GetInt64(0), r.GetInt64(1), r.GetInt64(2), r.GetInt64(3) }, ct))[0];
+        return new Dictionary<string, long> { ["packs_purchased"] = v[0], ["packs_opened"] = v[1], ["packs_unopened"] = v[2], ["welcome_packs"] = v[3] };
     }
 }

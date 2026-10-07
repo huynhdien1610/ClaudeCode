@@ -48,6 +48,20 @@ namespace Anima.Contracts
         public const string SealedCardNotTradable = "SEALED_CARD_NOT_TRADABLE";
         public const string SealedCardAlreadyRevealed = "SEALED_CARD_ALREADY_REVEALED";
 
+        // Quản trị
+        public const string Forbidden = "FORBIDDEN";
+        public const string SelfApprovalForbidden = "SELF_APPROVAL_FORBIDDEN";
+        public const string DropRateSumInvalid = "DROP_RATE_SUM_INVALID";
+        public const string VersionLocked = "VERSION_LOCKED";
+        public const string GemGrantForbidden = "GEM_GRANT_FORBIDDEN";
+        public const string TicketRequired = "TICKET_REQUIRED";
+        public const string AuditImmutable = "AUDIT_IMMUTABLE";
+        public const string CardHasInstances = "CARD_HAS_INSTANCES";
+        public const string CardPublishedImmutable = "CARD_PUBLISHED_IMMUTABLE";
+        public const string InvalidState = "INVALID_STATE";
+        public const string SelfRoleChangeForbidden = "SELF_ROLE_CHANGE_FORBIDDEN";
+        public const string ReasonRequired = "REASON_REQUIRED";
+
         // Thẻ
         public const string CardNotOwned = "CARD_NOT_OWNED";
         public const string CardLocked = "CARD_LOCKED";

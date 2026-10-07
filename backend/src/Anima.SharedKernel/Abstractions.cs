@@ -55,3 +55,15 @@ public interface IModuleSeeder
 {
     Task SeedAsync(CancellationToken ct);
 }
+
+/// <summary>Module đóng góp số liệu cho dashboard quản trị mà không để Admin truy vấn schema của module khác.</summary>
+public interface IStatsContributor
+{
+    Task<IReadOnlyDictionary<string, long>> CollectAsync(CancellationToken ct);
+}
+
+/// <summary>Việc chạy một lần khi khởi động, luôn chạy (khác <see cref="IModuleSeeder"/> chỉ chạy khi bật seed): ví dụ tạo Super Admin đầu tiên.</summary>
+public interface IStartupTask
+{
+    Task RunAsync(CancellationToken ct);
+}
