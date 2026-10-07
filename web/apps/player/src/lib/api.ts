@@ -58,7 +58,7 @@ export type Progress = { owned: number; total: number; percent: number };
 
 export type OddsEntry = { rarity: Rarity; ppm: number };
 export type PackView = { pack: { code: string; name: string; kind: string; priceCoin: number | null; priceGem: number | null; cardsPerPack: number; onSale: boolean; offSaleReason: string | null }; odds: { version: number; entries: OddsEntry[] } | null };
-export type PackInstance = { id: string; packCode: string; kind: "standard" | "welcome"; soulbound: boolean; createdAt: string };
+export type PackInstance = { id: string; packCode: string; kind: "standard" | "welcome" | "basic"; soulbound: boolean; createdAt: string };
 export type PurchaseResult = { packInstanceIds: string[]; currency: string; price: number; balances: Balances };
 export type OpenedCard = { instanceId: string; serial: number; edition: string; editionNo: number; rarity: Rarity; soulbound: boolean; card: Card };
 export type FairnessRef = { seedHash: string; clientSeed: string; nonce: number };
@@ -71,6 +71,11 @@ export type RevealResult = { sealedCardId: string; card: OpenedCard; fairness: F
 export type SeedPublic = { serverSeedHash: string; clientSeed: string; nextNonce: number };
 export type RevealedSeed = { serverSeedHash: string; serverSeed: string; clientSeed: string; noncesUsed: number; revealedAt: string };
 export type VerifyResult = { serverSeedHash: string; rolls: number[]; cardRolls: number[] };
+
+export type QuestTask = { code: string; kind: "OPEN_PACK" | "VERIFY_PHONE"; target: number; progress: number; done: boolean };
+export type QuestDay = { day: number; available: boolean; complete: boolean; claimed: boolean; rewardType: "BASIC_PACK" | "COIN"; rewardCoin: number; tasks: QuestTask[] };
+export type Quests = { currentDay: number; expired: boolean; endsAt: string; days: QuestDay[] };
+export type QuestClaim = { day: number; rewardType: "BASIC_PACK" | "COIN"; rewardCoin: number; packInstanceId: string | null; balances: Balances };
 
 export const api = {
   register: (b: { email: string; password: string; birthDate: string; country: string; locale: string; timezone: string }) => request<AuthResponse>("POST", "/v1/accounts", b),
@@ -89,6 +94,8 @@ export const api = {
 
   packs: () => request<PackView[]>("GET", "/v1/packs"),
   buy: (code: string, currency: "GEM" | "COIN", quantity: number, key: string) => request<PurchaseResult>("POST", `/v1/packs/${code}/purchase`, { currency, quantity }, { idem: key }),
+  quests: () => request<Quests>("GET", "/v1/me/quests"),
+  claimQuest: (day: number) => request<QuestClaim>("POST", `/v1/me/quests/${day}/claim`, {}),
   myPacks: () => request<PackInstance[]>("GET", "/v1/me/packs"),
   open: (id: string) => request<OpenResult>("POST", `/v1/pack-instances/${id}/open`),
   pity: (code: string) => request<{ count: number; guaranteeAfter: number }>("GET", `/v1/me/pity/${code}`),

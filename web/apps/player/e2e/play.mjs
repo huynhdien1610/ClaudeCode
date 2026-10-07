@@ -236,6 +236,23 @@ try {
     eq(await page.getByTestId("progress-text").innerText().then((s) => s.split("/")[0].trim()) !== "", true, "tiến độ còn");
   });
 
+  await step("Nhiệm vụ Tân thủ: ngày 1 nhận được 1 pack cơ bản gắn chặt tài khoản; ngày 2 chưa tới nên chưa nhận được", async () => {
+    await goto("/quests");
+    const d1 = page.locator('[data-testid="quest-day"][data-day="1"]');
+    await d1.waitFor();
+    eq(await d1.getAttribute("data-state"), "ready", "ngày 1 sẵn sàng (đã mở gói chào mừng)");
+    ok((await d1.innerText()).includes("Hôm nay"), "ngày 1 là hôm nay");
+    const d2 = page.locator('[data-testid="quest-day"][data-day="2"]');
+    ok(await d2.getByTestId("claim-quest").isDisabled(), "ngày 2 chưa tới phải bị khóa");
+    await d1.getByTestId("claim-quest").click();
+    await page.locator('[data-testid="quest-day"][data-day="1"][data-state="claimed"]').waitFor();
+    await goto("/packs");
+    await page.getByTestId("pack-item").first().waitFor();
+    const txt = await page.getByTestId("pack-list").innerText();
+    ok(txt.includes("Pack cơ bản") && txt.includes("Gắn chặt"), `thiếu pack cơ bản gắn chặt: ${txt}`);
+    await page.screenshot({ path: `${SHOTS}/quests.png` });
+  });
+
   await step("Sai mật khẩu hiện thông báo lỗi theo mã (tiếng Việt)", async () => {
     await page.getByRole("button", { name: "Đăng xuất" }).click();
     await page.waitForURL("**/login");
@@ -250,7 +267,7 @@ try {
     await page.getByTestId("password").fill("correct horse");
     await page.getByTestId("submit").click();
     await page.waitForURL("**/home");
-    for (const p of ["/home", "/store", "/collection", "/forge", "/wallet", "/account"]) {
+    for (const p of ["/home", "/store", "/quests", "/collection", "/forge", "/wallet", "/account"]) {
       await goto(p);
       const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
       ok(sw <= iw + 1, `${p} tràn ngang: ${sw} > ${iw}`);

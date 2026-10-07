@@ -2,6 +2,10 @@
 export const en = {
   "app.tagline": "Collect the echoes of the heart.",
   "nav.home": "Home", "nav.store": "Store", "nav.packs": "Packs", "nav.collection": "Collection", "nav.forge": "Forge", "nav.wallet": "Wallet", "nav.account": "Account", "nav.logout": "Log out",
+  "nav.quests": "Quests",
+  "quests.title": "Newbie quests", "quests.sub": "Finish each day's tasks within 7 days of creating your account. Missed days can be made up until the end of day 7.", "quests.day": "Day {n}", "quests.today": "Today", "quests.claim": "Claim reward", "quests.claimed": "Claimed", "quests.locked": "Not started", "quests.expired": "The newbie quests have ended.",
+  "quests.rewardPack": "1 basic pack (5 Common cards, account-bound)", "quests.rewardCoin": "{n} Coin", "quests.claimedOk": "Reward claimed: {r}", "quests.task.OPEN_PACK": "Open {n} pack(s) in total", "quests.task.VERIFY_PHONE": "Verify your phone number", "quests.progress": "{a}/{b}", "packs.basic": "Basic Pack", "reason.NEWBIE_QUEST": "Newbie quest reward",
+  "err.QUEST_EXPIRED": "Newbie quests have ended.", "err.QUEST_NOT_AVAILABLE": "This day has not started yet.", "err.QUEST_NOT_COMPLETE": "Finish every task of this day first.", "err.QUEST_ALREADY_CLAIMED": "This reward was already claimed.",
   "common.loading": "Loading…", "common.retry": "Try again", "common.close": "Close", "common.cancel": "Cancel", "common.next": "Next", "common.skip": "Skip", "common.all": "All", "common.search": "Search by name",
   "common.coin": "Coin", "common.gem": "Gem", "common.soulbound": "Account-bound", "common.empty": "Nothing here yet.", "common.copy": "Copy", "common.copied": "Copied", "common.cards": "{n} cards",
   "common.language": "Language", "common.verified": "Verified", "common.unverified": "Not verified", "common.save": "Save",
@@ -42,6 +46,10 @@ type Dict = Record<Key, string>;
 export const vi: Dict = {
   "app.tagline": "Sưu tầm tiếng vọng của trái tim.",
   "nav.home": "Trang chủ", "nav.store": "Cửa hàng", "nav.packs": "Pack", "nav.collection": "Bộ sưu tập", "nav.forge": "Lò rèn", "nav.wallet": "Ví", "nav.account": "Tài khoản", "nav.logout": "Đăng xuất",
+  "nav.quests": "Nhiệm vụ",
+  "quests.title": "Nhiệm vụ Tân thủ", "quests.sub": "Hoàn thành nhóm nhiệm vụ mỗi ngày trong 7 ngày kể từ khi tạo tài khoản. Ngày đã qua làm bù được đến hết ngày 7.", "quests.day": "Ngày {n}", "quests.today": "Hôm nay", "quests.claim": "Nhận thưởng", "quests.claimed": "Đã nhận", "quests.locked": "Chưa đến", "quests.expired": "Nhiệm vụ Tân thủ đã kết thúc.",
+  "quests.rewardPack": "1 pack cơ bản (5 thẻ Common, gắn chặt tài khoản)", "quests.rewardCoin": "{n} Coin", "quests.claimedOk": "Đã nhận thưởng: {r}", "quests.task.OPEN_PACK": "Mở tổng cộng {n} pack", "quests.task.VERIFY_PHONE": "Xác thực số điện thoại", "quests.progress": "{a}/{b}", "packs.basic": "Pack cơ bản", "reason.NEWBIE_QUEST": "Thưởng nhiệm vụ Tân thủ",
+  "err.QUEST_EXPIRED": "Nhiệm vụ Tân thủ đã kết thúc.", "err.QUEST_NOT_AVAILABLE": "Ngày này chưa đến.", "err.QUEST_NOT_COMPLETE": "Hãy hoàn thành mọi nhiệm vụ của ngày này trước.", "err.QUEST_ALREADY_CLAIMED": "Phần thưởng này đã được nhận.",
   "common.loading": "Đang tải…", "common.retry": "Thử lại", "common.close": "Đóng", "common.cancel": "Hủy", "common.next": "Tiếp", "common.skip": "Bỏ qua", "common.all": "Tất cả", "common.search": "Tìm theo tên",
   "common.coin": "Coin", "common.gem": "Gem", "common.soulbound": "Gắn chặt tài khoản", "common.empty": "Chưa có gì ở đây.", "common.copy": "Sao chép", "common.copied": "Đã chép", "common.cards": "{n} thẻ",
   "common.language": "Ngôn ngữ", "common.verified": "Đã xác thực", "common.unverified": "Chưa xác thực", "common.save": "Lưu",
@@ -80,6 +88,10 @@ export const vi: Dict = {
 export const zhHans: Dict = {
   "app.tagline": "收集心之回响。",
   "nav.home": "首页", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔炼炉", "nav.wallet": "钱包", "nav.account": "账户", "nav.logout": "退出登录",
+  "nav.quests": "任务",
+  "quests.title": "新手任务", "quests.sub": "创建账户后的 7 天内完成每天的任务。错过的天数可在第 7 天结束前补做。", "quests.day": "第 {n} 天", "quests.today": "今天", "quests.claim": "领取奖励", "quests.claimed": "已领取", "quests.locked": "未开始", "quests.expired": "新手任务已结束。",
+  "quests.rewardPack": "1 个基础卡包（5 张普通卡，绑定账户）", "quests.rewardCoin": "{n} 金币", "quests.claimedOk": "已领取奖励：{r}", "quests.task.OPEN_PACK": "累计开启 {n} 个卡包", "quests.task.VERIFY_PHONE": "验证手机号", "quests.progress": "{a}/{b}", "packs.basic": "基础卡包", "reason.NEWBIE_QUEST": "新手任务奖励",
+  "err.QUEST_EXPIRED": "新手任务已结束。", "err.QUEST_NOT_AVAILABLE": "这一天尚未开始。", "err.QUEST_NOT_COMPLETE": "请先完成当天所有任务。", "err.QUEST_ALREADY_CLAIMED": "该奖励已领取。",
   "common.loading": "加载中…", "common.retry": "重试", "common.close": "关闭", "common.cancel": "取消", "common.next": "下一步", "common.skip": "跳过", "common.all": "全部", "common.search": "按名称搜索",
   "common.coin": "Coin", "common.gem": "Gem", "common.soulbound": "账号绑定", "common.empty": "这里还没有内容。", "common.copy": "复制", "common.copied": "已复制", "common.cards": "{n} 张卡",
   "common.language": "语言", "common.verified": "已验证", "common.unverified": "未验证", "common.save": "保存",
@@ -118,6 +130,10 @@ export const zhHans: Dict = {
 export const zhHant: Dict = {
   "app.tagline": "收集心之迴響。",
   "nav.home": "首頁", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔煉爐", "nav.wallet": "錢包", "nav.account": "帳戶", "nav.logout": "登出",
+  "nav.quests": "任務",
+  "quests.title": "新手任務", "quests.sub": "建立帳戶後的 7 天內完成每天的任務。錯過的天數可在第 7 天結束前補做。", "quests.day": "第 {n} 天", "quests.today": "今天", "quests.claim": "領取獎勵", "quests.claimed": "已領取", "quests.locked": "未開始", "quests.expired": "新手任務已結束。",
+  "quests.rewardPack": "1 個基礎卡包（5 張普通卡，綁定帳戶）", "quests.rewardCoin": "{n} 金幣", "quests.claimedOk": "已領取獎勵：{r}", "quests.task.OPEN_PACK": "累計開啟 {n} 個卡包", "quests.task.VERIFY_PHONE": "驗證手機號", "quests.progress": "{a}/{b}", "packs.basic": "基礎卡包", "reason.NEWBIE_QUEST": "新手任務獎勵",
+  "err.QUEST_EXPIRED": "新手任務已結束。", "err.QUEST_NOT_AVAILABLE": "這一天尚未開始。", "err.QUEST_NOT_COMPLETE": "請先完成當天所有任務。", "err.QUEST_ALREADY_CLAIMED": "該獎勵已領取。",
   "common.loading": "載入中…", "common.retry": "重試", "common.close": "關閉", "common.cancel": "取消", "common.next": "下一步", "common.skip": "略過", "common.all": "全部", "common.search": "依名稱搜尋",
   "common.coin": "Coin", "common.gem": "Gem", "common.soulbound": "帳號綁定", "common.empty": "這裡還沒有內容。", "common.copy": "複製", "common.copied": "已複製", "common.cards": "{n} 張卡",
   "common.language": "語言", "common.verified": "已驗證", "common.unverified": "未驗證", "common.save": "儲存",

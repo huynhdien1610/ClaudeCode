@@ -7,7 +7,8 @@ import { PageTitle } from "@/components/Shell";
 import { PackOpening } from "@/components/PackOpening";
 
 export default function PacksPage() {
-  const { t, refresh, fail } = useApp(); const { busy, run } = useAction();
+  const { t, refresh, fail } = useApp();
+  const packLabel = (k: PackInstance["kind"]) => t(k === "welcome" ? "packs.welcome" : k === "basic" ? "packs.basic" : "packs.standard"); const { busy, run } = useAction();
   const [packs, setPacks] = useState<PackInstance[] | null>(null);
   const [opened, setOpened] = useState<{ title: string; res: OpenResult } | null>(null);
   const load = useCallback(() => api.myPacks().then(setPacks).catch(fail), [fail]);
@@ -22,12 +23,12 @@ export default function PacksPage() {
           <div key={p.id} className="panel row" data-testid="pack-item">
             <div className="pack-art" style={{ width: 56, cursor: "default", fontSize: 10 }} aria-hidden>ANIMA</div>
             <div style={{ flex: 1 }}>
-              <h3>{p.kind === "welcome" ? t("packs.welcome") : t("packs.standard")}</h3>
+              <h3>{packLabel(p.kind)}</h3>
               {p.soulbound && <span className="chip">{t("common.soulbound")}</span>}
             </div>
             <button className="btn primary" disabled={busy} data-testid="open-pack" onClick={() => run(async () => {
               const res = await api.open(p.id);
-              setOpened({ title: p.kind === "welcome" ? t("packs.welcome") : t("packs.standard"), res });
+              setOpened({ title: packLabel(p.kind), res });
             })}>{t("packs.open")}</button>
           </div>
         ))}
