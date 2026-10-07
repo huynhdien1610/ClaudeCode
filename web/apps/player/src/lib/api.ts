@@ -82,6 +82,17 @@ export type PaymentOrder = { id: string; packageCode: string; gem: number; amoun
 
 export type DeckView = { id: string; name: string; isDefault: boolean; valid: boolean; violations: { rule: string; message: string }[]; cardInstanceIds: string[]; count: number; updatedAt: string };
 
+export type BattleAnima = { name: string; element: string; defId: number; atk: number; def: number; hp: number; maxHp: number; canAttack: boolean; summoned: boolean } | null;
+export type BattleHandCard = { index: number; defId: number; name: string; element: string; type: string; rarity: string; cost: number; atk: number; def: number; hp: number };
+export type BattleEvent = { seq: number; kind: string; side: "you" | "opponent"; data: Record<string, unknown> };
+export type BattleView = {
+  id: string; status: "InProgress" | "Finished"; phase: "mulligan" | "main" | "finished"; yourTurn: boolean; turn: number; firstPlayer: "you" | "opponent";
+  you: { keeper: number; energy: number; deck: number; mulliganAvailable: boolean; decided: boolean; hand: BattleHandCard[]; field: BattleAnima[]; graveyard: number };
+  opponent: { keeper: number; hand: number; deck: number; field: BattleAnima[]; graveyard: number };
+  result: { won: boolean; reason: string } | null; events: BattleEvent[]; actionCount: number;
+};
+export type BattleSummary = { id: string; status: "InProgress" | "Finished"; won: boolean | null; reason: string | null; createdAt: string };
+
 export const api = {
   register: (b: { email: string; password: string; birthDate: string; country: string; locale: string; timezone: string }) => request<AuthResponse>("POST", "/v1/accounts", b),
   login: (b: { email: string; password: string }) => request<AuthResponse>("POST", "/v1/auth/login", b),
@@ -119,6 +130,10 @@ export const api = {
   saveDeck: (id: string, name: string, cardInstanceIds: string[]) => request<DeckView>("PUT", `/v1/decks/${id}`, { name, cardInstanceIds }),
   deleteDeck: (id: string) => request<void>("DELETE", `/v1/decks/${id}`),
   defaultDeck: (id: string) => request<DeckView>("POST", `/v1/decks/${id}/default`, {}),
+  startPractice: (deckId: string) => request<BattleView>("POST", "/v1/battles/practice", { deckId }),
+  battles: () => request<BattleSummary[]>("GET", "/v1/battles"),
+  battle: (id: string) => request<BattleView>("GET", `/v1/battles/${id}`),
+  battleAct: (id: string, a: { type: string; hand?: number; slot?: number; target?: number }) => request<BattleView>("POST", `/v1/battles/${id}/actions`, a),
   progress: () => request<Progress>("GET", "/v1/collection/progress"),
   card: (id: number, locale: string) => request<Card>("GET", `/v1/cards/${id}?locale=${locale}`),
 

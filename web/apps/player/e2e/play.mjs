@@ -265,7 +265,7 @@ try {
     await page.getByTestId("back-wallet").click();
     await page.waitForURL("**/wallet");
     await page.waitForFunction((v) => { const m = document.querySelector('[data-testid="gem"]')?.textContent?.replace(/\D/g, ""); return Number(m) === v; }, before + 100, { timeout: 8000 });
-    ok((await page.getByTestId("ledger").innerText()).includes("Nạp Gem"), "thiếu dòng Nạp Gem trong lịch sử");
+    await page.waitForFunction(() => document.querySelector('[data-testid="ledger"]')?.textContent?.includes("Nạp Gem"), null, { timeout: 8000 }).catch(() => { throw new Error("thiếu dòng Nạp Gem trong lịch sử"); });
     await page.screenshot({ path: `${SHOTS}/payment.png` });
   });
 
