@@ -15,7 +15,7 @@ Development bật `Dev:MockTopUp` (nạp Gem giả: `POST /v1/dev/topup`) và `I
 | Lệnh | Việc |
 |---|---|
 | `dotnet build backend/Anima.sln` | Build (cảnh báo là lỗi) |
-| `dotnet test backend/Anima.sln` | 204 test (25 đơn vị, 36 kiến trúc, 143 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
+| `dotnet test backend/Anima.sln` | 219 test (32 đơn vị, 39 kiến trúc, 148 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
 | `dotnet format backend/Anima.sln --verify-no-changes` | Kiểm tra định dạng |
 | `UPDATE_OPENAPI=1 dotnet test backend/tests/Anima.IntegrationTests --filter OpenApiContract` | Cập nhật snapshot hợp đồng API khi cố ý đổi API |
 
@@ -43,6 +43,7 @@ backend/
 | Collection | `collection` | Card Instance (serial, `#n/N`), tiến độ set, story theo quyền | BR-SUP-02, US-05.* |
 | Gacha | `gacha` | mua pack idempotent, mở pack, pity, gói chào mừng | BR-PACK-02/04/05/06, BR-NEW-01/04, BR-SUP-04 |
 | Forge | `forge` | rèn 2 → 1, lật thẻ chưa lật, hạn mức ngày | BR-FRG-01 → 07 |
+| Deck | `deck` | bộ bài 30 lá, tối đa 10 bộ, bộ mặc định, kiểm luật BR-DECK-01→04, gỡ thẻ rời trạng thái Owned (BR-DECK-06), `IDeckApi.RequireBattleReadyAsync` cho trận (BR-DECK-07) | BR-DECK-01→07 |
 | Quest | `quest` | nhiệm vụ Tân thủ 7 ngày, nhận thưởng (pack cơ bản gắn chặt tài khoản, 200 Coin ngày 6–7), làm bù đến hết ngày 7 | BR-NEW-03/04/05 |
 | Payment | `payment` | nạp Gem qua cổng web: bảng giá công khai, đơn hàng, webhook ký HMAC idempotent, hoàn tiền thu hồi Gem (có thể âm → Restricted NEGATIVE_GEM, nạp bù tự gỡ); cổng giả lập `sandbox`, cổng thật cài `IPaymentGateway` | BR-WEB-04/05, BR-WAL-02/04, SC-WAL-01/02/06/07/10–15 |
 | Admin | `admin` | đăng nhập quản trị (JWT riêng), 6 vai trò, audit log append-only, tra cứu tài khoản (PII che), khóa/mở, tỷ lệ rơi maker-checker, tham số kinh tế, bồi thường, dashboard | BR-ADM-*, SC-ADM-01..14 |

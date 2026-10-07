@@ -13,6 +13,8 @@ public interface ICollectionApi
     /// <summary>Khóa dòng (FOR UPDATE, theo thứ tự id để tránh deadlock) các thẻ; trả về những thẻ tìm thấy.</summary>
     Task<IReadOnlyList<CardInstance>> LockAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
     Task BurnAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
+    /// <summary>Đọc (không khóa) các thẻ theo id, thuộc bất kỳ chủ nào; thẻ không tồn tại bị bỏ qua.</summary>
+    Task<IReadOnlyList<CardInstance>> GetManyAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
     /// <summary>Số thẻ gắn chặt tài khoản (còn sở hữu) theo Card Definition — dùng cho BR-NEW-05.</summary>
     Task<IReadOnlyDictionary<int, int>> SoulboundCountsAsync(Guid accountId, CancellationToken ct);
 }
@@ -64,6 +66,9 @@ public sealed class CollectionService(IUnitOfWork uow, IClock clock) : ICollecti
 
     public async Task<IReadOnlyList<CardInstance>> LockAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct) =>
         await uow.QueryAsync($"SELECT {Cols} FROM collection.card_instance WHERE id = ANY(@ids) ORDER BY id FOR UPDATE", Map, ct, ("ids", ids.ToArray()));
+
+    public async Task<IReadOnlyList<CardInstance>> GetManyAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct) =>
+        await uow.QueryAsync($"SELECT {Cols} FROM collection.card_instance WHERE id = ANY(@ids)", Map, ct, ("ids", ids.ToArray()));
 
     public Task BurnAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct) =>
         uow.ExecAsync("UPDATE collection.card_instance SET state='Burned' WHERE id = ANY(@ids)", ct, ("ids", ids.ToArray()));

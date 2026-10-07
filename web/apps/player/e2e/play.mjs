@@ -269,6 +269,24 @@ try {
     await page.screenshot({ path: `${SHOTS}/payment.png` });
   });
 
+  await step("Bộ bài: tạo bộ, thêm thẻ (chưa đủ 30 thì báo chưa hợp lệ), lưu, tải lại vẫn còn", async () => {
+    await goto("/decks");
+    await page.getByTestId("deck-new").click();
+    await page.getByTestId("deck-name").fill("Bộ thử E2E");
+    for (let i = 0; i < 3; i++) await page.getByTestId("deck-add").first().click();
+    eq((await page.getByTestId("deck-count").innerText()).trim(), "3/30 lá", "đếm lá");
+    eq(await page.getByTestId("deck-valid").getAttribute("data-valid"), "false", "chưa hợp lệ");
+    ok((await page.getByTestId("deck-editor").innerText()).includes("đúng 30 lá"), "thiếu thông báo luật 30 lá");
+    await page.getByTestId("deck-save").click();
+    await page.getByTestId("deck-item").filter({ hasText: "Bộ thử E2E" }).waitFor();
+    await goto("/decks");
+    const item = page.getByTestId("deck-item").filter({ hasText: "Bộ thử E2E" });
+    await item.waitFor(); ok((await item.innerText()).includes("3/30"), "bộ lưu với 3 lá");
+    await item.click();
+    eq(await page.getByTestId("deck-cards").locator("li").count(), 3, "3 lá trong bộ sau khi tải lại");
+    await page.screenshot({ path: `${SHOTS}/decks.png` });
+  });
+
   await step("Sai mật khẩu hiện thông báo lỗi theo mã (tiếng Việt)", async () => {
     await page.getByRole("button", { name: "Đăng xuất" }).click();
     await page.waitForURL("**/login");
@@ -283,7 +301,7 @@ try {
     await page.getByTestId("password").fill("correct horse");
     await page.getByTestId("submit").click();
     await page.waitForURL("**/home");
-    for (const p of ["/home", "/store", "/quests", "/collection", "/forge", "/wallet", "/account"]) {
+    for (const p of ["/home", "/store", "/quests", "/decks", "/collection", "/forge", "/wallet", "/account"]) {
       await goto(p);
       const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
       ok(sw <= iw + 1, `${p} tràn ngang: ${sw} > ${iw}`);

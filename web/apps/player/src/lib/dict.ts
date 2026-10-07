@@ -2,6 +2,10 @@
 export const en = {
   "app.tagline": "Collect the echoes of the heart.",
   "nav.home": "Home", "nav.store": "Store", "nav.packs": "Packs", "nav.collection": "Collection", "nav.forge": "Forge", "nav.wallet": "Wallet", "nav.account": "Account", "nav.logout": "Log out",
+  "nav.decks": "Decks", "decks.title": "Decks", "decks.sub": "Build up to 10 decks of exactly 30 cards. Only cards you currently own can be used.", "decks.new": "New deck", "decks.name": "Deck name", "decks.save": "Save deck", "decks.delete": "Delete", "decks.setDefault": "Set as default", "decks.isDefault": "Default",
+  "decks.count": "{n}/30 cards", "decks.valid": "Valid", "decks.invalid": "Not ready", "decks.available": "Your cards", "decks.inDeck": "In this deck", "decks.empty": "No decks yet.", "decks.saved": "Deck saved.", "decks.anima": "Anima {a}/24+", "decks.support": "Echo/Sealed Memory {s}/6",
+  "decks.rule.DECK_SIZE": "A deck needs exactly 30 cards.", "decks.rule.DECK_ANIMA_MIN": "At least 24 Anima are required.", "decks.rule.DECK_SUPPORT_MAX": "At most 6 Echo / Sealed Memory cards.", "decks.rule.DECK_COPY_LIMIT": "At most 2 copies of a card (1 for Legendary and Secret Rare).", "decks.rule.DECK_RARITY_LIMIT": "At most 4 Epic, 2 Legendary and 1 Secret Rare.",
+  "err.DECK_LIMIT_REACHED": "You can save at most 10 decks.", "err.DECK_INVALID": "This deck cannot be used in a match.",
   "wallet.buyGem": "Buy Gem", "wallet.buyGemNote": "Pay with the online gateway. Gem is added only after the gateway confirms your payment.", "wallet.buyGo": "Buy", "pay.sandboxTitle": "Sandbox payment", "pay.sandboxNote": "This is a test gateway: no real money is charged. In production you are sent to the real payment page instead.", "pay.order": "Order", "pay.success": "Pay (simulate success)", "pay.fail": "Simulate failure", "pay.status": "Status", "pay.back": "Back to wallet",
   "pay.state.Created": "Waiting for payment", "pay.state.Paid": "Paid — Gem added", "pay.state.Failed": "Payment failed", "pay.state.Refunded": "Refunded", "reason.GEM_TOPUP": "Gem top-up", "reason.GEM_REFUND": "Gem refund", "err.PAYMENT_UNAVAILABLE": "Online top-up is not available right now.",
   "nav.quests": "Quests",
@@ -48,6 +52,10 @@ type Dict = Record<Key, string>;
 export const vi: Dict = {
   "app.tagline": "Sưu tầm tiếng vọng của trái tim.",
   "nav.home": "Trang chủ", "nav.store": "Cửa hàng", "nav.packs": "Pack", "nav.collection": "Bộ sưu tập", "nav.forge": "Lò rèn", "nav.wallet": "Ví", "nav.account": "Tài khoản", "nav.logout": "Đăng xuất",
+  "nav.decks": "Bộ bài", "decks.title": "Bộ bài", "decks.sub": "Lưu tối đa 10 bộ, mỗi bộ đúng 30 lá. Chỉ dùng được thẻ bạn đang sở hữu.", "decks.new": "Bộ mới", "decks.name": "Tên bộ", "decks.save": "Lưu bộ", "decks.delete": "Xóa", "decks.setDefault": "Đặt làm mặc định", "decks.isDefault": "Mặc định",
+  "decks.count": "{n}/30 lá", "decks.valid": "Hợp lệ", "decks.invalid": "Chưa hợp lệ", "decks.available": "Thẻ của bạn", "decks.inDeck": "Trong bộ này", "decks.empty": "Chưa có bộ bài nào.", "decks.saved": "Đã lưu bộ bài.", "decks.anima": "Anima {a}/24+", "decks.support": "Tiếng vọng/Ký ức {s}/6",
+  "decks.rule.DECK_SIZE": "Bộ bài phải có đúng 30 lá.", "decks.rule.DECK_ANIMA_MIN": "Cần ít nhất 24 Anima.", "decks.rule.DECK_SUPPORT_MAX": "Tối đa 6 lá Tiếng vọng / Ký ức phong ấn.", "decks.rule.DECK_COPY_LIMIT": "Mỗi thẻ tối đa 2 bản (Legendary và Secret Rare chỉ 1).", "decks.rule.DECK_RARITY_LIMIT": "Tối đa 4 Epic, 2 Legendary và 1 Secret Rare.",
+  "err.DECK_LIMIT_REACHED": "Bạn chỉ lưu được tối đa 10 bộ bài.", "err.DECK_INVALID": "Bộ bài này chưa dùng được để vào trận.",
   "wallet.buyGem": "Mua Gem", "wallet.buyGemNote": "Thanh toán qua cổng trực tuyến. Gem chỉ được cộng sau khi cổng xác nhận thanh toán của bạn.", "wallet.buyGo": "Mua", "pay.sandboxTitle": "Thanh toán thử (sandbox)", "pay.sandboxNote": "Đây là cổng thử nghiệm: không trừ tiền thật. Ở môi trường thật bạn sẽ được chuyển sang trang thanh toán của cổng.", "pay.order": "Đơn hàng", "pay.success": "Thanh toán (giả lập thành công)", "pay.fail": "Giả lập thất bại", "pay.status": "Trạng thái", "pay.back": "Về ví",
   "pay.state.Created": "Chờ thanh toán", "pay.state.Paid": "Đã thanh toán — đã cộng Gem", "pay.state.Failed": "Thanh toán thất bại", "pay.state.Refunded": "Đã hoàn tiền", "reason.GEM_TOPUP": "Nạp Gem", "reason.GEM_REFUND": "Hoàn tiền nạp Gem", "err.PAYMENT_UNAVAILABLE": "Hiện chưa nạp được Gem trực tuyến.",
   "nav.quests": "Nhiệm vụ",
@@ -92,6 +100,10 @@ export const vi: Dict = {
 export const zhHans: Dict = {
   "app.tagline": "收集心之回响。",
   "nav.home": "首页", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔炼炉", "nav.wallet": "钱包", "nav.account": "账户", "nav.logout": "退出登录",
+  "nav.decks": "牌组", "decks.title": "牌组", "decks.sub": "最多保存 10 套牌组，每套恰好 30 张。只能使用你当前拥有的卡牌。", "decks.new": "新建牌组", "decks.name": "牌组名称", "decks.save": "保存牌组", "decks.delete": "删除", "decks.setDefault": "设为默认", "decks.isDefault": "默认",
+  "decks.count": "{n}/30 张", "decks.valid": "有效", "decks.invalid": "未就绪", "decks.available": "你的卡牌", "decks.inDeck": "本牌组中", "decks.empty": "还没有牌组。", "decks.saved": "牌组已保存。", "decks.anima": "Anima {a}/24+", "decks.support": "回响/封印记忆 {s}/6",
+  "decks.rule.DECK_SIZE": "牌组必须恰好 30 张。", "decks.rule.DECK_ANIMA_MIN": "至少需要 24 张 Anima。", "decks.rule.DECK_SUPPORT_MAX": "回响/封印记忆最多 6 张。", "decks.rule.DECK_COPY_LIMIT": "每张卡最多 2 张（传说和秘稀只能 1 张）。", "decks.rule.DECK_RARITY_LIMIT": "最多 4 张史诗、2 张传说、1 张秘稀。",
+  "err.DECK_LIMIT_REACHED": "最多只能保存 10 套牌组。", "err.DECK_INVALID": "该牌组暂时无法用于对战。",
   "wallet.buyGem": "购买宝石", "wallet.buyGemNote": "通过在线支付网关付款。只有网关确认付款后才会发放宝石。", "wallet.buyGo": "购买", "pay.sandboxTitle": "沙盒支付", "pay.sandboxNote": "这是测试网关，不会扣除真实款项。正式环境会跳转到真实的支付页面。", "pay.order": "订单", "pay.success": "支付（模拟成功）", "pay.fail": "模拟失败", "pay.status": "状态", "pay.back": "返回钱包",
   "pay.state.Created": "等待付款", "pay.state.Paid": "已付款，宝石已到账", "pay.state.Failed": "付款失败", "pay.state.Refunded": "已退款", "reason.GEM_TOPUP": "宝石充值", "reason.GEM_REFUND": "宝石充值退款", "err.PAYMENT_UNAVAILABLE": "暂时无法在线充值。",
   "nav.quests": "任务",
@@ -136,6 +148,10 @@ export const zhHans: Dict = {
 export const zhHant: Dict = {
   "app.tagline": "收集心之迴響。",
   "nav.home": "首頁", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔煉爐", "nav.wallet": "錢包", "nav.account": "帳戶", "nav.logout": "登出",
+  "nav.decks": "牌組", "decks.title": "牌組", "decks.sub": "最多儲存 10 套牌組，每套恰好 30 張。只能使用你目前擁有的卡牌。", "decks.new": "新增牌組", "decks.name": "牌組名稱", "decks.save": "儲存牌組", "decks.delete": "刪除", "decks.setDefault": "設為預設", "decks.isDefault": "預設",
+  "decks.count": "{n}/30 張", "decks.valid": "有效", "decks.invalid": "未就緒", "decks.available": "你的卡牌", "decks.inDeck": "本牌組中", "decks.empty": "還沒有牌組。", "decks.saved": "牌組已儲存。", "decks.anima": "Anima {a}/24+", "decks.support": "迴響/封印記憶 {s}/6",
+  "decks.rule.DECK_SIZE": "牌組必須恰好 30 張。", "decks.rule.DECK_ANIMA_MIN": "至少需要 24 張 Anima。", "decks.rule.DECK_SUPPORT_MAX": "迴響/封印記憶最多 6 張。", "decks.rule.DECK_COPY_LIMIT": "每張卡最多 2 張（傳說和祕稀只能 1 張）。", "decks.rule.DECK_RARITY_LIMIT": "最多 4 張史詩、2 張傳說、1 張祕稀。",
+  "err.DECK_LIMIT_REACHED": "最多只能儲存 10 套牌組。", "err.DECK_INVALID": "該牌組暫時無法用於對戰。",
   "wallet.buyGem": "購買寶石", "wallet.buyGemNote": "透過線上支付閘道付款。只有閘道確認付款後才會發放寶石。", "wallet.buyGo": "購買", "pay.sandboxTitle": "沙盒支付", "pay.sandboxNote": "這是測試閘道，不會扣除真實款項。正式環境會跳轉到真實的支付頁面。", "pay.order": "訂單", "pay.success": "支付（模擬成功）", "pay.fail": "模擬失敗", "pay.status": "狀態", "pay.back": "返回錢包",
   "pay.state.Created": "等待付款", "pay.state.Paid": "已付款，寶石已到帳", "pay.state.Failed": "付款失敗", "pay.state.Refunded": "已退款", "reason.GEM_TOPUP": "寶石儲值", "reason.GEM_REFUND": "寶石儲值退款", "err.PAYMENT_UNAVAILABLE": "目前無法線上儲值。",
   "nav.quests": "任務",

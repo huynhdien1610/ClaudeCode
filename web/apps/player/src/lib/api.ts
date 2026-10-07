@@ -80,6 +80,8 @@ export type QuestClaim = { day: number; rewardType: "BASIC_PACK" | "COIN"; rewar
 export type GemPackage = { code: string; gem: number; priceMinor: number; currency: string };
 export type PaymentOrder = { id: string; packageCode: string; gem: number; amountMinor: number; currency: string; status: "Created" | "Paid" | "Failed" | "Refunded"; createdAt: string; paidAt: string | null; refundedAt: string | null };
 
+export type DeckView = { id: string; name: string; isDefault: boolean; valid: boolean; violations: { rule: string; message: string }[]; cardInstanceIds: string[]; count: number; updatedAt: string };
+
 export const api = {
   register: (b: { email: string; password: string; birthDate: string; country: string; locale: string; timezone: string }) => request<AuthResponse>("POST", "/v1/accounts", b),
   login: (b: { email: string; password: string }) => request<AuthResponse>("POST", "/v1/auth/login", b),
@@ -112,6 +114,11 @@ export const api = {
     const p = new URLSearchParams(); Object.entries(q).forEach(([k, v]) => v && p.set(k, v));
     return request<Collection>("GET", `/v1/collection?${p}`);
   },
+  decks: () => request<DeckView[]>("GET", "/v1/decks"),
+  createDeck: (name: string, cardInstanceIds: string[]) => request<DeckView>("POST", "/v1/decks", { name, cardInstanceIds }),
+  saveDeck: (id: string, name: string, cardInstanceIds: string[]) => request<DeckView>("PUT", `/v1/decks/${id}`, { name, cardInstanceIds }),
+  deleteDeck: (id: string) => request<void>("DELETE", `/v1/decks/${id}`),
+  defaultDeck: (id: string) => request<DeckView>("POST", `/v1/decks/${id}/default`, {}),
   progress: () => request<Progress>("GET", "/v1/collection/progress"),
   card: (id: number, locale: string) => request<Card>("GET", `/v1/cards/${id}?locale=${locale}`),
 
