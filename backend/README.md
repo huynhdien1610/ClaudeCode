@@ -15,7 +15,7 @@ Development bật `Dev:MockTopUp` (nạp Gem giả: `POST /v1/dev/topup`) và `I
 | Lệnh | Việc |
 |---|---|
 | `dotnet build backend/Anima.sln` | Build (cảnh báo là lỗi) |
-| `dotnet test backend/Anima.sln` | 177 test (18 đơn vị, 30 kiến trúc, 129 tích hợp — gồm 38 test Admin): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
+| `dotnet test backend/Anima.sln` | 192 test (25 đơn vị, 33 kiến trúc, 134 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
 | `dotnet format backend/Anima.sln --verify-no-changes` | Kiểm tra định dạng |
 | `UPDATE_OPENAPI=1 dotnet test backend/tests/Anima.IntegrationTests --filter OpenApiContract` | Cập nhật snapshot hợp đồng API khi cố ý đổi API |
 
@@ -43,6 +43,7 @@ backend/
 | Collection | `collection` | Card Instance (serial, `#n/N`), tiến độ set, story theo quyền | BR-SUP-02, US-05.* |
 | Gacha | `gacha` | mua pack idempotent, mở pack, pity, gói chào mừng | BR-PACK-02/04/05/06, BR-NEW-01/04, BR-SUP-04 |
 | Forge | `forge` | rèn 2 → 1, lật thẻ chưa lật, hạn mức ngày | BR-FRG-01 → 07 |
+| Quest | `quest` | nhiệm vụ Tân thủ 7 ngày, nhận thưởng (pack cơ bản gắn chặt tài khoản, 200 Coin ngày 6–7), làm bù đến hết ngày 7 | BR-NEW-03/04/05 |
 | Admin | `admin` | đăng nhập quản trị (JWT riêng), 6 vai trò, audit log append-only, tra cứu tài khoản (PII che), khóa/mở, tỷ lệ rơi maker-checker, tham số kinh tế, bồi thường, dashboard | BR-ADM-*, SC-ADM-01..14 |
 
 Ranh giới module do `Anima.ArchTests` canh: chỉ tham chiếu module được phép, không có vòng, không dùng lớp cài đặt (`*Service`) của module khác, không dùng `System.Random`.

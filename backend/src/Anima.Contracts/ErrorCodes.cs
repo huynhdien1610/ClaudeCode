@@ -61,6 +61,10 @@ namespace Anima.Contracts
         public const string InvalidState = "INVALID_STATE";
         public const string SelfRoleChangeForbidden = "SELF_ROLE_CHANGE_FORBIDDEN";
         public const string ReasonRequired = "REASON_REQUIRED";
+        public const string QuestExpired = "QUEST_EXPIRED";
+        public const string QuestNotAvailable = "QUEST_NOT_AVAILABLE";
+        public const string QuestNotComplete = "QUEST_NOT_COMPLETE";
+        public const string QuestAlreadyClaimed = "QUEST_ALREADY_CLAIMED";
 
         // Thẻ
         public const string CardNotOwned = "CARD_NOT_OWNED";

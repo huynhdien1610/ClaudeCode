@@ -15,6 +15,15 @@ public sealed record PurchaseRequest(string? Currency, int Quantity = 1);
 public sealed record PurchaseResult(IReadOnlyList<Guid> PackInstanceIds, string Currency, long Price, Balances Balances);
 public sealed record OpenedCard(Guid InstanceId, long Serial, string Edition, int EditionNo, string Rarity, bool Soulbound, object Card);
 public sealed record OpenResult(Guid PackInstanceId, string PackCode, IReadOnlyList<OpenedCard> Cards, string MaxRarity, bool Climax, int PityBefore, int PityAfter, bool PityTriggered, object Fairness);
+/// <summary>Người nhận: Quest (đếm nhiệm vụ mở pack).</summary>
+public sealed record PackOpened(Guid AccountId, string Kind) : IDomainEvent;
+
+public interface IGachaApi
+{
+    /// <summary>Cấp một pack cơ bản gắn chặt tài khoản (BR-NEW-03). Trả về id Pack Instance.</summary>
+    Task<Guid> GrantBasicPackAsync(Guid accountId, CancellationToken ct);
+}
+
 public sealed record PackInstanceDto(Guid Id, string PackCode, string Kind, bool Soulbound, DateTimeOffset CreatedAt);
 
 public sealed class GachaModule : IModule
@@ -26,6 +35,7 @@ public sealed class GachaModule : IModule
     {
         s.AddScoped<ICardIssuer, CardIssuer>();
         s.AddScoped<GachaService>();
+        s.AddScoped<IGachaApi>(sp => sp.GetRequiredService<GachaService>());
         s.AddScoped<IStatsContributor, GachaStats>();
         s.AddScoped<IDomainEventHandler<AccountRegistered>, WelcomePackGrant>();
     }
@@ -51,7 +61,7 @@ internal sealed class WelcomePackGrant(GachaService svc) : IDomainEventHandler<A
 }
 
 public sealed class GachaService(IUnitOfWork uow, IClock clock, ICatalogApi catalog, IWalletApi wallet, IFairnessApi fairness, IEconomyApi economy,
-    IIdentityApi identity, ICardIssuer issuer)
+    IIdentityApi identity, ICardIssuer issuer, ICollectionApi collection, IDomainEventPublisher events) : IGachaApi
 {
     private static readonly JsonSerializerOptions J = new(JsonSerializerDefaults.Web);
 
@@ -84,6 +94,14 @@ public sealed class GachaService(IUnitOfWork uow, IClock clock, ICatalogApi cata
     public async Task GrantWelcomePackAsync(Guid acc, CancellationToken ct) =>
         await uow.ExecAsync("INSERT INTO gacha.pack_instance(id,account_id,pack_code,kind,status,soulbound,created_at) VALUES(@id,@a,'welcome','welcome','Unopened',true,@now)", ct,
             ("id", Guid.NewGuid()), ("a", acc), ("now", clock.UtcNow));
+
+    public async Task<Guid> GrantBasicPackAsync(Guid acc, CancellationToken ct)
+    {
+        var id = Guid.NewGuid();
+        await uow.ExecAsync("INSERT INTO gacha.pack_instance(id,account_id,pack_code,kind,status,soulbound,created_at) VALUES(@id,@a,'basic','basic','Unopened',true,@now)", ct,
+            ("id", id), ("a", acc), ("now", clock.UtcNow));
+        return id;
+    }
 
     public async Task<IReadOnlyList<PackInstanceDto>> ListUnopenedAsync(Guid acc, CancellationToken ct) =>
         await uow.QueryAsync("SELECT id,pack_code,kind,soulbound,created_at FROM gacha.pack_instance WHERE account_id=@a AND status='Unopened' ORDER BY created_at, id",
@@ -122,6 +140,18 @@ public sealed class GachaService(IUnitOfWork uow, IClock clock, ICatalogApi cata
             extra["elements"] = chosen;
             for (var slot = 0; slot < 5; slot++)
                 issued.Add(await issuer.IssueAsync(acc, seed, slot, "common", seed.Roll(slot), true, "WELCOME", packInstanceId.ToString(), null, ct, CardTypes.Anima, chosen[slot]));
+        }
+        else if (pi.Kind == "basic")
+        {
+            // BR-NEW-05: 5 Anima Common (có thể trùng hệ), không cho ra bản thứ 3 của một Card Definition trong số thẻ gắn chặt tài khoản.
+            var held = (await collection.SoulboundCountsAsync(acc, ct)).ToDictionary(x => x.Key, x => x.Value);
+            for (var slot = 0; slot < 5; slot++)
+            {
+                var full = held.Where(x => x.Value >= 2).Select(x => x.Key).ToHashSet();
+                var card = await issuer.IssueAsync(acc, seed, slot, "common", seed.Roll(slot), true, "BASIC_PACK", packInstanceId.ToString(), null, ct, CardTypes.Anima, null, full);
+                issued.Add(card);
+                held[card.Definition.Id] = held.GetValueOrDefault(card.Definition.Id) + 1;
+            }
         }
         else
         {
@@ -163,6 +193,7 @@ public sealed class GachaService(IUnitOfWork uow, IClock clock, ICatalogApi cata
             cards.Add(new OpenedCard(x.Instance.Id, x.Instance.Serial, $"#{x.Instance.EditionNo}/{x.Definition.MaxSupply}", x.Instance.EditionNo, x.Definition.Rarity, x.Instance.Soulbound,
                 await catalog.ToPublicAsync(x.Definition, loc, true, ct)));
         var max = ordered[^1].Definition.Rarity;
+        await events.PublishAsync(new PackOpened(acc, pi.Kind), ct);
         return new OpenResult(packInstanceId, pi.Code, cards, max, Rarities.IsEpicPlus(max), pityBefore, pityAfter, pityTriggered,
             new { seedHash = seed.SeedHash, clientSeed = seed.ClientSeed, nonce = seed.Nonce });
     }, ct);

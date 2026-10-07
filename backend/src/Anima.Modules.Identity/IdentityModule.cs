@@ -233,6 +233,7 @@ public sealed partial class IdentityService(IUnitOfWork uow, IFieldCipher cipher
             }
             catch (Npgsql.PostgresException e) when (e.SqlState == "23505") { throw DomainException.Conflict(ErrorCodes.PhoneAlreadyUsed, "Phone number is already used"); }
             await uow.ExecAsync("DELETE FROM identity.otp WHERE account_id=@id", ct, ("id", id));
+            await events.PublishAsync(new PhoneVerified(id), ct);
         }, ct);
         return await GetAsync(id, ct);
     }

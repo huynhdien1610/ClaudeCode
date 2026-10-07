@@ -13,6 +13,8 @@ public interface ICollectionApi
     /// <summary>Khóa dòng (FOR UPDATE, theo thứ tự id để tránh deadlock) các thẻ; trả về những thẻ tìm thấy.</summary>
     Task<IReadOnlyList<CardInstance>> LockAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
     Task BurnAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
+    /// <summary>Số thẻ gắn chặt tài khoản (còn sở hữu) theo Card Definition — dùng cho BR-NEW-05.</summary>
+    Task<IReadOnlyDictionary<int, int>> SoulboundCountsAsync(Guid accountId, CancellationToken ct);
 }
 
 public sealed class CollectionModule : IModule
@@ -46,6 +48,10 @@ public sealed class CollectionService(IUnitOfWork uow, IClock clock) : ICollecti
 {
     private const string Cols = "id,serial,card_definition_id,edition_no,owner_id,state,soulbound,origin_type,origin_id,created_at";
     private static CardInstance Map(Npgsql.NpgsqlDataReader r) => new(r.GetGuid(0), r.GetInt64(1), r.GetInt32(2), r.GetInt32(3), r.GetGuid(4), r.GetString(5), r.GetBoolean(6), r.GetString(7), r.IsDBNull(8) ? null : r.GetString(8), r.GetFieldValue<DateTimeOffset>(9));
+
+    public async Task<IReadOnlyDictionary<int, int>> SoulboundCountsAsync(Guid acc, CancellationToken ct) =>
+        (await uow.QueryAsync("SELECT card_definition_id, count(*)::int FROM collection.card_instance WHERE owner_id=@a AND soulbound AND state <> 'Burned' GROUP BY 1",
+            r => (Id: r.GetInt32(0), N: r.GetInt32(1)), ct, ("a", acc))).ToDictionary(x => x.Id, x => x.N);
 
     public async Task<CardInstance> GrantAsync(Guid accountId, int defId, int editionNo, bool soulbound, string originType, string? originId, CancellationToken ct)
     {

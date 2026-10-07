@@ -176,7 +176,7 @@ public sealed class Player
         return cards;
     }
     public async Task<List<JsonElement>> Collection() => (await Get("/v1/collection"))["items"].EnumerateArray().ToList();
-    public async Task<Guid> OpenWelcomePackAsync() { var l = await Get("/v1/me/packs"); var id = l.Body.EnumerateArray().First(x => x.GetProperty("kind").GetString() == "welcome").GetProperty("id").GetGuid(); Assert.True((await Open(id)).Ok); return id; }
+    public async Task<Guid> OpenWelcomePackAsync() { var l = await Get("/v1/me/packs"); var id = l.Body.EnumerateArray().First(x => x.GetProperty("kind").GetString() == "welcome").GetProperty("id").GetGuid(); var o = await Open(id); Assert.True(o.Ok, o.Body.ToString()); return id; }
 }
 
 /// <summary>Client quản trị đã đăng nhập (tài khoản mẫu theo vai trò do AdminBootstrap tạo khi Admin:SeedDemoUsers).</summary>

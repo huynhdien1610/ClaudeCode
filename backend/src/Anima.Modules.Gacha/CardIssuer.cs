@@ -16,7 +16,7 @@ public sealed record IssuedCard(CardInstance Instance, CardDefinition Definition
 public interface ICardIssuer
 {
     Task<IssuedCard> IssueAsync(Guid accountId, RollSession seed, int slot, string rarity, int rarityRoll, bool soulbound, string originType, string? originId,
-        string? packCodeForOffSale, CancellationToken ct, string? cardType = null, string? element = null);
+        string? packCodeForOffSale, CancellationToken ct, string? cardType = null, string? element = null, IReadOnlySet<int>? excludeCardIds = null);
 }
 
 internal sealed class CardIssuer(ICatalogApi catalog, ICollectionApi collection) : ICardIssuer
@@ -24,12 +24,13 @@ internal sealed class CardIssuer(ICatalogApi catalog, ICollectionApi collection)
     private const int MaxRetries = 8;
 
     public async Task<IssuedCard> IssueAsync(Guid accountId, RollSession seed, int slot, string rarity, int rarityRoll, bool soulbound, string originType, string? originId,
-        string? packCodeForOffSale, CancellationToken ct, string? cardType = null, string? element = null)
+        string? packCodeForOffSale, CancellationToken ct, string? cardType = null, string? element = null, IReadOnlySet<int>? excludeCardIds = null)
     {
         var effective = rarity; string? note = null;
         for (var retry = 0; retry <= MaxRetries; retry++)
         {
             var candidates = await catalog.AvailableCardIdsAsync(effective, ct, cardType, element);
+            if (excludeCardIds is { Count: > 0 }) candidates = candidates.Where(c => !excludeCardIds.Contains(c)).ToList();
             if (candidates.Count == 0)
             {
                 // BR-SUP-04: hết bản của rarity → ngừng bán pack, KHÔNG tự hạ tỷ lệ ngầm. Lần mở đang chạy dùng rarity thấp hơn gần nhất
