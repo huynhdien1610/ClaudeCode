@@ -5,7 +5,7 @@
 | Mã tài liệu | PLAN-ANIMA-001 |
 | Phiên bản | 0.1 (Draft) |
 | Ngày | 2026-10-06 |
-| Đầu vào | [PRD](PRD_ANIMA.md) v0.2, [BRD](BRD_ANIMA.md) v0.3, [BDD](BDD_ANIMA.md) v0.2, [Solution Design](SOLUTION_DESIGN.md) v0.1, [Tech Stack](TECH_STACK.md) v0.3 |
+| Đầu vào | [BRD](BRD_ANIMA.md) v1.0 (baseline), [PRD](PRD_ANIMA.md) v0.5, [BDD](BDD_ANIMA.md) v0.5, [Solution Design](SOLUTION_DESIGN.md) v0.4, [Tech Stack](TECH_STACK.md) v0.6 |
 | Nguồn dữ liệu task | [`.vibe/backlog.json`](../.vibe/backlog.json) — bảng ở mục 8 được sinh bằng `python3 tools/render_sprint_plan.py` |
 | Trạng thái | **Chưa qua gate Intake** — chờ PO định danh và duyệt phạm vi (BRD Q-01, Q-03) |
 
@@ -148,14 +148,20 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 
 ---
 
-## 7. Thay đổi phạm vi đã ghi nhận
+## 7. Baseline yêu cầu và quản lý thay đổi
 
-| CR | Nội dung | Ảnh hưởng |
-|---|---|---|
-| [CR-001](../.vibe/changes/CR-001.json) | Người chơi dùng được cả website (ngoài app mobile); admin là website | BRD v0.3 (mục 4.4, BR-WEB), PRD v0.2, BDD mục 12A, Tech Stack 2.4, thêm sprint S006 và các task web |
-| [CR-003](../.vibe/changes/CR-003.json) | Phát hành toàn cầu; vi, en, zh-Hans, zh-Hant; ma trận tính năng theo quốc gia | BRD v0.5 (4.5, BR-GEO, BR-I18N, NFR-17→19), BDD 12C, SAD 18, Tech Stack 2.5; thêm T113 → T123 |
-| [CR-002](../.vibe/changes/CR-002.json) | Tài sản số: số lượng phát hành, commit–reveal, Lò rèn, quy đổi Gem ↔ Coin (R1); NFT (R2, sau gate pháp lý) | BRD v0.4, BDD v0.3, SAD v0.2 (mục 8, 17), Tech Stack 5.1, Master 2.4/5.7; thêm T099 → T112 và epic R2-E8 → E11 |
-| [CR-004](../.vibe/changes/CR-004.json) | Đấu trường: chỉ số chiến đấu, bộ bài 30 lá, vòng nhân quả 7 hệ, 8 sàn, Cộng minh/Hợp thể, Arena Point; gói chào mừng và nhiệm vụ Tân thủ | BRD v0.6 (10.18 → 10.25, EP-13), BDD 12D, PRD v0.5, SAD 19, Tech Stack 5.2, Master 3.11; thêm T124 → T133 (R1: dữ liệu thẻ, người mới; T133 spike engine), sửa T084; epic R2-E12 → E14, R3-E1 → E3 |
+Nguồn yêu cầu duy nhất: **[BRD](BRD_ANIMA.md) v1.0** (2026-10-07). Vì dự án chưa có code, bốn thay đổi phạm vi trước đây đã được **gộp thẳng vào BRD**; file CR giữ lại để truy vết (trạng thái `MERGED_INTO_BASELINE`).
+
+| Nội dung đã gộp | Vị trí trong BRD v1.0 | Task liên quan | Truy vết |
+|---|---|---|---|
+| Website người chơi dùng chung tài khoản; admin là website | 4.4, BR-WEB, 7.6 | Sprint S006 và các task web | [CR-001](../.vibe/changes/CR-001.json) |
+| Tài sản số: số lượng phát hành, commit–reveal, Lò rèn, quy đổi Gem ↔ Coin (R1); NFT (R2, sau gate pháp lý) | 6, 7.7, 7.8, 8.2, 8.5, BR-SUP, BR-PF, BR-FRG, BR-NFT, EP-11, EP-12 | T099 → T112; epic R2-E8 → E11 | [CR-002](../.vibe/changes/CR-002.json) |
+| Phát hành toàn cầu; vi, en, zh-Hans, zh-Hant; ma trận tính năng theo quốc gia | 4.5, BR-GEO, BR-I18N, NFR-17 → 19 | T113 → T123 | [CR-003](../.vibe/changes/CR-003.json) |
+| Đấu trường, gói chào mừng, nhiệm vụ Tân thủ | 7.9, 8.6, BR-CARD → BR-NEW, EP-13, NFR-20, 21 | T124 → T133, T084; epic R2-E12 → E14, R3-E1 → E3 | [CR-004](../.vibe/changes/CR-004.json) |
+
+**Quy tắc thay đổi từ nay:**
+- Task chưa tới `READY_FOR_DEV`: sửa thẳng BRD (và BDD, PRD nếu ảnh hưởng), tăng phiên bản, ghi một dòng vào bảng lịch sử đầu BRD; cập nhật `.vibe/backlog.json` nếu task đổi.
+- Task đã `READY_FOR_DEV` trở đi: mở CR mới trong `.vibe/changes/`, đánh giá ảnh hưởng tới task và gate trước khi sửa.
 
 ---
 
@@ -412,7 +418,7 @@ Task được phép bắt đầu ngay khi chưa qua Intake: các task kỹ thu�
 | R2-E3 | Profile công khai (SSR trên web) | US-05.5 |
 | R2-E4 | Nhiệm vụ hằng ngày, referral, thành tựu | US-07.3..07.5, BR-REF-* |
 | R2-E5 | Feed, follow, chat, leaderboard | EP-08 |
-| R2-E6 | Đổi Gem → Coin | BR-WAL-05 |
+| R2-E6 | (Đã chuyển lên R1: quy đổi Gem ↔ Coin hai chiều — T103) | BR-WAL-05, BR-WAL-06 |
 | R2-E7 | Điểm danh/ads trên web (nếu PO duyệt Q-32) | BR-WEB-03 |
 | R2-E8 | Smart contract AnimaCards + AnimaCommitments, audit độc lập | BR-NFT-06..08, BR-PF-06, SAD 17 |
 | R2-E9 | Liên kết ví (EIP-4361), KYC, sàng lọc ví | BR-NFT-02, 03, 10 |

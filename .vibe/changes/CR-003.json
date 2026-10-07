@@ -4,18 +4,50 @@
   "requested_by": "Product owner (người dùng phiên làm việc)",
   "requested_at": "2026-10-06",
   "stage_at_request": "BACKLOG (trước READY_FOR_DEV)",
-  "decisions": ["Ngôn ngữ: vi, en, zh (đề xuất zh-Hans + zh-Hant)", "Phát hành toàn cầu, nhiều quốc gia cùng tham gia"],
+  "decisions": [
+    "Ngôn ngữ: vi, en, zh (đề xuất zh-Hans + zh-Hant)",
+    "Phát hành toàn cầu, nhiều quốc gia cùng tham gia"
+  ],
   "impact": {
-    "documents": ["BRD v0.5", "BDD v0.4", "PRD v0.4", "SOLUTION_DESIGN v0.3", "TECH_STACK v0.5", "Master Document v1.3", "SPRINT_PLAN"],
-    "business_rules_added": ["BR-GEO-01..08", "BR-I18N-01..07"],
-    "nfr_changed": ["NFR-08", "NFR-15"],
-    "nfr_added": ["NFR-17", "NFR-18", "NFR-19"],
-    "open_questions_added": ["Q-43..Q-50"],
-    "risks_added": ["RK-17..RK-21"],
+    "documents": [
+      "BRD v0.5",
+      "BDD v0.4",
+      "PRD v0.4",
+      "SOLUTION_DESIGN v0.3",
+      "TECH_STACK v0.5",
+      "Master Document v1.3",
+      "SPRINT_PLAN"
+    ],
+    "business_rules_added": [
+      "BR-GEO-01..08",
+      "BR-I18N-01..07"
+    ],
+    "nfr_changed": [
+      "NFR-08",
+      "NFR-15"
+    ],
+    "nfr_added": [
+      "NFR-17",
+      "NFR-18",
+      "NFR-19"
+    ],
+    "open_questions_added": [
+      "Q-43..Q-50"
+    ],
+    "risks_added": [
+      "RK-17..RK-21"
+    ],
     "schedule": "Nền tảng i18n ngay từ S001–S002 (đỡ phải làm lại); module tuân thủ theo quốc gia ở S004; dịch nội dung song song từ S003"
   },
   "decision_owner": "Product Owner",
   "decision": "APPROVED_BY_PO_IN_SESSION (cần định danh PO chính thức — Q-01)",
-  "open_points": ["Q-43 giản thể/phồn thể", "Q-44 Trung Quốc đại lục", "Q-45 danh sách thị trường"],
-  "invalidated_gates": []
+  "open_points": [
+    "Q-43 giản thể/phồn thể",
+    "Q-44 Trung Quốc đại lục",
+    "Q-45 danh sách thị trường"
+  ],
+  "invalidated_gates": [],
+  "status": "MERGED_INTO_BASELINE",
+  "merged_into": "BRD v1.0 (2026-10-07)",
+  "merge_note": "Chưa có code nên CR được gộp thẳng vào baseline BRD v1.0; file giữ lại để truy vết lịch sử."
 }

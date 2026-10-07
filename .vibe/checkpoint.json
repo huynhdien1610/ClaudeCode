@@ -2,7 +2,7 @@
   "version": "1.1",
   "project_id": "anima",
   "project_name": "ANIMA: Echoes of the Heart",
-  "updated_at": "2026-10-06T00:00:00Z",
+  "updated_at": "2026-10-07T00:00:00Z",
   "phase": "INTAKE",
   "current_sprint": "S001",
   "gates": {
@@ -68,10 +68,17 @@
       "next_action": "Quyết định trước S011; T035 dùng staging tạm"
     }
   ],
-  "open_change_requests": [
-    "CR-001",
-    "CR-002",
-    "CR-003",
-    "CR-004"
-  ]
+  "open_change_requests": [],
+  "requirements_baseline": {
+    "document": "docs/BRD_ANIMA.md",
+    "version": "1.0",
+    "date": "2026-10-07",
+    "merged_change_requests": [
+      "CR-001",
+      "CR-002",
+      "CR-003",
+      "CR-004"
+    ],
+    "change_policy": "Trước READY_FOR_DEV: sửa thẳng BRD và ghi lịch sử phiên bản. Từ READY_FOR_DEV trở đi: mở CR mới, đánh giá ảnh hưởng tới task đã bắt đầu."
+  }
 }

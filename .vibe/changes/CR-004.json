@@ -18,14 +18,41 @@
     "Ghi kèm: Q-44 không phát hành ở Trung Quốc đại lục; Q-47 giữ nguyên tên riêng"
   ],
   "impact": {
-    "documents": ["BRD v0.6", "BDD v0.5", "PRD v0.5", "SOLUTION_DESIGN v0.4", "TECH_STACK v0.6", "Master Document v1.4", "SPRINT_PLAN"],
-    "business_rules_added": ["BR-CARD-01..07", "BR-DECK-01..09", "BR-BTL-01..11", "BR-ELM-01..06", "BR-ARN-01..04", "BR-FUS-01..05", "BR-PVP-01..09", "BR-NEW-01..06"],
-    "open_questions_added": ["Q-51..Q-57"],
-    "questions_resolved": ["Q-44", "Q-47"],
-    "risks_added": ["RK-22..RK-25"],
+    "documents": [
+      "BRD v0.6",
+      "BDD v0.5",
+      "PRD v0.5",
+      "SOLUTION_DESIGN v0.4",
+      "TECH_STACK v0.6",
+      "Master Document v1.4",
+      "SPRINT_PLAN"
+    ],
+    "business_rules_added": [
+      "BR-CARD-01..07",
+      "BR-DECK-01..09",
+      "BR-BTL-01..11",
+      "BR-ELM-01..06",
+      "BR-ARN-01..04",
+      "BR-FUS-01..05",
+      "BR-PVP-01..09",
+      "BR-NEW-01..06"
+    ],
+    "open_questions_added": [
+      "Q-51..Q-57"
+    ],
+    "questions_resolved": [
+      "Q-44",
+      "Q-47"
+    ],
+    "risks_added": [
+      "RK-22..RK-25"
+    ],
     "schedule": "R1: chỉ số trên thẻ, gói chào mừng, nhiệm vụ Tân thủ. R2: battle engine, hướng dẫn, cốt truyện Act 1, luyện tập, giao hữu, xây bộ bài. R3: xếp hạng, cược AP, giải đấu, Draft"
   },
   "decision_owner": "Product Owner",
   "decision": "APPROVED_BY_PO_IN_SESSION (cần định danh PO chính thức — Q-01)",
-  "invalidated_gates": []
+  "invalidated_gates": [],
+  "status": "MERGED_INTO_BASELINE",
+  "merged_into": "BRD v1.0 (2026-10-07)",
+  "merge_note": "Chưa có code nên CR được gộp thẳng vào baseline BRD v1.0; file giữ lại để truy vết lịch sử."
 }

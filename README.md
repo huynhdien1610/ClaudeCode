@@ -8,7 +8,7 @@ Nền tảng sưu tầm thẻ bài số (app mobile + website người chơi + w
 
 - [Master Document](docs/ANIMA_Master_Document.md) — v1.4: tổng quan dự án, mô hình kinh doanh, feature set, thiết kế animation mở pack, hệ thống kinh tế, BRD, IP & câu chuyện, roadmap, kiến trúc & tech stack, Đấu trường.
 - [PRD](docs/PRD_ANIMA.md) — Product Requirements Document v0.5 (Draft): tầm nhìn, persona, North Star, phạm vi MVP, user journey, kế hoạch đo lường, kế hoạch phát hành.
-- [BRD](docs/BRD_ANIMA.md) — Business Requirements Document v0.6 (Draft): mục tiêu, phạm vi theo release, quy trình TO-BE, business rules, kịch bản BDD, phân quyền, dữ liệu, NFR, mâu thuẫn và câu hỏi mở.
+- [BRD](docs/BRD_ANIMA.md) — Business Requirements Document v1.0 — baseline hợp nhất, nguồn yêu cầu duy nhất (Draft, chờ PO duyệt): mục tiêu, phạm vi theo release, quy trình TO-BE, business rules, kịch bản BDD, phân quyền, dữ liệu, NFR, mâu thuẫn và câu hỏi mở.
 - [BDD](docs/BDD_ANIMA.md) — Đặc tả hành vi v0.5 (Draft): 223 kịch bản và 50 sơ đồ kịch bản phủ mọi Business Rule, kèm traceability.
 - [Tech Stack](docs/TECH_STACK.md) — Tech stack v0.6: đã chốt Unity 6 và ASP.NET Core (.NET 10); PostgreSQL, Redis, Firebase; cloud chưa chốt; kiến trúc, tích hợp, CI/CD, ánh xạ NFR.
 - [Solution Design](docs/SOLUTION_DESIGN.md) — v0.4: kiến trúc, cấu trúc repo, module backend, engine Đấu trường, mô hình dữ liệu, API, luồng xử lý, bảo mật, Git contract, chiến lược kiểm thử.

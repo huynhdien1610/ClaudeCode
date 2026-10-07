@@ -4,25 +4,27 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BRD-ANIMA-001 |
-| Phiên bản | 0.6 (Draft) |
-| Ngày | 2026-10-06 |
+| Phiên bản | 1.0 (Baseline hợp nhất — Draft, chờ PO duyệt) |
+| Ngày | 2026-10-07 |
 | Nguồn | [ANIMA_Master_Document.md](ANIMA_Master_Document.md) v1.0 (2026-10-05) |
 | Trạng thái | **DRAFT — Chờ Product Owner xác nhận** |
 | Business owner | Product Owner (chưa định danh — xem Q-01) |
 | Người soạn | Business Analyst |
 | Tài liệu liên quan | [PRD](PRD_ANIMA.md), [BDD](BDD_ANIMA.md), [Tech Stack](TECH_STACK.md), [Solution Design](SOLUTION_DESIGN.md), [Sprint Plan](SPRINT_PLAN.md) |
 
-**Thay đổi v0.6 (2026-10-06) — CR-004:** thêm chế độ **Đấu trường** (đấu bài giữa người chơi và với máy). Thẻ có chỉ số chiến đấu và 3 loại thẻ (BR-CARD), bộ bài 30 lá (BR-DECK), luật trận (BR-BTL), hệ theo nhân quả cảm xúc (BR-ELM), 8 sàn đấu (BR-ARN), Cộng minh và Hợp thể (BR-FUS), chế độ chơi và Arena Point (BR-PVP), người chơi mới (BR-NEW). Đã chốt Q-44 (không phát hành ở Trung Quốc đại lục) và Q-47 (giữ nguyên tên riêng). Câu hỏi mới Q-51 → Q-57, rủi ro RK-22 → RK-25.
+**Baseline v1.0 (2026-10-07):** dự án chưa có code nên mọi thay đổi phạm vi trước đây (CR-001 → CR-004) được **gộp thẳng vào thân tài liệu**. Từ bản này, BRD là nguồn yêu cầu duy nhất; không còn nhãn CR trong các mục. Thay đổi về sau sửa trực tiếp vào BRD và ghi vào bảng lịch sử dưới đây; chỉ mở Change Request khi task liên quan đã bắt đầu code (READY_FOR_DEV trở đi).
 
-**Thay đổi v0.5 (2026-10-06) — CR-003:** phát hành toàn cầu với 3 ngôn ngữ: tiếng Việt, tiếng Anh, tiếng Trung (đề xuất cả giản thể và phồn thể). Thêm mục 4.5 (thị trường, đợt phát hành, ngôn ngữ), nhóm quy tắc theo quốc gia BR-GEO và đa ngôn ngữ BR-I18N (mục 10.16, 10.17), sửa NFR-08, NFR-15, thêm NFR-17 → 19, câu hỏi Q-43 → Q-50, rủi ro RK-17 → RK-21.
+| Phiên bản | Ngày | Nội dung |
+|---|---|---|
+| 0.1 | 2026-10-05 | Bản đầu từ Master Document |
+| 0.2 | 2026-10-06 | Tách lý do hạn chế `FRAUD` / `NEGATIVE_GEM`; BDD tách sang [BDD_ANIMA.md](BDD_ANIMA.md) |
+| 0.3 | 2026-10-06 | Người chơi dùng được cả website (trước là CR-001) |
+| 0.4 | 2026-10-06 | Tài sản số: số lượng phát hành, commit–reveal, Lò rèn, quy đổi Gem ↔ Coin, NFT (trước là CR-002) |
+| 0.5 | 2026-10-06 | Phát hành toàn cầu, 4 ngôn ngữ, ma trận quốc gia (trước là CR-003) |
+| 0.6 | 2026-10-06 | Đấu trường, gói chào mừng, nhiệm vụ Tân thủ (trước là CR-004) |
+| **1.0** | 2026-10-07 | Hợp nhất baseline: bỏ nhãn CR; sửa các chỗ mâu thuẫn giữa phần gốc và phần bổ sung (đổi Gem ↔ Coin, FTUE, phạm vi, trạng thái thẻ); bổ sung luồng Lò rèn, NFT, trận đấu (7.7 → 7.9), vòng đời thẻ chưa lật và trận đấu (8.5, 8.6), thực thể, tích hợp, API, NFR còn thiếu |
 
-**Thay đổi v0.4 (2026-10-06) — CR-002:** mô hình tài sản số. Thẻ là tài sản duy nhất, có thể rút về ví riêng dưới dạng NFT (R2, sau gate pháp lý). Thêm: số lượng phát hành giới hạn theo mùa (BR-SUP), mở pack và rèn có thể kiểm chứng bằng commit–reveal (BR-PF), Lò rèn 2 thẻ → 1 thẻ chưa lật (BR-FRG), NFT (BR-NFT), quy đổi Gem ↔ Coin hai chiều (BR-WAL-05 sửa). Sửa BR-ECO-01: Gem/Coin vẫn không rút ra tiền; **công ty không bao giờ mua lại thẻ bằng tiền thật hay tiền mã hóa**. Câu hỏi mới Q-36 → Q-42, rủi ro RK-13 → RK-16.
-
-**Thay đổi v0.3 (2026-10-06) — CR-001:** người chơi dùng được cả **website** lẫn app mobile; admin vẫn là website nội bộ. Thêm mục 4.4 (ma trận tính năng theo nền tảng), nhóm quy tắc BR-WEB (mục 10.11), tích hợp cổng thanh toán web, câu hỏi Q-31 → Q-35 và rủi ro RK-12. Bỏ giả định AS-10 "chỉ có app mobile".
-
-**Thay đổi v0.2 (2026-10-06):** tách lý do hạn chế tài khoản thành `FRAUD` và `NEGATIVE_GEM`. Tài khoản bị hạn chế vì số dư Gem âm được nạp bù và tự gỡ hạn chế khi số dư ≥ 0. Bản v0.1 chặn nạp với mọi tài khoản Restricted nên người chơi bị âm Gem không có cách thoát. Bộ kịch bản BDD đầy đủ chuyển sang [BDD_ANIMA.md](BDD_ANIMA.md).
-
-> **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn và mục 16 có 57 câu hỏi (2 đã chốt) cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
+> **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn (1 đã quyết) và mục 16 có 57 câu hỏi (3 đã chốt) cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
 
 ### Quy ước ký hiệu
 
@@ -40,7 +42,7 @@
 | Q | Open Question |
 | RK | Risk |
 
-Mỗi yêu cầu được đánh dấu nguồn: **[MD §x]** = lấy từ Master Document; **[BA]** = BA bổ sung, cần PO duyệt.
+Mỗi yêu cầu được đánh dấu nguồn: **MD** = lấy từ Master Document; **PO** = quyết định của Product Owner trong các buổi làm việc ngày 2026-10-06 (chờ PO định danh ký duyệt — Q-01); **BA** = BA bổ sung, cần PO duyệt. "PO + BA" = PO quyết định hướng, BA chi tiết hóa con số và điều kiện.
 
 ---
 
@@ -69,23 +71,26 @@ Mỗi yêu cầu được đánh dấu nguồn: **[MD §x]** = lấy từ Master
 
 # 1. TÓM TẮT ĐIỀU HÀNH
 
-ANIMA là app mobile (iOS, Android) cho phép người dùng mua, mở, sưu tầm và giao dịch thẻ bài số thuộc IP gốc "ANIMA: Echoes of the Heart". Giá trị cốt lõi:
+ANIMA là nền tảng thẻ bài số gồm **app mobile (iOS, Android)**, **website người chơi** dùng chung tài khoản và **website admin** nội bộ. Người dùng mua, mở, sưu tầm, rèn, giao dịch và đấu bằng thẻ thuộc IP gốc "ANIMA: Echoes of the Heart". Phát hành toàn cầu bằng tiếng Việt, tiếng Anh, tiếng Trung giản thể và phồn thể. Giá trị cốt lõi:
 
 1. **Trải nghiệm mở pack cinematic** — tái tạo cảm giác hồi hộp khi mở thẻ vật lý. [MD §4]
 2. **IP gốc có chiều sâu cảm xúc** — 8 hệ cảm xúc, mỗi thẻ mang một Story Fragment. [MD §7]
 3. **Kinh tế F2P bền vững** — người chơi free kiếm được khoảng 1 pack/tuần qua điểm danh, quảng cáo và nhiệm vụ. [MD §5]
+4. **Thẻ là tài sản số minh bạch** — mỗi thẻ có số thứ tự trong số lượng phát hành giới hạn, kết quả mở pack kiểm chứng được (commit–reveal), thẻ thừa đưa vào Lò rèn; từ R2 thẻ rút được về ví riêng dưới dạng NFT sau gate pháp lý. [PO]
+5. **Thẻ dùng để đấu** — mỗi thẻ có chỉ số chiến đấu; Đấu trường theo vòng nhân quả của 8 hệ cảm xúc mở từ R2. [PO]
 
-Doanh thu đến từ bán pack (60%), quảng cáo rewarded (25%), phí giao dịch P2P (10%) và Battle Pass (5%). [MD §2.1]
+Doanh thu đến từ bán pack (60%), quảng cáo rewarded (25%), phí giao dịch P2P (10%) và Battle Pass (5%) [MD §2.1]; bổ sung phí Lò rèn, phí rút NFT và royalty khi NFT bán lại ở sàn ngoài (R2) [PO]. Tỷ trọng cần Finance tính lại.
 
-Ràng buộc nền tảng: **tiền trong app không bao giờ rút ra được tiền thật**, tỷ lệ rơi thẻ được công khai. Mục đích là giảm rủi ro bị coi là cờ bạc. [MD §2.3]
+Ràng buộc nền tảng: **Gem/Coin không bao giờ rút ra được tiền thật**, **công ty không bao giờ mua lại thẻ**, tỷ lệ rơi và số lượng phát hành được công khai, mọi phần thưởng có giá trị trong Đấu trường do công ty cấp chứ không lấy từ người chơi khác. Mục đích là giảm rủi ro bị coi là cờ bạc hay sản phẩm đầu tư. [MD §2.3 + PO]
 
-**Ba vấn đề cần quyết định trước khi vào thiết kế chi tiết:**
+**Bốn vấn đề cần quyết định trước khi vào thiết kế chi tiết:**
 
 | # | Vấn đề | Tham chiếu |
 |---|---|---|
 | 1 | Thưởng quảng cáo ở thị trường Tier 2 (Việt Nam) cao hơn doanh thu quảng cáo thu về ($0.008 trả cho user so với $0.001–0.004 thu được mỗi view). Mỗi lượt xem ở VN đang lỗ. | CF-04, RK-02 |
 | 2 | Bảng tỷ lệ rơi thẻ BR-01 thiếu bậc Uncommon, trong khi animation và bảng màu có Uncommon. | CF-01 |
 | 3 | Nạp Gem qua thẻ cào và ví điện tử cho hàng hóa số trên iOS/Android có thể vi phạm chính sách thanh toán của App Store và Google Play. | RK-05, Q-20 |
+| 4 | Thẻ rút được về ví và bán ở sàn ngoài có thể khiến mô hình bị xếp vào cờ bạc hoặc sản phẩm đầu tư; luật mỗi thị trường khác nhau. NFT chỉ mở khi có ý kiến pháp lý bằng văn bản. | RK-13, RK-17, Q-41, Q-46 |
 
 ---
 
@@ -100,6 +105,7 @@ Ràng buộc nền tảng: **tiền trong app không bao giờ rút ra được 
 | P-03 | Giao dịch thẻ giữa người sưu tầm qua mạng xã hội, chợ đen | Lừa đảo, không xác thực được thẻ thật/giả |
 | P-04 | Các app thẻ bài số hiện có phần lớn phụ thuộc IP bên thứ ba | Chi phí bản quyền cao, rủi ro pháp lý |
 | P-05 | Người chơi không trả phí ít có cách tham gia sưu tầm lâu dài | Retention thấp ở nhóm free |
+| P-06 | Thẻ số ở nhiều app chỉ để ngắm; người chơi không tin tỷ lệ rơi và không biết thẻ của mình hiếm thật đến đâu | Ít lý do giữ và dùng thẻ; nghi ngờ bị "bóp" tỷ lệ |
 
 ## 2.2. TO-BE (giải pháp)
 
@@ -107,9 +113,10 @@ Ràng buộc nền tảng: **tiền trong app không bao giờ rút ra được 
 |---|---|---|
 | P-01 | Mua pack trực tiếp trong app, mở tức thì | EP-03, EP-04 |
 | P-02 | Thẻ lưu trên server, không hỏng/mất, xem offline | EP-05, NFR-10 |
-| P-03 | Chợ P2P có escrow, lịch sử minh bạch, chống gian lận | EP-06 |
+| P-03 | Chợ P2P có escrow, lịch sử minh bạch, chống gian lận; mỗi thẻ có serial duy nhất, NFT kiểm chứng được trên blockchain (R2) | EP-06, EP-12 |
 | P-04 | IP gốc ANIMA | Mục 7 Master Document |
-| P-05 | Điểm danh, quảng cáo rewarded, nhiệm vụ đổi ra Coin mua pack | EP-07 |
+| P-05 | Điểm danh, quảng cáo rewarded, nhiệm vụ đổi ra Coin mua pack; gói chào mừng và nhiệm vụ Tân thủ | EP-07, EP-13 |
+| P-06 | Commit–reveal, số lượng phát hành công khai `#n/N`, Lò rèn, chỉ số chiến đấu và Đấu trường | EP-11, EP-13 |
 
 ---
 
@@ -143,11 +150,13 @@ Ràng buộc nền tảng: **tiền trong app không bao giờ rút ra được 
 
 ## 4.1. Phạm vi theo release
 
-Master Document có mâu thuẫn giữa "In Scope" (§6.2) và Roadmap (§8.1) — xem CF-02. Bảng dưới đây **đề xuất** chia theo Roadmap; PO cần xác nhận (Q-03).
+Master Document có mâu thuẫn giữa "In Scope" (§6.2) và Roadmap (§8.1) — xem CF-02. Bảng dưới đây chia theo Roadmap cộng các quyết định của PO; PO cần xác nhận toàn bảng (Q-03) và việc có đưa Đấu trường lên sớm hơn không (Q-57).
 
 | Hạng mục | Release 1 — MVP (3–6 tháng) | Release 2 (6–12 tháng) | Release 3 (12–18 tháng) |
 |---|---|---|---|
 | Tài khoản, xác thực, thiết bị | ✔ | | |
+| Website người chơi dùng chung tài khoản (mục 4.4) | ✔ (không có điểm danh/ads) | Chợ, đấu giá, profile, ví NFT trên web | |
+| 4 ngôn ngữ, ma trận tính năng theo quốc gia (mục 4.5) | ✔ | | |
 | Ví Gem/Coin, nạp IAP | ✔ | | |
 | Mua và mở pack, animation 6 giai đoạn | ✔ (animation cơ bản theo rarity) | Nâng cấp cinematic đầy đủ | |
 | Bộ sưu tập, tiến độ set | ✔ | Profile công khai | AR/3D |
@@ -160,33 +169,36 @@ Master Document có mâu thuẫn giữa "In Scope" (§6.2) và Roadmap (§8.1) �
 | Livestream mở pack | | ✔ (CF-03) | |
 | Battle Pass | | | ✔ |
 | Admin: người dùng, thẻ, pack, kinh tế, dashboard | ✔ | Xử lý tranh chấp chợ | |
-| Commit–reveal cho mở pack và rèn (CR-002) | ✔ | Neo cam kết lên blockchain | |
-| Số lượng phát hành giới hạn, mùa (CR-002) | ✔ | | |
-| Lò rèn 2 → 1 (CR-002) | ✔ | | |
-| Quy đổi Gem ↔ Coin hai chiều (CR-002) | ✔ | | |
-| NFT: rút thẻ về ví, nạp lại, royalty, KYC (CR-002) | | ✔ (sau gate pháp lý) | |
-| Chỉ số chiến đấu và 3 loại thẻ trên thẻ; gói chào mừng; nhiệm vụ Tân thủ 7 ngày (CR-004) | ✔ | | |
-| Đấu trường: trận hướng dẫn, cốt truyện Act 1, luyện tập, giao hữu, xây bộ bài (CR-004) | | ✔ | |
-| Đấu trường: xếp hạng, thách đấu cược Arena Point, giải đấu, Draft (CR-004) | | | ✔ |
+| Commit–reveal cho mở pack và rèn | ✔ | Neo cam kết lên blockchain | |
+| Số lượng phát hành giới hạn, mùa | ✔ | | |
+| Lò rèn 2 → 1 | ✔ | | |
+| Quy đổi Gem ↔ Coin hai chiều | ✔ | | |
+| NFT: rút thẻ về ví, nạp lại, royalty, KYC | | ✔ (sau gate pháp lý) | |
+| Chỉ số chiến đấu và 3 loại thẻ trên thẻ; gói chào mừng; nhiệm vụ Tân thủ 7 ngày | ✔ | | |
+| Đấu trường: trận hướng dẫn, cốt truyện Act 1, luyện tập, giao hữu, xây bộ bài | | ✔ | |
+| Đấu trường: xếp hạng, thách đấu cược Arena Point, giải đấu, Draft | | | ✔ |
 
-## 4.2. Out of Scope (toàn dự án giai đoạn đầu) [MD §6.2]
+## 4.2. Out of Scope [MD §6.2 + PO]
 
-- ~~Chơi game đối kháng bằng thẻ~~ — **đưa vào phạm vi R2–R3 theo CR-004** (mục 10.18 → 10.25)
-- Cược bằng Gem, Coin hoặc thẻ giữa người chơi — loại khỏi phạm vi vĩnh viễn (BR-PVP-03, 05)
-- ~~Blockchain/NFT~~ — **đưa vào phạm vi R2 theo CR-002** (mục 10.15), có gate pháp lý
-- **Công ty mua lại thẻ bằng tiền thật hoặc tiền mã hóa** — loại khỏi phạm vi vĩnh viễn (BR-ECO-01)
-- Token/tiền mã hóa riêng của ANIMA; Gem/Coin không đưa lên blockchain
-- AR/3D (đến Release 3)
-- Hợp tác thương hiệu bên thứ ba
-- **Rút tiền ra tiền thật dưới mọi hình thức** (BR-ECO-01)
-- **Bán Gem/Coin/thẻ lấy tiền thật bên ngoài app** — cấm theo điều khoản sử dụng [BA]
-- Ứng dụng desktop cài đặt (Windows/macOS). Website chạy trên trình duyệt **nằm trong phạm vi** (CR-001, mục 4.4)
+**Loại khỏi phạm vi vĩnh viễn:**
+- Rút Gem/Coin ra tiền thật dưới mọi hình thức (BR-ECO-01).
+- Công ty mua lại thẻ bằng tiền thật hoặc tiền mã hóa; cam kết giá hay lợi nhuận (BR-ECO-01).
+- Chuyển Gem/Coin trực tiếp giữa người chơi (BR-ECO-02).
+- Cược bằng Gem, Coin hoặc thẻ giữa người chơi; chỉ được cược Arena Point không có giá trị quy đổi (BR-PVP-03 → 05).
+- Token hay tiền mã hóa riêng của ANIMA; Gem/Coin không đưa lên blockchain.
+- Bán Gem/Coin/thẻ/tài khoản lấy tiền thật bên ngoài nền tảng — cấm theo điều khoản sử dụng [BA].
+- Phát hành ở Trung Quốc đại lục (mục 4.5.2) và ở quốc gia thuộc danh sách trừng phạt (BR-GEO-03).
+
+**Chưa làm ở giai đoạn đầu:**
+- AR/3D (Release 3).
+- Hợp tác thương hiệu bên thứ ba.
+- Ứng dụng desktop cài đặt (Windows/macOS); website chạy trên trình duyệt thì nằm trong phạm vi (mục 4.4).
 
 ## 4.3. Ràng buộc thiết kế UI (xem thêm 4.4)
 
-`ui_required = true`. Toàn bộ EP-01 → EP-09 đều có giao diện người dùng; EP-10 (Admin) có giao diện web nội bộ. BA chỉ quy định ràng buộc nghiệp vụ; bố cục, component và interaction do Product Designer quyết định. Riêng animation mở pack, Master Document §4 đã có spec chi tiết đến từng frame — đây là **design input đã có**, Designer kế thừa và được điều chỉnh, ngoại trừ các ràng buộc nghiệp vụ tại BR-PACK-05 → BR-PACK-08.
+`ui_required = true`. EP-01 → EP-09 và EP-11 → EP-13 có giao diện người dùng trên app và website (theo ma trận mục 4.4); EP-10 (Admin) có giao diện web nội bộ. BA chỉ quy định ràng buộc nghiệp vụ; bố cục, component và interaction do Product Designer quyết định. Riêng animation mở pack, Master Document §4 đã có spec chi tiết đến từng frame — đây là **design input đã có**, Designer kế thừa và được điều chỉnh, ngoại trừ các ràng buộc nghiệp vụ tại BR-PACK-05 → BR-PACK-08.
 
-## 4.4. Nền tảng và ma trận tính năng (CR-001)
+## 4.4. Nền tảng và ma trận tính năng
 
 | Nền tảng | Người dùng | Công nghệ (Solution Design) |
 |---|---|---|
@@ -208,8 +220,12 @@ Một tài khoản dùng chung trên cả app và web (BR-WEB-01).
 | Profile công khai (R2) | ✔ | ✔ — link chia sẻ mở trên web |
 | Chợ, đấu giá (R2) | ✔ | ✔ |
 | Feed, chat, leaderboard (R2) | ✔ | ✔ |
+| Lò rèn, kiểm chứng công bằng, quy đổi Gem ↔ Coin | ✔ | ✔ |
+| Liên kết ví, rút/nạp NFT (R2) | ✘ | ✔ — chỉ trên web (BR-NFT-01) |
+| Gói chào mừng, nhiệm vụ Tân thủ | ✔ | ✔ (nhiệm vụ có điểm danh/ads chỉ làm được trên app) |
+| Xây bộ bài, trận đấu (R2) | ✔ | ✔ |
 
-## 4.5. Thị trường và ngôn ngữ (CR-003)
+## 4.5. Thị trường và ngôn ngữ
 
 ### 4.5.1. Ngôn ngữ
 
@@ -227,12 +243,12 @@ Một tài khoản dùng chung trên cả app và web (BR-WEB-01).
 | Soft launch | Việt Nam | vi | Như kế hoạch PRD mục 10 |
 | Đợt 1 toàn cầu | Đông Nam Á (Singapore, Malaysia, Philippines, Thái Lan, Indonesia), Đài Loan, Hồng Kông | en, zh-Hans, zh-Hant | Thị trường gần, eCPM quảng cáo tốt hơn VN, cộng đồng Hoa ngữ lớn |
 | Đợt 2 | Bắc Mỹ, châu Âu, Úc, Nhật, Hàn | en (+ ngôn ngữ mới nếu PO duyệt) | Cần rà luật loot box và tài sản số từng nước |
-| Không phát hành (đề xuất) | Trung Quốc đại lục | — | Cần giấy phép phát hành game (ISBN), dịch vụ Google/Firebase không hoạt động, cấm giao dịch tài sản mã hóa (Q-44) |
+| Không phát hành (PO đã chốt — Q-44) | Trung Quốc đại lục | — | Cần giấy phép phát hành game (ISBN), dịch vụ Google/Firebase không hoạt động, cấm giao dịch tài sản mã hóa |
 | Chặn hoàn toàn | Quốc gia thuộc danh sách trừng phạt | — | BR-GEO-03 |
 
 ### 4.5.3. Tính năng có thể tắt theo quốc gia
 
-Mua pack bằng tiền, Lò rèn, chợ P2P, NFT, rewarded ads, nạp qua web, quy đổi Coin → Gem. Bật/tắt theo ma trận Legal duyệt cho từng thị trường (BR-GEO-02).
+Mua pack bằng tiền, Lò rèn, chợ P2P, NFT, rewarded ads, nạp qua web, quy đổi Coin → Gem, thách đấu cược Arena Point, phần thưởng theo bộ (BR-GEO-06). Bật/tắt theo ma trận Legal duyệt cho từng thị trường (BR-GEO-02).
 
 ---
 
@@ -258,7 +274,7 @@ Mua pack bằng tiền, Lò rèn, chợ P2P, NFT, rewarded ads, nạp qua web, q
 
 | Actor | Mô tả | Định danh |
 |---|---|---|
-| Guest | Đã cài app, chưa đăng ký | Device ID |
+| Guest | Đã cài app hoặc mở website, chưa đăng ký | Device ID (app) / phiên trình duyệt (web) |
 | Player (chưa xác thực) | Đã đăng ký, chưa xác thực SĐT | Account ID |
 | Verified Player | Đã xác thực SĐT qua OTP | Account ID + SĐT |
 | CS Agent | Nhân viên chăm sóc khách hàng | Tài khoản admin |
@@ -267,17 +283,21 @@ Mua pack bằng tiền, Lò rèn, chợ P2P, NFT, rewarded ads, nạp qua web, q
 | Fraud Analyst | Điều tra gian lận, khóa tài khoản | Tài khoản admin |
 | Finance Viewer | Xem báo cáo doanh thu, đối soát | Tài khoản admin |
 | Super Admin | Quản trị tài khoản admin, phân quyền | Tài khoản admin |
-| Hệ thống (System) | Scheduler, kết thúc đấu giá, reset ngày | — |
+| Hệ thống (System) | Scheduler, kết thúc đấu giá, reset ngày, đồng hồ lượt và kết thúc trận | — |
+| Máy (Bot đối thủ) | Đối thủ trong trận hướng dẫn, cốt truyện, luyện tập | — |
 | App Store / Google Play | Xử lý thanh toán IAP, hoàn tiền | Store transaction ID |
 | Ad Network | AdMob, Unity Ads, AppLovin | Ad transaction ID |
 | SMS/OTP Provider | Gửi OTP | Message ID |
-| Cổng thanh toán web (CR-001) | Thanh toán nạp Gem trên website, gửi IPN/webhook, hoàn tiền | Gateway transaction ID |
+| Cổng thanh toán web | Thanh toán nạp Gem trên website, gửi IPN/webhook, hoàn tiền | Gateway transaction ID |
+| Nhà cung cấp KYC | Xác minh danh tính và tuổi trước khi rút NFT | KYC reference ID |
+| Dịch vụ sàng lọc ví | Kiểm tra ví theo danh sách trừng phạt, rửa tiền | Screening ID |
+| Blockchain (EVM L2) và indexer | Mint, chuyển NFT; báo NFT nạp vào ví lưu ký; neo gốc Merkle | Transaction hash |
 
 ---
 
 # 6. MÔ HÌNH TIỀN TỆ VÀ TÀI SẢN SỐ
 
-Master Document định giá mọi phần thưởng bằng "$" nhưng ví lại dùng Gem và Coin, và chưa nói Gem/Coin dùng vào việc gì. Phần này **đề xuất** một mô hình để thống nhất; tất cả đều là giả định chờ PO và Finance duyệt (AS-01 → AS-04).
+Master Document định giá mọi phần thưởng bằng "$" nhưng ví lại dùng Gem và Coin, và chưa nói Gem/Coin dùng vào việc gì. Phần này thống nhất mô hình. Quy đổi hai chiều đã được PO chốt; con số tỷ lệ, phí và bảng thưởng vẫn là đề xuất chờ PO và Finance duyệt (AS-01 → AS-04). Arena Point là loại điểm riêng, không phải tiền tệ (mục 6.4).
 
 ## 6.1. Định nghĩa tiền tệ [BA]
 
@@ -295,11 +315,11 @@ Master Document định giá mọi phần thưởng bằng "$" nhưng ví lại 
 | 1 Coin | tương đương $0.001 |
 | 1 pack tiêu chuẩn | 1,000 Coin hoặc 100 Gem (≈ $1.00) [MD §5.2: "30 ngày = $1.00 = 1 pack"] |
 | Gem → Coin | 1 Gem = 9 Coin (phí 10%) |
-| Coin → Gem | 11 Coin = 1 Gem (phí ≈ 10%) — **CR-002: PO cho phép hai chiều** |
+| Coin → Gem | 11 Coin = 1 Gem (phí ≈ 10%); PO đã chốt cho đổi hai chiều |
 | 1 slot thẻ trong pack | ≈ 200 Coin (1 pack / 5 thẻ) |
 | Phí rèn | 50 Coin hoặc 5 Gem (≈ $0.05) |
 
-Quy đổi hai chiều do PO quyết định (CR-002, trả lời Q-05). Rủi ro farm Coin bằng bot rồi đổi sang Gem được kiểm soát bằng BR-FRD-*, giới hạn quy đổi theo ngày (BR-WAL-06) và việc Gem/Coin không rút ra tiền thật. Tỷ lệ và phí là tham số kinh tế có version (BR-ECO-03).
+Quy đổi hai chiều do PO quyết định (trả lời Q-05). Rủi ro farm Coin bằng bot rồi đổi sang Gem được kiểm soát bằng BR-FRD-*, giới hạn quy đổi theo ngày (BR-WAL-06) và việc Gem/Coin không rút ra tiền thật. Tỷ lệ và phí là tham số kinh tế có version (BR-ECO-03).
 
 ## 6.3. Bảng quy đổi thưởng F2P sang Coin
 
@@ -314,6 +334,7 @@ Quy đổi hai chiều do PO quyết định (CR-002, trả lời Q-05). Rủi r
 | Nhiệm vụ: mở 1 pack / mua thẻ trên chợ / chia sẻ | $0.01 / $0.01 / $0.02 | 10 / 10 / 20 |
 | Referral (mỗi bạn hợp lệ) | $0.50 | 500 |
 | Đăng nhập lần đầu / hoàn thành tutorial | $0.10 / $0.20 | 100 / 200 |
+| Nhiệm vụ Tân thủ ngày 1 → 5 / ngày 6 → 7 (BR-NEW-03) | — | 1 pack cơ bản mỗi ngày / 200 Coin mỗi ngày (Q-53) |
 
 ## 6.4. Tài sản số
 
@@ -321,14 +342,14 @@ Quy đổi hai chiều do PO quyết định (CR-002, trả lời Q-05). Rủi r
 |---|---|---|
 | Card Definition | Mẫu thẻ: tên, hệ, rarity, art, Story Fragment, set | — |
 | Card Instance | Một bản thẻ cụ thể, serial duy nhất toàn hệ thống, thuộc một edition có số lượng giới hạn (BR-SUP) | Có, qua chợ P2P; rút về ví dưới dạng NFT (BR-NFT, R2) |
-| Thẻ Anima, Tiếng vọng, Ký ức phong ấn (CR-004) | Ba loại thẻ; Anima có chỉ số chiến đấu (BR-CARD) | Như Card Instance |
-| Bộ bài (CR-004) | 30 Card Instance do người chơi chọn và lưu (BR-DECK) | Không |
-| Arena Point (CR-004) | Điểm thi đấu, chỉ đổi vật phẩm gắn chặt tài khoản (BR-PVP-03) | **Không** |
+| Thẻ Anima, Tiếng vọng, Ký ức phong ấn | Ba loại thẻ; Anima có chỉ số chiến đấu (BR-CARD) | Như Card Instance |
+| Bộ bài | 30 Card Instance do người chơi chọn và lưu (BR-DECK) | Không |
+| Arena Point | Điểm thi đấu, chỉ đổi vật phẩm gắn chặt tài khoản (BR-PVP-03) | **Không** |
 | Thẻ chưa lật (Sealed Card) | Kết quả của Lò rèn; lật ra thành một Card Instance theo tỷ lệ rèn công khai | Không |
 | NFT | Card Instance đã rút về ví ngoài; token ID = serial thẻ | Tự do trên blockchain; công ty nhận royalty khi bán lại (BR-NFT-06) |
 | Pack Definition | Loại pack: giá, số thẻ, bảng drop rate (có version) | — |
 | Pack Instance | Một pack đã mua, chưa mở | **Không** [BA — AS-05] |
-| Thẻ độc quyền (streak 100 ngày, sự kiện) | Card Instance gắn cờ "soulbound" | **Không** [BA — AS-06] |
+| Thẻ gắn chặt tài khoản (soulbound) | Card Instance gắn cờ soulbound: thẻ độc quyền streak 100 ngày, sự kiện [BA — AS-06]; thẻ gói chào mừng và pack cơ bản Tân thủ (BR-NEW-04); vật phẩm đổi bằng Arena Point | **Không** niêm yết, rèn, rút NFT; vẫn dùng trong bộ bài |
 
 ---
 
@@ -340,21 +361,26 @@ Bổ sung các luồng còn trống tại Master Document §6.5.
 
 ```mermaid
 flowchart TD
-    A[Guest mở app] --> B{Đã có tài khoản?}
-    B -- Chưa --> C[Đăng ký: email / SĐT / social]
+    A[Guest mở app hoặc website] --> R{Quốc gia bị chặn? BR-GEO-03}
+    R -- Có --> X0[Từ chối: REGION_BLOCKED]
+    R -- Không --> B{Đã có tài khoản?}
+    B -- Chưa --> AG{Đủ tuổi theo ma trận quốc gia? BR-GEO-04}
+    AG -- Không --> X1[Từ chối: AGE_BELOW_MINIMUM]
+    AG -- Có --> C[Đăng ký: email / SĐT / social]
     B -- Có --> D[Đăng nhập]
-    C --> E{Thiết bị đã gắn tài khoản khác?}
+    C --> E{App: thiết bị đã gắn tài khoản khác?}
     E -- Có --> X[Từ chối: BR-ACC-03]
-    E -- Không --> F[Tạo Player chưa xác thực]
-    F --> G[Nhận thưởng đăng nhập lần đầu]
-    G --> H[Tutorial: mở pack miễn phí]
-    H --> I[Nhận thưởng tutorial]
+    E -- Không / Web --> F[Tạo Player chưa xác thực, gán quốc gia pháp lý BR-GEO-01]
+    F --> G[Nhận 100 Coin đăng nhập lần đầu]
+    G --> H[Nhận và mở gói chào mừng: 5 Anima Common, 5 hệ khác nhau BR-NEW-01]
+    H --> H2[R2: trận hướng dẫn với bộ bài mượn BR-NEW-06]
+    H2 --> I[Nhận 200 Coin hoàn thành tutorial; mở nhiệm vụ Tân thủ 7 ngày BR-NEW-03]
     F --> J[Xác thực SĐT bằng OTP]
     J -- Thành công --> K[Verified Player]
     J -- Sai OTP 5 lần --> L[Khóa xác thực 30 phút]
 ```
 
-**Exception:** SĐT đã gắn với tài khoản khác → từ chối, thông báo "Số điện thoại đã được sử dụng". OTP hết hạn sau 5 phút → yêu cầu gửi lại (BR-ACC-05).
+**Exception:** SĐT đã gắn với tài khoản khác → từ chối `PHONE_ALREADY_USED`. OTP hết hạn sau 5 phút → yêu cầu gửi lại (BR-ACC-05). Trên web không có bước gắn thiết bị; đăng nhập trình duyệt mới của tài khoản Verified cần OTP (BR-WEB-02).
 
 ## 7.2. Luồng mua và mở pack
 
@@ -365,15 +391,15 @@ flowchart TD
     C --> D{Đủ số dư?}
     D -- Không --> E[Gợi ý nạp Gem / kiếm Coin]
     D -- Có --> F[Server trừ tiền, tạo Pack Instance]
-    F --> G[Người chơi mở pack]
-    G --> H[Server quay kết quả + áp pity, ghi bất biến]
+    F --> G[Người chơi mở pack; thấy mã băm server seed BR-PF-03]
+    G --> H[Server quay bằng commit–reveal, áp pity, chọn Card Definition còn bản, cấp số #n/N, ghi bất biến]
     H --> I[Thẻ vào bộ sưu tập ngay lập tức]
     I --> J[Client phát animation theo kết quả]
     J --> K{Skip / Fast mode?}
     K -- Có --> L[Màn Summary]
     K -- Không --> M[6 giai đoạn: Entry → Summary]
     M --> L
-    L --> N[Mở pack khác / Chia sẻ / Bán]
+    L --> N[Mở pack khác / Chia sẻ / Bán / Đưa vào Lò rèn]
 ```
 
 **Nguyên tắc then chốt (BR-PACK-02):** kết quả do server quyết định và ghi lại **trước** khi phát animation. Animation, skip, mất mạng hay thoát app giữa chừng không làm thay đổi kết quả. Lần mở app sau, pack đã mở nhưng chưa xem hết animation được phát lại ở màn Summary.
@@ -382,6 +408,7 @@ flowchart TD
 - Mất mạng khi bấm mở → pack vẫn ở trạng thái "Chưa mở", không trừ gì thêm.
 - Mất mạng sau khi server đã quay → kết quả đã ghi; client tải lại khi có mạng.
 - Pack Definition bị ngừng bán sau khi user đã mua → Pack Instance vẫn mở được theo version drop rate tại thời điểm mua (BR-PACK-04).
+- Một rarity trong pack hết bản → pack tự ngừng bán `PACK_SUPPLY_EXHAUSTED` cho tới khi có version tỷ lệ mới (BR-SUP-04).
 
 ## 7.3. Luồng kiếm Coin F2P
 
@@ -437,16 +464,78 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Chọn gói Gem] --> B[Thanh toán qua App Store / Google Play]
+    A[Chọn gói Gem] --> P{Nền tảng}
+    P -- App --> B[Thanh toán qua App Store / Google Play]
+    P -- Web --> W[Chuyển sang cổng thanh toán web]
+    W --> W2[Cổng gửi IPN có chữ ký / server tự truy vấn trạng thái BR-WEB-04]
+    W2 --> D
     B --> C[App gửi receipt lên server]
     C --> D{Server xác thực receipt với store}
     D -- Hợp lệ, chưa xử lý --> E[Cộng Gem, ghi ledger]
     D -- Đã xử lý trước đó --> F[Trả kết quả cũ, không cộng lại]
     D -- Không hợp lệ --> G[Từ chối, ghi log]
-    H[Store gửi thông báo hoàn tiền / chargeback] --> I{Gem còn đủ?}
+    H[Store / cổng web gửi thông báo hoàn tiền, chargeback] --> I{Gem còn đủ?}
     I -- Đủ --> J[Thu hồi Gem]
     I -- Không đủ --> K[Số dư Gem âm, hạn chế mua & giao dịch]
 ```
+
+## 7.7. Luồng Lò rèn
+
+```mermaid
+flowchart TD
+    A[Chọn 2 Card Instance] --> B{Cả 2 rèn được? BR-FRG-05}
+    B -- Không --> X[Từ chối: CARD_NOT_FORGEABLE]
+    B -- Có --> C[Xem bảng tỷ lệ rèn và số bản còn lại]
+    C --> D[Chọn trả 50 Coin hoặc 5 Gem]
+    D --> E{Đủ số dư, chưa vượt hạn mức ngày? BR-FRG-07}
+    E -- Không --> Y[Từ chối: INSUFFICIENT_BALANCE / FORGE_DAILY_LIMIT]
+    E -- Có --> F[Một giao dịch: hủy 2 thẻ, trừ phí, tạo thẻ chưa lật]
+    F --> G[Người chơi lật thẻ]
+    G --> H[Server quay commit–reveal theo tỷ lệ rèn, chọn thẻ mùa hiện tại còn bản]
+    H --> I[Card Instance mới #n/N vào bộ sưu tập]
+```
+
+## 7.8. Luồng rút thẻ về ví NFT và nạp lại (R2, chỉ trên website)
+
+```mermaid
+flowchart TD
+    A[Player Verified mở Ví NFT trên web] --> K{Đã KYC, ≥ 18 tuổi, NFT bật ở quốc gia?}
+    K -- Không --> X[Từ chối: KYC_REQUIRED / FEATURE_NOT_AVAILABLE_IN_REGION]
+    K -- Có --> L{Đã liên kết ví?}
+    L -- Chưa --> L2[Ký thông điệp chứng minh quyền sở hữu; sàng lọc ví BR-NFT-03, 10]
+    L2 --> M
+    L -- Rồi --> M[Chọn thẻ Owned, không soulbound]
+    M --> N{Qua thời gian chờ 30 ngày, hết hạn hoàn tiền? BR-NFT-02}
+    N -- Không --> Y[Từ chối: WITHDRAW_COOLDOWN]
+    N -- Có --> O[Trừ phí rút; thẻ sang Withdrawing]
+    O --> P{Giao dịch mint được xác nhận?}
+    P -- Có --> Q[In Wallet: NFT trong ví người chơi]
+    P -- Thất bại / quá hạn --> R[Trả thẻ về Owned, hoàn phí]
+    Q --> S[Người chơi gửi NFT vào ví lưu ký ANIMA từ ví đã liên kết]
+    S --> T[Indexer thấy đủ xác nhận → thẻ về Owned của tài khoản liên kết BR-NFT-05]
+```
+
+## 7.9. Luồng trận đấu (R2–R3)
+
+```mermaid
+flowchart TD
+    A[Chọn chế độ: luyện tập / giao hữu / R3 xếp hạng, cược AP] --> B{Có bộ 30 lá hợp lệ? BR-DECK-07}
+    B -- Không --> X[Từ chối: DECK_INVALID]
+    B -- Có --> C{Xếp hạng?}
+    C -- Có --> D[Ghép trận Glicko-2; không ghép tài khoản liên kết BR-PVP-06]
+    D --> E[Công bố sàn; 15 giây chọn bộ, hết giờ dùng bộ mặc định BR-ARN-04]
+    C -- Không --> E2[Người thách đấu chọn sàn; máy hoặc bạn bè vào trận]
+    E --> F[Khóa thẻ trong bộ BR-DECK-08; giữ AP cược nếu có]
+    E2 --> F
+    F --> G[Chọn người đi trước bằng commit–reveal; bốc 5, đổi tay 1 lần]
+    G --> H[Lượt: bốc 1, Cộng hưởng = min n, 6; ra thẻ, úp bẫy, tấn công, Hợp thể; 20 giây]
+    H --> I{Keeper ≤ 0 / hết bài / đầu hàng / mất kết nối > 60 giây / 3 lần hết giờ?}
+    I -- Chưa --> H
+    I -- Có --> J[Server ghi kết quả và log hành động để phát lại]
+    J --> K[Mở khóa thẻ; cập nhật rating, AP, nhiệm vụ]
+```
+
+**Exception:** mất kết nối ≤ 60 giây → vào lại trận, đồng hồ lượt vẫn chạy; trận cược bị hủy trước khi bắt đầu → hoàn AP (BR-PVP-04); server mất node giữa trận → dựng lại trận từ log hành động, không đổi kết quả đã ghi.
 
 ---
 
@@ -489,10 +578,16 @@ Chuyển trạng thái bị từ chối: Banned → Pending Deletion (phải gi�
 | Withdrawing | In Wallet | Giao dịch mint/chuyển trên blockchain được xác nhận |
 | Withdrawing | Owned | Giao dịch blockchain thất bại hoặc quá hạn |
 | In Wallet | Owned (chủ mới hoặc cũ) | NFT được gửi vào ví lưu ký của ANIMA và ví gửi đã liên kết với tài khoản (BR-NFT-05) |
+| Owned | In Match | Thẻ thuộc bộ bài đang dùng khi trận bắt đầu (BR-DECK-08) |
+| In Match | Owned | Trận kết thúc hoặc bị hủy |
 
-Chuyển bị từ chối (CR-002): Burned → bất kỳ; In Wallet → Listed/In Auction/Burned (phải nạp lại trước); Locked/soulbound → Withdrawing.
-
-Chuyển bị từ chối: Listed → In Auction (phải hủy niêm yết trước); In Auction → Owned bởi Seller khi đã có bid; mọi chuyển đổi với thẻ soulbound sang Listed/In Auction.
+Chuyển bị từ chối:
+- Listed → In Auction (phải hủy niêm yết trước); In Auction → Owned bởi Seller khi đã có bid.
+- Burned → bất kỳ trạng thái nào.
+- In Wallet → Listed / In Auction / Burned / In Match (phải nạp lại trước).
+- Thẻ soulbound → Listed / In Auction / Burned / Withdrawing.
+- Locked → Withdrawing / In Match.
+- In Match → Listed / In Auction / Burned / Withdrawing (`CARD_IN_MATCH`).
 
 ## 8.3. Pack Instance
 
@@ -504,12 +599,37 @@ Chuyển bị từ chối: Listed → In Auction (phải hủy niêm yết trư�
 
 Chuyển bị từ chối: Opened → bất kỳ trạng thái nào khác.
 
+Gói chào mừng và pack cơ bản Tân thủ là Pack Instance cấp miễn phí, theo cùng vòng đời; thẻ mở ra mang cờ soulbound (BR-NEW-04).
+
 ## 8.4. Listing và Auction
 
 | Đối tượng | Trạng thái |
 |---|---|
 | Listing | Active → Sold / Cancelled / Expired / Removed (bởi admin) |
 | Auction | Active → Ended-Sold → Settled; Active → Ended-NoBid; Active → Cancelled (chỉ khi chưa có bid, hoặc admin hủy) |
+
+## 8.5. Thẻ chưa lật (Sealed Card)
+
+| Từ | Đến | Điều kiện |
+|---|---|---|
+| — | Sealed | Rèn thành công (BR-FRG-01) |
+| Sealed | Revealed | Người chơi lật; server quay và tạo Card Instance mới |
+
+Thẻ Sealed không giao dịch, không rút, không rèn (BR-FRG-06). Revealed là trạng thái cuối.
+
+## 8.6. Trận đấu (Match)
+
+| Từ | Đến | Điều kiện |
+|---|---|---|
+| — | Queued | Vào hàng chờ xếp hạng (R3) |
+| Queued | Matched | Ghép được đối thủ |
+| Queued | Cancelled | Người chơi rời hàng chờ |
+| — / Matched | Deck Select | Giao hữu, luyện tập: tạo trận; xếp hạng: công bố sàn |
+| Deck Select | In Progress | Hai bên có bộ hợp lệ (hết 15 giây thì dùng bộ mặc định) |
+| Deck Select | Cancelled | Một bên không có bộ mặc định hợp lệ; hoàn AP cược, không phạt |
+| In Progress | Finished | Có người thắng theo BR-BTL-07 |
+
+Chuyển bị từ chối: Finished → bất kỳ; Cancelled → bất kỳ. Kết quả Finished chỉ bị thu hồi phần thưởng (không đổi kết quả) khi Fraud Analyst xác định dàn xếp trận (BR-PVP-07).
 
 ---
 
@@ -536,7 +656,7 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 | US-02.1 | Là Player, tôi muốn xem số dư Gem và Coin | Số dư khớp ledger; cập nhật ngay sau giao dịch | FR-07 | R1 |
 | US-02.2 | Là Player, tôi muốn nạp Gem | Chỉ cộng Gem sau khi server xác thực receipt (BR-WAL-02) | FR-08 | R1 |
 | US-02.3 | Là Player, tôi muốn xem lịch sử giao dịch | Hiển thị mọi biến động: thời gian, loại, số tiền, số dư sau; lưu ≥ 24 tháng hiển thị cho user | FR-09 | R1 |
-| US-02.4 | Là Player, tôi muốn đổi Gem sang Coin | Theo tỷ lệ cấu hình, có phí; một chiều (Q-05) | FR-10 | R2 |
+| US-02.4 | Là Player, tôi muốn đổi Gem ↔ Coin hai chiều | Theo tỷ lệ cấu hình, làm tròn xuống, có phí; Coin → Gem cần xác thực SĐT và có hạn mức ngày (BR-WAL-05, 06) | FR-10 | R1 |
 
 ## EP-03 — Mua Pack (FR-11)
 
@@ -626,41 +746,43 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 | US-10.4 | Là CS Agent, tôi muốn xử lý tranh chấp giao dịch | Theo BR-MKT-11 | FR-53 | R2 |
 | US-10.5 | Là Finance Viewer / PO, tôi muốn dashboard DAU, MAU, doanh thu | Số liệu trễ tối đa 1 giờ (Q-30) | FR-54 | R1 |
 | US-10.6 | Là Economy Manager, tôi muốn điều chỉnh tỷ lệ thưởng | Thay đổi có hiệu lực từ thời điểm áp dụng, không hồi tố; cần duyệt (BR-ADM-02) | FR-55 | R1 |
-| US-10.7 | Là Content Manager, tôi muốn tạo mùa và đặt số lượng phát hành từng thẻ | Số lượng không đổi được sau khi mùa mở bán; cần Super Admin duyệt (BR-SUP-01, BR-ADM-02) | CR-002 | R1 |
+| US-10.7 | Là Content Manager, tôi muốn tạo mùa và đặt số lượng phát hành từng thẻ | Số lượng không đổi được sau khi mùa mở bán; cần Super Admin duyệt (BR-SUP-01, BR-ADM-02) | — | R1 |
+| US-10.8 | Là Economy Manager, tôi muốn bật/tắt tính năng theo quốc gia | Thay đổi cần maker-checker và Legal duyệt; có hiệu lực ngay ở backend (BR-GEO-02) | — | R1 |
+| US-10.9 | Là Content Manager, tôi muốn nhập chỉ số chiến đấu, mạch truyện, công thức Hợp thể cho thẻ | Kiểm tra khung chỉ số (BR-CARD-03); khóa sửa sau khi phát hành (BR-CARD-06) | — | R1 |
+| US-10.10 | Là Economy Manager, tôi muốn quản lý thể thức, danh sách cấm và mùa xếp hạng | Danh sách cấm công bố trước ≥ 7 ngày; maker-checker (BR-PVP-08) | — | R3 |
 
-## EP-11 — Lò rèn & Kiểm chứng công bằng (CR-002)
-
-| ID | User Story | AC chính | Nguồn | Release |
-|---|---|---|---|---|
-| US-11.1 | Là Player, tôi muốn đưa 2 thẻ không cần vào Lò rèn để nhận 1 thẻ chưa lật | 2 thẻ bị hủy; trừ phí đúng loại tiền đã chọn; thẻ chưa lật xuất hiện ngay (BR-FRG-01, 02) | CR-002 | R1 |
-| US-11.2 | Là Player, tôi muốn xem tỷ lệ rèn trước khi rèn | Bảng tỷ lệ rèn và số bản còn lại hiển thị trước khi xác nhận (BR-FRG-03, BR-SUP-01) | CR-002 | R1 |
-| US-11.3 | Là Player, tôi muốn kiểm tra kết quả mở pack/lật thẻ rèn là công bằng | Xem mã băm seed trước khi quay; đổi seed để nhận seed cũ; công cụ kiểm tra tính lại đúng kết quả (BR-PF-*) | CR-002 | R1 |
-| US-11.4 | Là Player, tôi muốn biết thẻ của tôi là bản số mấy trên tổng số bao nhiêu | Hiển thị `#37/100` và tổng đã hủy (BR-SUP-02, 06) | CR-002 | R1 |
-| US-11.5 | Là Player, tôi muốn đổi Gem ↔ Coin | Theo tỷ lệ cấu hình, làm tròn xuống, có hạn mức (BR-WAL-05, 06) | CR-002 | R1 |
-
-## EP-12 — NFT (CR-002, R2, sau gate pháp lý)
+## EP-11 — Lò rèn, Kiểm chứng công bằng, Số lượng phát hành
 
 | ID | User Story | AC chính | Nguồn | Release |
 |---|---|---|---|---|
-| US-12.1 | Là Player đã KYC, tôi muốn liên kết ví blockchain với tài khoản | Ký thông điệp chứng minh quyền sở hữu; 1 ví ↔ 1 tài khoản; ví qua sàng lọc (BR-NFT-03, 10) | CR-002 | R2 |
-| US-12.2 | Là Player, tôi muốn rút một thẻ về ví của mình dưới dạng NFT | Đủ điều kiện BR-NFT-02; trừ phí; thẻ chuyển Withdrawing → In Wallet khi chuỗi xác nhận | CR-002 | R2 |
-| US-12.3 | Là Player, tôi muốn nạp NFT từ ví vào lại tài khoản để chơi, rèn hoặc bán trên chợ | Thẻ về Owned sau đủ xác nhận (BR-NFT-05) | CR-002 | R2 |
-| US-12.4 | Là người mua ở sàn ngoài, tôi muốn kiểm chứng thẻ là thật và duy nhất | Token trên contract chính thức, metadata trên IPFS có mã băm (BR-NFT-07, 08) | CR-002 | R2 |
+| US-11.1 | Là Player, tôi muốn đưa 2 thẻ không cần vào Lò rèn để nhận 1 thẻ chưa lật | 2 thẻ bị hủy; trừ phí đúng loại tiền đã chọn; thẻ chưa lật xuất hiện ngay (BR-FRG-01, 02) | PO | R1 |
+| US-11.2 | Là Player, tôi muốn xem tỷ lệ rèn trước khi rèn | Bảng tỷ lệ rèn và số bản còn lại hiển thị trước khi xác nhận (BR-FRG-03, BR-SUP-01) | PO | R1 |
+| US-11.3 | Là Player, tôi muốn kiểm tra kết quả mở pack/lật thẻ rèn là công bằng | Xem mã băm seed trước khi quay; đổi seed để nhận seed cũ; công cụ kiểm tra tính lại đúng kết quả (BR-PF-*) | PO | R1 |
+| US-11.4 | Là Player, tôi muốn biết thẻ của tôi là bản số mấy trên tổng số bao nhiêu | Hiển thị `#37/100` và tổng đã hủy (BR-SUP-02, 06) | PO | R1 |
 
-## EP-13 — Đấu trường (CR-004)
+## EP-12 — NFT (R2, sau gate pháp lý, chỉ trên website)
 
 | ID | User Story | AC chính | Nguồn | Release |
 |---|---|---|---|---|
-| US-13.1 | Là Player, tôi muốn xem chỉ số chiến đấu, loại thẻ, mạch truyện và công thức Hợp thể trên mỗi thẻ | Hiển thị đủ BR-CARD-02 | CR-004 | R1 |
-| US-13.2 | Là người mới, tôi muốn nhận gói chào mừng và làm nhiệm vụ Tân thủ để có đủ 30 lá | BR-NEW-01 → 05 | CR-004 | R1 |
-| US-13.3 | Là người mới, tôi muốn chơi một trận hướng dẫn để hiểu luật ngay | BR-NEW-06 | CR-004 | R2 |
-| US-13.4 | Là Player, tôi muốn xây và lưu tối đa 10 bộ bài 30 lá | Kiểm tra hợp lệ theo BR-DECK-01 → 04 khi lưu và khi vào trận | CR-004 | R2 |
-| US-13.5 | Là Player, tôi muốn chơi cốt truyện Act 1 với máy | Mở khóa story theo tiến độ; phần thưởng do công ty cấp | CR-004 | R2 |
-| US-13.6 | Là Player, tôi muốn đấu giao hữu với bạn và chọn sàn | BR-ARN-04 | CR-004 | R2 |
-| US-13.7 | Là Player, tôi muốn đấu xếp hạng theo mùa | BR-PVP-06, 08 | CR-004 | R3 |
-| US-13.8 | Là Player, tôi muốn thách đấu có cược bằng Arena Point | BR-PVP-03, 04 | CR-004 | R3 |
-| US-13.9 | Là Player, tôi muốn tham gia giải đấu sự kiện | BR-PVP-05 | CR-004 | R3 |
-| US-13.10 | Là Player, tôi muốn xem lại trận đã đấu | BR-BTL-10 | CR-004 | R3 |
+| US-12.1 | Là Player đã KYC, tôi muốn liên kết ví blockchain với tài khoản | Ký thông điệp chứng minh quyền sở hữu; 1 ví ↔ 1 tài khoản; ví qua sàng lọc (BR-NFT-03, 10) | PO | R2 |
+| US-12.2 | Là Player, tôi muốn rút một thẻ về ví của mình dưới dạng NFT | Đủ điều kiện BR-NFT-02; trừ phí; thẻ chuyển Withdrawing → In Wallet khi chuỗi xác nhận | PO | R2 |
+| US-12.3 | Là Player, tôi muốn nạp NFT từ ví vào lại tài khoản để chơi, rèn hoặc bán trên chợ | Thẻ về Owned sau đủ xác nhận (BR-NFT-05) | PO | R2 |
+| US-12.4 | Là người mua ở sàn ngoài, tôi muốn kiểm chứng thẻ là thật và duy nhất | Token trên contract chính thức, metadata trên IPFS có mã băm (BR-NFT-07, 08) | PO | R2 |
+
+## EP-13 — Đấu trường và người chơi mới
+
+| ID | User Story | AC chính | Nguồn | Release |
+|---|---|---|---|---|
+| US-13.1 | Là Player, tôi muốn xem chỉ số chiến đấu, loại thẻ, mạch truyện và công thức Hợp thể trên mỗi thẻ | Hiển thị đủ BR-CARD-02 | PO | R1 |
+| US-13.2 | Là người mới, tôi muốn nhận gói chào mừng và làm nhiệm vụ Tân thủ để có đủ 30 lá | BR-NEW-01 → 05 | PO | R1 |
+| US-13.3 | Là người mới, tôi muốn chơi một trận hướng dẫn để hiểu luật ngay | BR-NEW-06 | PO | R2 |
+| US-13.4 | Là Player, tôi muốn xây và lưu tối đa 10 bộ bài 30 lá | Kiểm tra hợp lệ theo BR-DECK-01 → 04 khi lưu và khi vào trận | PO | R2 |
+| US-13.5 | Là Player, tôi muốn chơi cốt truyện Act 1 với máy | Mở khóa story theo tiến độ; phần thưởng do công ty cấp | PO | R2 |
+| US-13.6 | Là Player, tôi muốn đấu giao hữu với bạn và chọn sàn | BR-ARN-04 | PO | R2 |
+| US-13.7 | Là Player, tôi muốn đấu xếp hạng theo mùa | BR-PVP-06, 08 | PO | R3 |
+| US-13.8 | Là Player, tôi muốn thách đấu có cược bằng Arena Point | BR-PVP-03, 04 | PO | R3 |
+| US-13.9 | Là Player, tôi muốn tham gia giải đấu sự kiện | BR-PVP-05 | PO | R3 |
+| US-13.10 | Là Player, tôi muốn xem lại trận đã đấu | BR-BTL-10 | PO | R3 |
 
 ---
 
@@ -670,10 +792,10 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-ACC-01 | (Theo BR-GEO-04 từ CR-003: tuổi lấy theo ma trận quốc gia, mặc định như sau.) Người dùng phải từ 13 tuổi trở lên. Dưới 18 tuổi: cần cơ chế đồng ý của cha mẹ/người giám hộ cho việc nạp tiền và xử lý dữ liệu cá nhân (phạm vi chờ Legal — Q-21). | MD BR-07 + BA |
+| BR-ACC-01 | Tuổi tối thiểu và tuổi cần đồng ý của người giám hộ lấy theo ma trận quốc gia (BR-GEO-04); mặc định từ 13 tuổi trở lên. Dưới 18 tuổi: cần cơ chế đồng ý của cha mẹ/người giám hộ cho việc nạp tiền và xử lý dữ liệu cá nhân (phạm vi chờ Legal — Q-21). Rút NFT yêu cầu đủ 18 tuổi (BR-NFT-02). | MD BR-07 + BA |
 | BR-ACC-02 | Email và SĐT là duy nhất trong toàn hệ thống. Một SĐT chỉ xác thực cho 1 tài khoản. | MD FR-04 |
 | BR-ACC-03 | Áp dụng cho **thiết bị mobile** (phiên web theo BR-WEB-02). Một thiết bị chỉ gắn với 1 tài khoản. Đăng nhập tài khoản khác trên thiết bị đã gắn bị từ chối. Đổi thiết bị: tài khoản được chuyển sang thiết bị mới tối đa 2 lần/30 ngày; thiết bị cũ bị gỡ gắn. | MD BR-08 + BA (Q-06) |
-| BR-ACC-04 | Chỉ Verified Player được: niêm yết, mua trên chợ, đấu giá, nhắn tin, nhận thưởng referral. Player chưa xác thực được: mở pack, điểm danh, xem ads (Q-07). | BA |
+| BR-ACC-04 | Chỉ Verified Player được: niêm yết, mua trên chợ, đấu giá, nhắn tin, nhận thưởng referral, đổi Coin → Gem (BR-WAL-06), thách đấu cược Arena Point, liên kết ví và rút NFT (cần thêm KYC — BR-NFT-02). Player chưa xác thực được: mở pack, điểm danh, xem ads (Q-07), rèn tối đa 5 lần/ngày (BR-FRG-07), chơi trận không cược. | BA + PO |
 | BR-ACC-05 | OTP gồm 6 chữ số, hiệu lực 5 phút, tối đa 5 lần nhập sai; vượt quá thì khóa xác thực 30 phút; tối đa 5 lần gửi OTP/SĐT/ngày. | BA |
 
 ## 10.2. Ví & Ledger (WAL)
@@ -684,15 +806,15 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 | BR-WAL-02 | Gem chỉ được cộng sau khi server xác thực receipt với store. Mỗi store transaction ID chỉ được ghi nhận một lần. | BA |
 | BR-WAL-03 | Số dư Coin không bao giờ âm. Số dư Gem chỉ có thể âm do thu hồi khi hoàn tiền (BR-WAL-04). | BA |
 | BR-WAL-04 | Khi store thông báo hoàn tiền/chargeback: thu hồi đúng số Gem của giao dịch đó. Nếu số dư không đủ, số dư Gem âm và tài khoản chuyển sang Restricted với lý do `NEGATIVE_GEM`; tự gỡ khi nạp bù đến số dư ≥ 0. | BA |
-| BR-WAL-05 | Quy đổi Gem ↔ Coin hai chiều với nền tảng theo tỷ lệ cấu hình (đề xuất 1 Gem → 9 Coin; 11 Coin → 1 Gem). Số đổi ra làm tròn xuống; số lẻ không đủ một đơn vị không bị trừ. | MD FR-10 + CR-002 |
-| BR-WAL-06 | Giới hạn đổi Coin → Gem tối đa 1,000 Gem/ngày/tài khoản; tài khoản chưa xác thực SĐT không được đổi Coin → Gem. | CR-002 (Q-38) |
+| BR-WAL-05 | Quy đổi Gem ↔ Coin hai chiều với nền tảng theo tỷ lệ cấu hình (đề xuất 1 Gem → 9 Coin; 11 Coin → 1 Gem). Số đổi ra làm tròn xuống; số lẻ không đủ một đơn vị không bị trừ. | MD FR-10 + PO |
+| BR-WAL-06 | Giới hạn đổi Coin → Gem tối đa 1,000 Gem/ngày/tài khoản; tài khoản chưa xác thực SĐT không được đổi Coin → Gem. | PO + BA (Q-38) |
 
 ## 10.3. Kinh tế chung (ECO)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-ECO-01 | (Sửa theo CR-002) Gem và Coin không bao giờ rút ra tiền thật, tiền mã hóa hay hàng hóa ngoài nền tảng. **Công ty không mua lại thẻ bằng tiền thật hay tiền mã hóa, không cam kết giá, không hứa lợi nhuận** dưới bất kỳ hình thức nào (giao diện, quảng cáo, điều khoản). Thẻ có thể rút về ví riêng dưới dạng NFT theo BR-NFT. | MD BR-06 + CR-002 |
-| BR-ECO-02 | Gem/Coin không chuyển trực tiếp giữa các tài khoản. Người chơi giao dịch với nhau bằng cách mua bán thẻ trên chợ, thanh toán bằng Gem hoặc Coin. | BA + CR-002 (Q-36) |
+| BR-ECO-01 | Gem và Coin không bao giờ rút ra tiền thật, tiền mã hóa hay hàng hóa ngoài nền tảng. **Công ty không mua lại thẻ bằng tiền thật hay tiền mã hóa, không cam kết giá, không hứa lợi nhuận** dưới bất kỳ hình thức nào (giao diện, quảng cáo, điều khoản). Thẻ có thể rút về ví riêng dưới dạng NFT theo BR-NFT. | MD BR-06 + PO |
+| BR-ECO-02 | Gem/Coin không chuyển trực tiếp giữa các tài khoản. Người chơi giao dịch với nhau bằng cách mua bán thẻ trên chợ, thanh toán bằng Gem hoặc Coin. | BA (Q-36) |
 | BR-ECO-03 | Mọi thay đổi tham số kinh tế (thưởng, phí, giá, drop rate) có version và thời điểm hiệu lực; bản ghi phát sinh trước thời điểm hiệu lực giữ nguyên giá trị cũ. | BA |
 | BR-ECO-04 | Tổng phần thưởng F2P từ quảng cáo không vượt quá 50% doanh thu quảng cáo thực nhận trong tháng (tính theo toàn hệ thống). | MD §2.2 + BA (CF-04) |
 
@@ -701,7 +823,7 @@ Mỗi Epic ánh xạ về FR trong Master Document. AC chi tiết dạng BDD ở
 | ID | Quy tắc | Nguồn |
 |---|---|---|
 | BR-PACK-01 | Tỷ lệ rơi của mỗi Pack Definition được công khai trong app, trước khi thanh toán, khớp chính xác với tỷ lệ server dùng. | MD §2.3 |
-| BR-PACK-02 | Kết quả mở pack do server quyết định bằng bộ sinh số ngẫu nhiên an toàn (CSPRNG) và ghi bất biến **trước** khi client phát animation. Skip, mất mạng hoặc thoát app không đổi kết quả. | BA |
+| BR-PACK-02 | Kết quả mở pack do server quyết định theo cơ chế commit–reveal (BR-PF), với server seed sinh bằng bộ sinh số ngẫu nhiên an toàn (CSPRNG), và ghi bất biến **trước** khi client phát animation. Skip, mất mạng hoặc thoát app không đổi kết quả. | BA |
 | BR-PACK-03 | Tỷ lệ rơi mặc định mỗi slot thẻ: **chờ xác nhận** — xem DT-01 và CF-01. | MD BR-01 |
 | BR-PACK-04 | Pack Instance được mở theo version drop rate tại thời điểm mua. | BA |
 | BR-PACK-05 | **Pity:** mỗi tài khoản có một bộ đếm riêng cho từng Pack Definition. Bộ đếm tăng 1 khi mở pack không có thẻ Legendary hoặc Secret Rare; về 0 khi có. Khi bộ đếm = 49, pack mở kế tiếp (thứ 50) đảm bảo ít nhất 1 thẻ Legendary. | MD BR-02 + BA (Q-09) |
@@ -762,7 +884,7 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 |---|---|---|
 | BR-MKT-01 | Chỉ Verified Player, tài khoản không Restricted, mới được niêm yết/mua/đấu giá. | BA |
 | BR-MKT-02 | Thẻ đang niêm yết hoặc đấu giá bị khóa: không niêm yết lần nữa, không dùng cho mục đích khác. | BA |
-| BR-MKT-03 | Thẻ soulbound không được giao dịch. | BA |
+| BR-MKT-03 | Thẻ soulbound (mục 6.4) không được giao dịch. | BA |
 | BR-MKT-04 | Giá niêm yết nằm trong khoảng sàn/trần cấu hình theo rarity (chống rửa giá trị qua giá cực cao/cực thấp). | BA (Q-19) |
 | BR-MKT-05 | Phí thu từ Seller: 5% với giá cố định, 10% với đấu giá. Phí = làm tròn lên đến đơn vị nguyên. Seller nhận = Giá − Phí. | MD BR-05 + BA |
 | BR-MKT-06 | Listing được định giá bằng đúng một loại tiền (Gem hoặc Coin) do Seller chọn; Buyer thanh toán và Seller nhận bằng chính loại tiền đó. | MD FR-28 + BA |
@@ -790,188 +912,188 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 | BR-ADM-03 | Không thay đổi drop rate của Pack Definition đang bán; phải tạo version mới có thời điểm hiệu lực. | BA |
 | BR-ADM-04 | Admin không được cộng/trừ Gem trực tiếp. Bồi thường cho người chơi chỉ bằng Coin hoặc thẻ, qua maker-checker, kèm mã ticket. | BA |
 
-## 10.11. Đa nền tảng — Website người chơi (WEB) — CR-001
+## 10.11. Đa nền tảng — Website người chơi (WEB)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-WEB-01 | Một tài khoản dùng chung cho app và web. Ví, bộ sưu tập, Pack Instance, bộ đếm pity và streak là một bản duy nhất trên server; thay đổi ở nền tảng này hiện ở nền tảng kia ngay lần tải dữ liệu kế tiếp. | CR-001 |
-| BR-WEB-02 | Phiên web không gắn thiết bị theo BR-ACC-03. Mỗi tài khoản có tối đa 3 phiên web đang hoạt động; đăng nhập phiên thứ 4 sẽ đăng xuất phiên cũ nhất. Tài khoản Verified đăng nhập từ trình duyệt chưa từng dùng phải nhập OTP gửi tới SĐT đã xác thực. | CR-001 (Q-35) |
-| BR-WEB-03 | Ở R1, điểm danh và rewarded ads chỉ có trên app mobile, vì web không có cơ chế gắn thiết bị và kiểm tra toàn vẹn thiết bị để chống farm. | CR-001 (Q-32) |
-| BR-WEB-04 | Nạp Gem trên web qua cổng thanh toán. Chỉ cộng Gem khi server nhận thông báo IPN/webhook có chữ ký hợp lệ hoặc tự truy vấn trạng thái từ cổng; trang trả về (return URL) trên trình duyệt không đủ để cộng. Mỗi gateway transaction ID chỉ được ghi nhận một lần. Hoàn tiền qua cổng xử lý như BR-WAL-04. | CR-001 (Q-31) |
-| BR-WEB-05 | Bảng giá gói Gem trên web được công khai, có thể khác giá trong app (Q-33). Gem mua ở nền tảng nào cũng dùng được ở cả hai nền tảng (Q-34). | CR-001 |
-| BR-WEB-06 | Mở pack trên web tuân theo BR-PACK-02. Nếu trình duyệt không chạy được bản Unity Web, dùng chế độ hiển thị rút gọn; kết quả và thứ tự lật không đổi. | CR-001 |
-| BR-WEB-07 | Nạp Gem trên web áp dụng cùng điều kiện tuổi và đồng ý của người giám hộ như trên app (BR-ACC-01). | CR-001 |
+| BR-WEB-01 | Một tài khoản dùng chung cho app và web. Ví, bộ sưu tập, Pack Instance, bộ đếm pity và streak là một bản duy nhất trên server; thay đổi ở nền tảng này hiện ở nền tảng kia ngay lần tải dữ liệu kế tiếp. | PO + BA |
+| BR-WEB-02 | Phiên web không gắn thiết bị theo BR-ACC-03. Mỗi tài khoản có tối đa 3 phiên web đang hoạt động; đăng nhập phiên thứ 4 sẽ đăng xuất phiên cũ nhất. Tài khoản Verified đăng nhập từ trình duyệt chưa từng dùng phải nhập OTP gửi tới SĐT đã xác thực. | PO + BA (Q-35) |
+| BR-WEB-03 | Ở R1, điểm danh và rewarded ads chỉ có trên app mobile, vì web không có cơ chế gắn thiết bị và kiểm tra toàn vẹn thiết bị để chống farm. | PO + BA (Q-32) |
+| BR-WEB-04 | Nạp Gem trên web qua cổng thanh toán. Chỉ cộng Gem khi server nhận thông báo IPN/webhook có chữ ký hợp lệ hoặc tự truy vấn trạng thái từ cổng; trang trả về (return URL) trên trình duyệt không đủ để cộng. Mỗi gateway transaction ID chỉ được ghi nhận một lần. Hoàn tiền qua cổng xử lý như BR-WAL-04. | PO + BA (Q-31) |
+| BR-WEB-05 | Bảng giá gói Gem trên web được công khai, có thể khác giá trong app (Q-33). Gem mua ở nền tảng nào cũng dùng được ở cả hai nền tảng (Q-34). | PO + BA |
+| BR-WEB-06 | Mở pack trên web tuân theo BR-PACK-02. Nếu trình duyệt không chạy được bản Unity Web, dùng chế độ hiển thị rút gọn; kết quả và thứ tự lật không đổi. | PO + BA |
+| BR-WEB-07 | Nạp Gem trên web áp dụng cùng điều kiện tuổi và đồng ý của người giám hộ như trên app (BR-ACC-01). | PO + BA |
 
-## 10.12. Số lượng phát hành và mùa (SUP) — CR-002
-
-| ID | Quy tắc | Nguồn |
-|---|---|---|
-| BR-SUP-01 | Mỗi Card Definition (cả Anima và bài hỗ trợ — CR-004) có **số lượng phát hành tối đa** (max supply) cố định trong một mùa, công khai trong app. Ví dụ đề xuất: Common 50,000; Uncommon 20,000; Rare 5,000; Epic 1,000; Legendary 300; Secret Rare 100. | CR-002 (Q-39) |
-| BR-SUP-02 | Mỗi Card Instance mang số thứ tự trong edition, dạng `#37/100`, và serial duy nhất toàn hệ thống. Không có hai Card Instance cùng serial. | CR-002 |
-| BR-SUP-03 | Khi quay được một rarity, hệ thống chọn đều một Card Definition **còn bản** trong rarity đó. Card Definition hết bản bị loại khỏi lượt chọn. | CR-002 |
-| BR-SUP-04 | Khi mọi Card Definition của một rarity trong pack đã hết bản, pack đó **tự động ngừng bán** cho đến khi có version tỷ lệ mới được công bố. Hệ thống không được tự hạ tỷ lệ một cách ngầm. | CR-002 |
-| BR-SUP-05 | Mùa kết thúc thì set của mùa đóng lại vĩnh viễn: không phát hành thêm bản nào của set đó (kể cả qua Lò rèn). | CR-002 |
-| BR-SUP-06 | Thẻ bị hủy (burn) không được phát hành lại; số bản đã phát hành và số bản đã hủy đều công khai. | CR-002 |
-
-## 10.13. Kiểm chứng công bằng — Commit–reveal (PF) — CR-002
+## 10.12. Số lượng phát hành và mùa (SUP)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-PF-01 | Mỗi tài khoản có một cặp hạt giống: **server seed** (bí mật, công bố trước mã băm SHA-256) và **client seed** (người chơi tự đặt hoặc dùng giá trị ngẫu nhiên mặc định), cùng bộ đếm **nonce** tăng 1 sau mỗi lần quay (mở pack hoặc lật thẻ rèn). | CR-002 |
-| BR-PF-02 | Mọi kết quả quay = HMAC-SHA256(server seed, `client seed:nonce:slot`), quy ra số nguyên trong [0, 1,000,000) để tra bảng tỷ lệ của version áp dụng. | CR-002 |
-| BR-PF-03 | Mã băm của server seed phải được hiển thị cho người chơi **trước** lần quay đầu tiên dùng seed đó. | CR-002 |
-| BR-PF-04 | Khi người chơi đổi seed, server công bố server seed cũ. Người chơi kiểm tra lại được mọi lần quay đã dùng seed đó bằng công cụ công khai. | CR-002 |
-| BR-PF-05 | Pity (BR-PACK-05) và lựa chọn Card Definition theo số bản còn lại (BR-SUP-03) là bước tất định sau khi quay, được ghi trong bản ghi mở pack để kiểm tra lại. | CR-002 |
-| BR-PF-06 | (R2) Mỗi ngày, gốc Merkle của tất cả mã băm server seed đã phát hành và của danh sách Card Instance mới được ghi lên blockchain. | CR-002 |
+| BR-SUP-01 | Mỗi Card Definition (mọi loại thẻ — BR-CARD-01) có **số lượng phát hành tối đa** (max supply) cố định trong một mùa, công khai trong app. Ví dụ đề xuất: Common 50,000; Uncommon 20,000; Rare 5,000; Epic 1,000; Legendary 300; Secret Rare 100. | PO + BA (Q-39) |
+| BR-SUP-02 | Mỗi Card Instance mang số thứ tự trong edition, dạng `#37/100`, và serial duy nhất toàn hệ thống. Không có hai Card Instance cùng serial. | PO + BA |
+| BR-SUP-03 | Khi quay được một rarity, hệ thống chọn đều một Card Definition **còn bản** trong rarity đó. Card Definition hết bản bị loại khỏi lượt chọn. | PO + BA |
+| BR-SUP-04 | Khi mọi Card Definition của một rarity trong pack đã hết bản, pack đó **tự động ngừng bán** cho đến khi có version tỷ lệ mới được công bố. Hệ thống không được tự hạ tỷ lệ một cách ngầm. | PO + BA |
+| BR-SUP-05 | Mùa kết thúc thì set của mùa đóng lại vĩnh viễn: không phát hành thêm bản nào của set đó (kể cả qua Lò rèn). | PO + BA |
+| BR-SUP-06 | Thẻ bị hủy (burn) không được phát hành lại; số bản đã phát hành và số bản đã hủy đều công khai. | PO + BA |
 
-## 10.14. Lò rèn (FRG) — CR-002
-
-| ID | Quy tắc | Nguồn |
-|---|---|---|
-| BR-FRG-01 | Công thức duy nhất: **2 Card Instance bất kỳ + phí rèn → 1 thẻ chưa lật**. Hai thẻ đầu vào bị hủy vĩnh viễn (Burned) ngay khi rèn thành công. | CR-002 |
-| BR-FRG-02 | Phí rèn trả bằng Coin **hoặc** Gem theo lựa chọn của người chơi (đề xuất 50 Coin hoặc 5 Gem); là tham số kinh tế có version. | CR-002 |
-| BR-FRG-03 | Thẻ chưa lật được lật theo **bảng tỷ lệ rèn** công khai (mặc định bằng tỷ lệ một slot của pack tiêu chuẩn), dùng commit–reveal như mở pack. **Không có pity, không có vật phẩm tăng tỷ lệ, không có yếu tố nào khác tác động vào kết quả.** | CR-002 (quyết định PO) |
-| BR-FRG-04 | Kết quả lật lấy từ cùng kho số lượng giới hạn của **mùa hiện tại** (BR-SUP-03). Thẻ đầu vào thuộc mùa nào cũng được. | CR-002 (Q-40) |
-| BR-FRG-05 | Không rèn được: thẻ soulbound, thẻ đang Listed/In Auction/Locked/Withdrawing/In Wallet. | CR-002 |
-| BR-FRG-06 | Thẻ chưa lật không giao dịch, không rút về ví; phải lật mới thành Card Instance. | CR-002 |
-| BR-FRG-07 | Tài khoản chưa xác thực SĐT rèn tối đa 5 lần/ngày; tài khoản đã xác thực tối đa 100 lần/ngày. | CR-002 (chống bot) |
-
-## 10.15. NFT — rút thẻ về ví (NFT) — CR-002, R2, có gate pháp lý
+## 10.13. Kiểm chứng công bằng — Commit–reveal (PF)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-NFT-01 | Chỉ mở chức năng NFT khi có ý kiến pháp lý bằng văn bản cho thị trường áp dụng (Q-41). Chức năng rút/nạp chỉ có trên **website**, không có trong app mobile. | CR-002 |
-| BR-NFT-02 | Điều kiện rút một thẻ: tài khoản Verified, đã KYC, từ 18 tuổi; thẻ ở trạng thái Owned, không soulbound; đã qua **thời gian chờ** 30 ngày kể từ khi tài khoản có thẻ đó và không còn giao dịch nạp Gem nào trong thời hạn có thể hoàn tiền (Q-37). | CR-002 |
-| BR-NFT-03 | Khi rút, thẻ được mint thành NFT (chuẩn ERC-721) với token ID = serial thẻ, gửi tới ví người chơi đã liên kết. Ví phải được liên kết bằng chữ ký chứng minh quyền sở hữu. Mỗi ví chỉ liên kết với một tài khoản. | CR-002 |
-| BR-NFT-04 | Phí rút trả bằng Coin hoặc Gem (đề xuất 200 Coin hoặc 20 Gem); công ty trả phí gas. | CR-002 (Q-42) |
-| BR-NFT-05 | Nạp lại: người chơi gửi NFT vào ví lưu ký của ANIMA từ ví đã liên kết; sau đủ số xác nhận trên chuỗi, thẻ trở về trạng thái Owned của tài khoản liên kết với ví gửi. NFT gửi từ ví chưa liên kết bị giữ chờ người gửi liên kết ví. | CR-002 |
-| BR-NFT-06 | Smart contract khai báo royalty theo chuẩn ERC-2981 (đề xuất 5%) cho mọi lần bán lại. Royalty ở sàn ngoài là tự nguyện theo chính sách từng sàn; không hứa với người chơi về việc thu được. | CR-002 |
-| BR-NFT-07 | Ảnh và metadata của mỗi Card Definition lưu trên IPFS (kèm bản dự phòng Arweave), gắn mã băm nội dung; không phụ thuộc server ANIMA. | CR-002 |
-| BR-NFT-08 | Smart contract thực thi số lượng tối đa của mỗi Card Definition (BR-SUP-01). Công ty **không có quyền** thu hồi, sửa hay hủy NFT đang nằm trong ví người chơi. | CR-002 |
-| BR-NFT-09 | Thẻ kiếm được bằng Coin từ quảng cáo được rút như mọi thẻ khác. | CR-002 (quyết định PO) |
-| BR-NFT-10 | Ví liên kết được sàng lọc theo danh sách trừng phạt/rửa tiền trước khi rút; giao dịch rút giá trị cao được ghi nhận cho kiểm tra AML. | CR-002 |
+| BR-PF-01 | Mỗi tài khoản có một cặp hạt giống: **server seed** (bí mật, công bố trước mã băm SHA-256) và **client seed** (người chơi tự đặt hoặc dùng giá trị ngẫu nhiên mặc định), cùng bộ đếm **nonce** tăng 1 sau mỗi lần quay (mở pack hoặc lật thẻ rèn). | PO + BA |
+| BR-PF-02 | Mọi kết quả quay = HMAC-SHA256(server seed, `client seed:nonce:slot`), quy ra số nguyên trong [0, 1,000,000) để tra bảng tỷ lệ của version áp dụng. | PO + BA |
+| BR-PF-03 | Mã băm của server seed phải được hiển thị cho người chơi **trước** lần quay đầu tiên dùng seed đó. | PO + BA |
+| BR-PF-04 | Khi người chơi đổi seed, server công bố server seed cũ. Người chơi kiểm tra lại được mọi lần quay đã dùng seed đó bằng công cụ công khai. | PO + BA |
+| BR-PF-05 | Pity (BR-PACK-05) và lựa chọn Card Definition theo số bản còn lại (BR-SUP-03) là bước tất định sau khi quay, được ghi trong bản ghi mở pack để kiểm tra lại. | PO + BA |
+| BR-PF-06 | (R2) Mỗi ngày, gốc Merkle của tất cả mã băm server seed đã phát hành và của danh sách Card Instance mới được ghi lên blockchain. | PO + BA |
 
-## 10.16. Quốc gia và tuân thủ (GEO) — CR-003
+## 10.14. Lò rèn (FRG)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-GEO-01 | Mỗi tài khoản có một **quốc gia pháp lý** xác định khi đăng ký, theo thứ tự ưu tiên: quốc gia của tài khoản store/phương thức thanh toán → quốc gia của SĐT đã xác thực → quốc gia theo IP. Người chơi không tự đổi; chỉ CS đổi khi có bằng chứng, ghi audit. | CR-003 |
-| BR-GEO-02 | Mỗi quốc gia có một **ma trận tính năng** (bật/tắt và tham số: tuổi tối thiểu, hạn mức). Mọi API của tính năng có thể tắt phải kiểm tra ma trận ở backend và trả `FEATURE_NOT_AVAILABLE_IN_REGION` khi bị tắt. Thay đổi ma trận cần maker-checker và Legal duyệt. | CR-003 |
-| BR-GEO-03 | Không cho đăng ký, đăng nhập, nạp tiền hay rút NFT từ quốc gia trong danh sách trừng phạt (theo quốc gia pháp lý hoặc IP). | CR-003 |
-| BR-GEO-04 | Tuổi tối thiểu và tuổi cần đồng ý của người giám hộ lấy theo ma trận quốc gia (mặc định 13 và 18). Thay thế số cố định trong BR-ACC-01. | CR-003 (Q-46) |
-| BR-GEO-05 | Ở thị trường yêu cầu công bố xác suất **từng vật phẩm**, app hiển thị thêm xác suất của từng Card Definition = tỷ lệ rarity ÷ số Card Definition còn bản trong rarity đó, cập nhật khi số lượng thay đổi. | CR-003 |
-| BR-GEO-06 | Không có phần thưởng nào chỉ nhận được khi gom đủ một bộ vật phẩm lấy từ gacha ở thị trường cấm cơ chế này (ví dụ "kompu gacha" ở Nhật). Mọi tính năng thưởng theo bộ phải khai báo cờ để ma trận quốc gia tắt được. | CR-003 |
-| BR-GEO-07 | Giá trong app theo bảng giá khu vực của store; giá trên web hiển thị bằng tiền tệ địa phương, đã gồm thuế tiêu dùng (VAT/GST) nếu luật nước đó yêu cầu. | CR-003 (Q-49) |
-| BR-GEO-08 | Đổi quốc gia pháp lý không làm mất tài sản; tính năng bị tắt ở quốc gia mới thì tài sản liên quan bị khóa ở trạng thái chỉ xem (ví dụ thẻ đang niêm yết bị gỡ khỏi chợ và trả về Owned). | CR-003 |
+| BR-FRG-01 | Công thức duy nhất: **2 Card Instance bất kỳ + phí rèn → 1 thẻ chưa lật**. Hai thẻ đầu vào bị hủy vĩnh viễn (Burned) ngay khi rèn thành công. | PO + BA |
+| BR-FRG-02 | Phí rèn trả bằng Coin **hoặc** Gem theo lựa chọn của người chơi (đề xuất 50 Coin hoặc 5 Gem); là tham số kinh tế có version. | PO + BA |
+| BR-FRG-03 | Thẻ chưa lật được lật theo **bảng tỷ lệ rèn** công khai (mặc định bằng tỷ lệ một slot của pack tiêu chuẩn), dùng commit–reveal như mở pack. **Không có pity, không có vật phẩm tăng tỷ lệ, không có yếu tố nào khác tác động vào kết quả.** | PO |
+| BR-FRG-04 | Kết quả lật lấy từ cùng kho số lượng giới hạn của **mùa hiện tại** (BR-SUP-03). Thẻ đầu vào thuộc mùa nào cũng được. | PO + BA (Q-40) |
+| BR-FRG-05 | Không rèn được: thẻ soulbound, thẻ đang Listed/In Auction/Locked/Withdrawing/In Wallet. | PO + BA |
+| BR-FRG-06 | Thẻ chưa lật không giao dịch, không rút về ví; phải lật mới thành Card Instance. | PO + BA |
+| BR-FRG-07 | Tài khoản chưa xác thực SĐT rèn tối đa 5 lần/ngày; tài khoản đã xác thực tối đa 100 lần/ngày. | PO + BA (chống bot) |
 
-## 10.17. Đa ngôn ngữ (I18N) — CR-003
-
-| ID | Quy tắc | Nguồn |
-|---|---|---|
-| BR-I18N-01 | Ngôn ngữ mặc định lấy theo ngôn ngữ thiết bị/trình duyệt nếu thuộc 4 mã hỗ trợ, ngược lại dùng `en`. Người chơi đổi được bất cứ lúc nào; lựa chọn lưu theo tài khoản và đồng bộ giữa app và web. | CR-003 |
-| BR-I18N-02 | Nội dung **pháp lý và tiền tệ** (điều khoản, chính sách quyền riêng tư, tỷ lệ rơi, giá, phí, thông báo giao dịch) phải có đủ 4 bản trước khi phát hành; thiếu bản nào thì không phát hành nội dung đó. Chuỗi giao diện thường được dùng `en` làm dự phòng, CI cảnh báo khi thiếu. | CR-003 |
-| BR-I18N-03 | Story Fragment, tên hiệu thẻ, mô tả set phải có đủ 4 bản trước khi set mở bán. Tên riêng của Anima (Seraphel, Nocturne…) giữ nguyên chữ Latin ở mọi ngôn ngữ; tên hiệu được dịch (ví dụ "the Hopebringer"). | CR-003 (Q-47) |
-| BR-I18N-04 | Mã lỗi nghiệp vụ không đổi theo ngôn ngữ; thông điệp hiển thị cho người dùng lấy theo ngôn ngữ đang chọn. | CR-003 |
-| BR-I18N-05 | Ngày, giờ, số, tiền định dạng theo locale; thời điểm reset ngày vẫn theo múi giờ tài khoản (BR-CHK-01). | CR-003 |
-| BR-I18N-06 | Bộ lọc từ cấm cho tên hiển thị, chat, mô tả niêm yết áp dụng cho cả 4 ngôn ngữ. | CR-003 |
-| BR-I18N-07 | Metadata NFT (R2) có trường tên và mô tả mặc định bằng `en`, kèm bản dịch trong thuộc tính bổ sung. | CR-003 |
-
-## 10.18. Loại thẻ và chỉ số chiến đấu (CARD) — CR-004
+## 10.15. NFT — rút thẻ về ví (NFT) — R2, có gate pháp lý
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-CARD-01 | Có 3 loại thẻ: **Anima** (sinh vật chiến đấu), **Tiếng vọng** (bài Buff) và **Ký ức phong ấn** (bài Bẫy). Cả 3 loại đều có rarity, hệ, mùa, số lượng phát hành, ra từ pack, rèn được, rút NFT được như nhau. | CR-004 |
-| BR-CARD-02 | Anima có: Cộng hưởng (chi phí 1–6), ATK, DEF, HP, hệ, tối đa 1 kỹ năng, mạch truyện (0–1), danh sách công thức Hợp thể. Thang chỉ số: ATK và DEF 0–3,000; HP 100–4,000; bước 50. | CR-004 |
-| BR-CARD-03 | Khung chỉ số theo chi phí, áp dụng như nhau cho mọi rarity: ATK + DEF + HP ÷ 2 ≈ 600 × Cộng hưởng + 300 (sai lệch tối đa ±10%). Rarity cao khác ở kỹ năng, không ở tổng chỉ số. Hệ số cuối cùng chỉnh bằng mô phỏng (Q-51). | CR-004 |
-| BR-CARD-04 | Tiếng vọng: có Cộng hưởng; dùng một lần hoặc gắn vào một Anima; hiệu lực mạnh hơn khi dùng lên Anima cùng hệ. | CR-004 |
-| BR-CARD-05 | Ký ức phong ấn: úp vào một trong 2 ô Ký ức; **tự kích hoạt** khi điều kiện ghi trên thẻ xảy ra, người chơi không phải bấm phản ứng; dùng xong vào mộ. | CR-004 |
-| BR-CARD-06 | Chỉ số, kỹ năng, mạch truyện, công thức Hợp thể là **bất biến** sau khi Card Definition phát hành (vì gắn với NFT). Cân bằng game bằng thể thức và danh sách cấm (BR-PVP-08). | CR-004 |
-| BR-CARD-07 | Set Awakening 100 thẻ = **80 Anima + 20 bài hỗ trợ** (khoảng 12 Tiếng vọng, 8 Ký ức phong ấn), thiết kế theo 15–20 mạch truyện. Cập nhật BR-SUP-01 cho cả bài hỗ trợ. | CR-004 |
+| BR-NFT-01 | Chỉ mở chức năng NFT khi có ý kiến pháp lý bằng văn bản cho thị trường áp dụng (Q-41). Chức năng rút/nạp chỉ có trên **website**, không có trong app mobile. | PO + BA |
+| BR-NFT-02 | Điều kiện rút một thẻ: tài khoản Verified, đã KYC, từ 18 tuổi; thẻ ở trạng thái Owned, không soulbound; đã qua **thời gian chờ** 30 ngày kể từ khi tài khoản có thẻ đó và không còn giao dịch nạp Gem nào trong thời hạn có thể hoàn tiền (Q-37). | PO + BA |
+| BR-NFT-03 | Khi rút, thẻ được mint thành NFT (chuẩn ERC-721) với token ID = serial thẻ, gửi tới ví người chơi đã liên kết. Ví phải được liên kết bằng chữ ký chứng minh quyền sở hữu. Mỗi ví chỉ liên kết với một tài khoản. | PO + BA |
+| BR-NFT-04 | Phí rút trả bằng Coin hoặc Gem (đề xuất 200 Coin hoặc 20 Gem); công ty trả phí gas. | PO + BA (Q-42) |
+| BR-NFT-05 | Nạp lại: người chơi gửi NFT vào ví lưu ký của ANIMA từ ví đã liên kết; sau đủ số xác nhận trên chuỗi, thẻ trở về trạng thái Owned của tài khoản liên kết với ví gửi. NFT gửi từ ví chưa liên kết bị giữ chờ người gửi liên kết ví. | PO + BA |
+| BR-NFT-06 | Smart contract khai báo royalty theo chuẩn ERC-2981 (đề xuất 5%) cho mọi lần bán lại. Royalty ở sàn ngoài là tự nguyện theo chính sách từng sàn; không hứa với người chơi về việc thu được. | PO + BA |
+| BR-NFT-07 | Ảnh và metadata của mỗi Card Definition lưu trên IPFS (kèm bản dự phòng Arweave), gắn mã băm nội dung; không phụ thuộc server ANIMA. | PO + BA |
+| BR-NFT-08 | Smart contract thực thi số lượng tối đa của mỗi Card Definition (BR-SUP-01). Công ty **không có quyền** thu hồi, sửa hay hủy NFT đang nằm trong ví người chơi. | PO + BA |
+| BR-NFT-09 | Thẻ kiếm được bằng Coin từ quảng cáo được rút như mọi thẻ khác. | PO |
+| BR-NFT-10 | Ví liên kết được sàng lọc theo danh sách trừng phạt/rửa tiền trước khi rút; giao dịch rút giá trị cao được ghi nhận cho kiểm tra AML. | PO + BA |
 
-## 10.19. Bộ bài (DECK) — CR-004
-
-| ID | Quy tắc | Nguồn |
-|---|---|---|
-| BR-DECK-01 | Bộ bài có **đúng 30 lá**: ít nhất 24 Anima; Tiếng vọng + Ký ức phong ấn **tối đa 6 lá**. | CR-004 |
-| BR-DECK-02 | Mỗi Card Definition tối đa 2 bản trong một bộ; Legendary và Secret Rare tối đa 1 bản. | CR-004 |
-| BR-DECK-03 | Mỗi bộ tối đa 4 Epic, 2 Legendary, 1 Secret Rare. | CR-004 |
-| BR-DECK-04 | Bộ bài chỉ gồm Card Instance ở trạng thái **Owned** của chính tài khoản, kể cả thẻ gắn chặt tài khoản. Không dùng thẻ Listed, In Auction, Locked, Withdrawing, In Wallet, Burned. | CR-004 |
-| BR-DECK-05 | Mỗi tài khoản lưu tối đa 10 bộ, có tên. Bộ đã lưu được dùng lại, không phải chọn lại mỗi trận. Thẻ không nằm trong bộ vẫn ở trong ví như bình thường. | CR-004 |
-| BR-DECK-06 | Khi một Card Instance rời trạng thái Owned (bán, rèn, rút NFT, bị khóa), nó bị gỡ khỏi mọi bộ đã lưu; bộ đó chuyển thành "chưa hợp lệ" cho đến khi người chơi bổ sung. | CR-004 |
-| BR-DECK-07 | Server kiểm tra lại toàn bộ BR-DECK-01 → 04 khi vào trận; bộ không hợp lệ không vào được trận. | CR-004 |
-| BR-DECK-08 | Trong lúc trận diễn ra, mọi Card Instance của bộ bài đang dùng bị khóa với niêm yết, rèn, rút NFT; mở khóa khi trận kết thúc. | CR-004 |
-| BR-DECK-09 | Dạng Hợp thể không nằm trong bộ bài (theo công thức, BR-FUS-04). | CR-004 |
-
-## 10.20. Luật trận đấu (BTL) — CR-004
+## 10.16. Quốc gia và tuân thủ (GEO)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-BTL-01 | Mỗi Keeper có **8,000 máu**. Mỗi bên có 3 ô Anima và 2 ô Ký ức phong ấn. | CR-004 |
-| BR-BTL-02 | Thứ tự đi trước chọn ngẫu nhiên (commit–reveal, BR-PF). Mỗi bên bốc 5 lá đầu trận và được đổi tay một lần (trả cả 5, xào lại, bốc 5). Người đi sau bốc thêm 1 lá đầu trận (Q-55). | CR-004 |
-| BR-BTL-03 | Đầu mỗi lượt bốc 1 lá. Năng lượng Cộng hưởng của lượt thứ n = min(n, 6); không cộng dồn sang lượt sau. | CR-004 |
-| BR-BTL-04 | Anima vừa ra sân không tấn công trong lượt đó, trừ khi có kỹ năng cho phép. Mỗi Anima tấn công tối đa 1 lần mỗi lượt. | CR-004 |
-| BR-BTL-05 | Tấn công một Anima: sát thương = max(100, ATK hiệu lực − DEF hiệu lực của mục tiêu) × hệ số khắc (BR-ELM-04), làm tròn đến hàng chục (từ 5 trở lên làm tròn lên). Chỉ được tấn công thẳng Keeper khi sân Anima đối phương trống; sát thương lên Keeper = ATK hiệu lực. | CR-004 |
-| BR-BTL-06 | Anima có HP ≤ 0 rời sân vào mộ (Ký ức). | CR-004 |
-| BR-BTL-07 | Thắng khi: máu Keeper đối thủ ≤ 0; đối thủ phải bốc khi đã hết bài; đối thủ đầu hàng; đối thủ mất kết nối quá 60 giây. | CR-004 |
-| BR-BTL-08 | Mỗi lượt 20 giây, cộng quỹ dự phòng 30 giây cho cả trận. Hết thời gian thì lượt tự kết thúc; 3 lượt liên tiếp hết giờ thì xử thua. | CR-004 |
-| BR-BTL-09 | **Đột tử:** bắt đầu từ lượt thứ 10 của mỗi người, Keeper của người đang đến lượt mất 500 máu, rồi 1,000, 1,500… tăng 500 mỗi lượt. | CR-004 |
-| BR-BTL-10 | Server quyết định mọi kết quả (xào bài, bốc bài, sát thương, kích hoạt bẫy). Mỗi trận lưu đủ dữ liệu để phát lại. | CR-004 |
-| BR-BTL-11 | Mục tiêu thiết kế: trung vị thời lượng trận 4 phút, 90% số trận trong 3–6 phút; đo bằng mô phỏng máy đấu máy trước khi mở và theo dõi sau khi mở. | CR-004 |
+| BR-GEO-01 | Mỗi tài khoản có một **quốc gia pháp lý** xác định khi đăng ký, theo thứ tự ưu tiên: quốc gia của tài khoản store/phương thức thanh toán → quốc gia của SĐT đã xác thực → quốc gia theo IP. Người chơi không tự đổi; chỉ CS đổi khi có bằng chứng, ghi audit. | PO + BA |
+| BR-GEO-02 | Mỗi quốc gia có một **ma trận tính năng** (bật/tắt và tham số: tuổi tối thiểu, hạn mức). Mọi API của tính năng có thể tắt phải kiểm tra ma trận ở backend và trả `FEATURE_NOT_AVAILABLE_IN_REGION` khi bị tắt. Thay đổi ma trận cần maker-checker và Legal duyệt. | PO + BA |
+| BR-GEO-03 | Không cho đăng ký, đăng nhập, nạp tiền hay rút NFT từ quốc gia trong danh sách trừng phạt (theo quốc gia pháp lý hoặc IP). | PO + BA |
+| BR-GEO-04 | Tuổi tối thiểu và tuổi cần đồng ý của người giám hộ lấy theo ma trận quốc gia (mặc định 13 và 18). | PO + BA (Q-46) |
+| BR-GEO-05 | Ở thị trường yêu cầu công bố xác suất **từng vật phẩm**, app hiển thị thêm xác suất của từng Card Definition = tỷ lệ rarity ÷ số Card Definition còn bản trong rarity đó, cập nhật khi số lượng thay đổi. | PO + BA |
+| BR-GEO-06 | Không có phần thưởng nào chỉ nhận được khi gom đủ một bộ vật phẩm lấy từ gacha ở thị trường cấm cơ chế này (ví dụ "kompu gacha" ở Nhật). Mọi tính năng thưởng theo bộ phải khai báo cờ để ma trận quốc gia tắt được. | PO + BA |
+| BR-GEO-07 | Giá trong app theo bảng giá khu vực của store; giá trên web hiển thị bằng tiền tệ địa phương, đã gồm thuế tiêu dùng (VAT/GST) nếu luật nước đó yêu cầu. | PO + BA (Q-49) |
+| BR-GEO-08 | Đổi quốc gia pháp lý không làm mất tài sản; tính năng bị tắt ở quốc gia mới thì tài sản liên quan bị khóa ở trạng thái chỉ xem (ví dụ thẻ đang niêm yết bị gỡ khỏi chợ và trả về Owned). | PO + BA |
 
-## 10.21. Hệ và nhân quả (ELM) — CR-004
+## 10.17. Đa ngôn ngữ (I18N)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-ELM-01 | **Vòng sinh:** Sợ hãi (Umbryx) → Giận dữ (Pyraxis) → Nỗi buồn (Aqualis) → Kiên định (Terrakin) → Tự do (Ventara) → Phấn khích (Voltaris) → Hy vọng (Luminara) → Sợ hãi. | CR-004 |
-| BR-ELM-02 | **Vòng khắc** (mỗi hệ khắc hệ cách một bước trong vòng sinh): Umbryx khắc Aqualis; Pyraxis khắc Terrakin; Aqualis khắc Ventara; Terrakin khắc Voltaris; Ventara khắc Luminara; Voltaris khắc Umbryx; Luminara khắc Pyraxis. | CR-004 |
-| BR-ELM-03 | Nihilum nằm ngoài hai vòng: tấn công 7 hệ còn lại với hệ số ×1.1; Luminara tấn công Nihilum với hệ số ×1.5; Nihilum không hưởng hiệu ứng sinh. | CR-004 |
-| BR-ELM-04 | Hệ số sát thương: tấn công hệ mình khắc ×1.25; tấn công hệ khắc mình ×0.75; còn lại ×1.0 (ngoại lệ Nihilum theo BR-ELM-03). | CR-004 |
-| BR-ELM-05 | **Sinh:** khi một Anima ra sân mà phe mình đang có Anima thuộc hệ sinh ra nó, Anima mới nhận +200 ATK và +200 HP đến hết trận. | CR-004 |
-| BR-ELM-06 | **Chuỗi nhân quả:** khi phe mình có 3 Anima thuộc 3 hệ liên tiếp trong vòng sinh, cả 3 nhận +300 ATK đến hết lượt; tối đa 1 lần mỗi lượt. | CR-004 |
+| BR-I18N-01 | Ngôn ngữ mặc định lấy theo ngôn ngữ thiết bị/trình duyệt nếu thuộc 4 mã hỗ trợ, ngược lại dùng `en`. Người chơi đổi được bất cứ lúc nào; lựa chọn lưu theo tài khoản và đồng bộ giữa app và web. | PO + BA |
+| BR-I18N-02 | Nội dung **pháp lý và tiền tệ** (điều khoản, chính sách quyền riêng tư, tỷ lệ rơi, giá, phí, thông báo giao dịch) phải có đủ 4 bản trước khi phát hành; thiếu bản nào thì không phát hành nội dung đó. Chuỗi giao diện thường được dùng `en` làm dự phòng, CI cảnh báo khi thiếu. | PO + BA |
+| BR-I18N-03 | Story Fragment, tên hiệu thẻ, mô tả set phải có đủ 4 bản trước khi set mở bán. Tên riêng của Anima (Seraphel, Nocturne…) giữ nguyên chữ Latin ở mọi ngôn ngữ; tên hiệu được dịch (ví dụ "the Hopebringer"). | PO + BA (Q-47) |
+| BR-I18N-04 | Mã lỗi nghiệp vụ không đổi theo ngôn ngữ; thông điệp hiển thị cho người dùng lấy theo ngôn ngữ đang chọn. | PO + BA |
+| BR-I18N-05 | Ngày, giờ, số, tiền định dạng theo locale; thời điểm reset ngày vẫn theo múi giờ tài khoản (BR-CHK-01). | PO + BA |
+| BR-I18N-06 | Bộ lọc từ cấm cho tên hiển thị, chat, mô tả niêm yết áp dụng cho cả 4 ngôn ngữ. | PO + BA |
+| BR-I18N-07 | Metadata NFT (R2) có trường tên và mô tả mặc định bằng `en`, kèm bản dịch trong thuộc tính bổ sung. | PO + BA |
 
-## 10.22. Sàn đấu (ARN) — CR-004
-
-| ID | Quy tắc | Nguồn |
-|---|---|---|
-| BR-ARN-01 | Có 8 sàn: Thành Luminara (chủ nhà Luminara), Thung lũng Lặng Thinh (Umbryx), Núi Cuồng Nộ (Pyraxis), Biển Hoài Niệm (Aqualis), Cao nguyên Bất Khuất (Terrakin), Đỉnh Gió Ngàn (Ventara), Tháp Sấm (Voltaris), Vết Nứt (Nihilum). | CR-004 |
-| BR-ARN-02 | Anima thuộc hệ chủ nhà nhận +15% ATK và HP; Anima thuộc hệ mà hệ chủ nhà khắc bị −10% ATK và HP. Áp dụng khi vào sân, làm tròn đến hàng chục; DEF không đổi. Sàn Vết Nứt không có hệ bị yếu. | CR-004 |
-| BR-ARN-03 | Mỗi sàn có một luật riêng: Thành Luminara — cuối lượt, Anima ít HP nhất của mỗi bên hồi 200; Thung lũng Lặng Thinh — Anima vừa ra sân không bị chọn làm mục tiêu 1 lượt; Núi Cuồng Nộ — mọi Anima +200 ATK, −200 DEF; Biển Hoài Niệm — mỗi bên 1 lần/trận, Anima đầu tiên bị hạ trở về tay; Cao nguyên Bất Khuất — DEF ×2 trong 3 lượt đầu của mỗi bên; Đỉnh Gió Ngàn — mỗi lượt được đổi vị trí 2 Anima; Tháp Sấm — đầu mỗi lượt, 100 sát thương lên một Anima ngẫu nhiên trên sân; Vết Nứt — tắt mọi luật sàn khác, đột tử bắt đầu từ lượt 8. | CR-004 |
-| BR-ARN-04 | Chọn sàn: xếp hạng — ngẫu nhiên (commit–reveal), công bố trước, người chơi có 15 giây chọn 1 trong các bộ đã lưu, hết giờ thì dùng bộ được đặt làm mặc định (không có bộ mặc định hợp lệ thì hủy ghép, không bị phạt); giao hữu — người thách đấu chọn; sự kiện — "sàn của tuần". | CR-004 |
-
-## 10.23. Cộng minh và Hợp thể (FUS) — CR-004
+## 10.18. Loại thẻ và chỉ số chiến đấu (CARD)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-FUS-01 | Mỗi Anima thuộc tối đa 1 mạch truyện (story arc). | CR-004 |
-| BR-FUS-02 | **Cộng minh:** khi phe mình có 2 Anima cùng mạch trên sân, mỗi thẻ cùng mạch +100 ATK và +200 HP; có 3 thẻ trở lên thì +200 ATK và +400 HP. Hiệu lực mất khi số thẻ cùng mạch giảm. | CR-004 |
-| BR-FUS-03 | **Hợp thể:** hy sinh 2 Anima trên sân khớp một công thức (cùng hệ hoặc liền nhau trong vòng sinh, và cùng mạch truyện) + trả Cộng hưởng ghi trong công thức → dạng Hợp thể vào ô của một trong hai thẻ; tấn công được từ lượt sau. Hai thẻ nguyên liệu vào mộ. Tối đa 1 lần Hợp thể mỗi lượt. | CR-004 |
-| BR-FUS-04 | Hợp thể **theo công thức**: người chơi không cần sở hữu thẻ Hợp thể. Chỉ số dạng Hợp thể ghi trong công thức (định hướng: khoảng 70% tổng ATK và HP của hai nguyên liệu, DEF bằng giá trị cao hơn) cùng kỹ năng riêng. | CR-004 |
-| BR-FUS-05 | Thẻ Hợp thể **bản art đặc biệt** là thẻ sưu tầm, chỉ phát làm phần thưởng cốt truyện hoặc giải đấu; sở hữu thẻ này chỉ đổi hình hiển thị khi Hợp thể, không đổi chỉ số. | CR-004 |
+| BR-CARD-01 | Có 3 loại thẻ: **Anima** (sinh vật chiến đấu), **Tiếng vọng** (bài Buff) và **Ký ức phong ấn** (bài Bẫy). Cả 3 loại đều có rarity, hệ, mùa, số lượng phát hành, ra từ pack, rèn được, rút NFT được như nhau. | PO + BA |
+| BR-CARD-02 | Anima có: Cộng hưởng (chi phí 1–6), ATK, DEF, HP, hệ, tối đa 1 kỹ năng, mạch truyện (0–1), danh sách công thức Hợp thể. Thang chỉ số: ATK và DEF 0–3,000; HP 100–4,000; bước 50. | PO + BA |
+| BR-CARD-03 | Khung chỉ số theo chi phí, áp dụng như nhau cho mọi rarity: ATK + DEF + HP ÷ 2 ≈ 600 × Cộng hưởng + 300 (sai lệch tối đa ±10%). Rarity cao khác ở kỹ năng, không ở tổng chỉ số. Hệ số cuối cùng chỉnh bằng mô phỏng (Q-51). | PO + BA |
+| BR-CARD-04 | Tiếng vọng: có Cộng hưởng; dùng một lần hoặc gắn vào một Anima; hiệu lực mạnh hơn khi dùng lên Anima cùng hệ. | PO + BA |
+| BR-CARD-05 | Ký ức phong ấn: úp vào một trong 2 ô Ký ức; **tự kích hoạt** khi điều kiện ghi trên thẻ xảy ra, người chơi không phải bấm phản ứng; dùng xong vào mộ. | PO + BA |
+| BR-CARD-06 | Chỉ số, kỹ năng, mạch truyện, công thức Hợp thể là **bất biến** sau khi Card Definition phát hành (vì gắn với NFT). Cân bằng game bằng thể thức và danh sách cấm (BR-PVP-08). | PO + BA |
+| BR-CARD-07 | Set Awakening 100 thẻ = **80 Anima + 20 bài hỗ trợ** (khoảng 12 Tiếng vọng, 8 Ký ức phong ấn), thiết kế theo 15–20 mạch truyện. | PO + BA |
 
-## 10.24. Chế độ chơi và Arena Point (PVP) — CR-004
-
-| ID | Quy tắc | Nguồn |
-|---|---|---|
-| BR-PVP-01 | Chế độ và release: Trận hướng dẫn, Cốt truyện Act 1, Luyện tập với máy, Giao hữu (R2); Xếp hạng theo mùa, Thách đấu cược Arena Point, Giải đấu (R3); Draft (R3, chờ Q-52). | CR-004 |
-| BR-PVP-02 | Mọi chế độ dùng bộ bài riêng của người chơi đều yêu cầu bộ 30 lá hợp lệ (BR-DECK). Chỉ trận hướng dẫn dùng bộ bài mượn. | CR-004 |
-| BR-PVP-03 | **Arena Point (AP)** chỉ kiếm được qua thi đấu (thắng trận, nhiệm vụ đấu trường, thưởng mùa). AP **không mua được, không đổi sang hoặc từ Gem/Coin/thẻ, không chuyển cho người khác, không rút**. AP chỉ đổi lấy vật phẩm gắn chặt tài khoản (khung thẻ, mặt sau thẻ, danh hiệu, hiệu ứng) và vé giải đấu. | CR-004 |
-| BR-PVP-04 | **Thách đấu cược:** hai bên đồng ý cùng một mức cược AP (tối thiểu 10, tối đa 1,000 và không vượt số dư). AP bị giữ khi trận bắt đầu; người thắng nhận cả hai phần; trận bị hủy trước khi bắt đầu thì hoàn lại; mất kết nối quá hạn tính là thua. | CR-004 |
-| BR-PVP-05 | Phần thưởng có giá trị (Coin, thẻ chưa lật, thẻ Hợp thể bản sưu tầm) **chỉ do công ty cấp** theo hạng mùa, nhiệm vụ, giải đấu; không bao giờ lấy từ người chơi khác. | CR-004 |
-| BR-PVP-06 | Ghép trận xếp hạng theo điểm kỹ năng (Glicko-2). Không ghép hai tài khoản cùng thiết bị, cùng fingerprint hoặc cùng SĐT. Mỗi cặp người chơi tối đa 3 trận xếp hạng hoặc thách đấu cược với nhau mỗi ngày. | CR-004 |
-| BR-PVP-07 | Phát hiện dàn xếp trận: đầu hàng sớm lặp lại, tỷ lệ thắng bất thường giữa một cặp → gắn cờ cho Fraud Analyst; AP, hạng và phần thưởng liên quan có thể bị thu hồi. | CR-004 |
-| BR-PVP-08 | Thể thức **Standard** (thẻ của 2 mùa gần nhất) và **Eternal** (mọi thẻ). Danh sách cấm/hạn chế cập nhật đầu mùa, công bố trước ít nhất 7 ngày. Không sửa chỉ số thẻ đã phát hành. | CR-004 |
-| BR-PVP-09 | Thách đấu cược AP là một tính năng riêng trong ma trận quốc gia (BR-GEO-02), tắt được theo thị trường. | CR-004 |
-
-## 10.25. Người chơi mới (NEW) — CR-004
+## 10.19. Bộ bài (DECK)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-NEW-01 | **Gói chào mừng:** khi tạo tài khoản, người chơi nhận 1 pack 5 lá **Anima Common** thuộc **5 hệ khác nhau**, chọn ngẫu nhiên trong 7 hệ vòng nhân quả (không có Nihilum, không có bài hỗ trợ, không có thẻ hiếm). Thay thế "pack tutorial bảo đảm ít nhất 1 Rare" của PRD 7.1. | CR-004 |
-| BR-NEW-02 | Không tặng bộ khởi đầu 30 lá. Người chơi có đủ 30 lá bằng cách mua pack hoặc làm nhiệm vụ, xem quảng cáo theo thời gian. | CR-004 |
-| BR-NEW-03 | **Nhiệm vụ Tân thủ 7 ngày** tính từ lúc tạo tài khoản: mỗi ngày 1 nhóm nhiệm vụ; hoàn thành nhóm của ngày 1 → 5 thì nhận 1 **pack cơ bản** (5 Anima Common, có thể trùng hệ); ngày 6 → 7 thưởng Coin (Q-53). Nhiệm vụ của ngày đã qua làm bù được đến hết ngày 7. | CR-004 |
-| BR-NEW-04 | Thẻ chào mừng và thẻ từ pack cơ bản **gắn chặt tài khoản**: không niêm yết, không rút NFT, không rèn; dùng được trong bộ bài và tính vào 30 lá sở hữu. | CR-004 |
-| BR-NEW-05 | Pack cơ bản không cho ra bản thứ 3 của cùng một Card Definition trong số thẻ gắn chặt tài khoản, để 30 lá Tân thủ (5 + 25) luôn lập được một bộ hợp lệ theo BR-DECK-02. | CR-004 |
-| BR-NEW-06 | **Trận hướng dẫn có kịch bản:** mở ngay sau khi nhận gói chào mừng; hai bên dùng bộ bài mượn cố định, đối thủ là máy; không có phần thưởng ngoài đánh dấu hoàn thành; thẻ mượn không vào bộ sưu tập; chơi lại được. | CR-004 |
+| BR-DECK-01 | Bộ bài có **đúng 30 lá**: ít nhất 24 Anima; Tiếng vọng + Ký ức phong ấn **tối đa 6 lá**. | PO + BA |
+| BR-DECK-02 | Mỗi Card Definition tối đa 2 bản trong một bộ; Legendary và Secret Rare tối đa 1 bản. | PO + BA |
+| BR-DECK-03 | Mỗi bộ tối đa 4 Epic, 2 Legendary, 1 Secret Rare. | PO + BA |
+| BR-DECK-04 | Bộ bài chỉ gồm Card Instance ở trạng thái **Owned** của chính tài khoản, kể cả thẻ gắn chặt tài khoản. Không dùng thẻ Listed, In Auction, Locked, Withdrawing, In Wallet, Burned. | PO + BA |
+| BR-DECK-05 | Mỗi tài khoản lưu tối đa 10 bộ, có tên. Bộ đã lưu được dùng lại, không phải chọn lại mỗi trận. Thẻ không nằm trong bộ vẫn ở trong ví như bình thường. | PO + BA |
+| BR-DECK-06 | Khi một Card Instance rời trạng thái Owned (bán, rèn, rút NFT, bị khóa), nó bị gỡ khỏi mọi bộ đã lưu; bộ đó chuyển thành "chưa hợp lệ" cho đến khi người chơi bổ sung. | PO + BA |
+| BR-DECK-07 | Server kiểm tra lại toàn bộ BR-DECK-01 → 04 khi vào trận; bộ không hợp lệ không vào được trận. | PO + BA |
+| BR-DECK-08 | Trong lúc trận diễn ra, mọi Card Instance của bộ bài đang dùng bị khóa với niêm yết, rèn, rút NFT; mở khóa khi trận kết thúc. | PO + BA |
+| BR-DECK-09 | Dạng Hợp thể không nằm trong bộ bài (theo công thức, BR-FUS-04). | PO + BA |
+
+## 10.20. Luật trận đấu (BTL)
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-BTL-01 | Mỗi Keeper có **8,000 máu**. Mỗi bên có 3 ô Anima và 2 ô Ký ức phong ấn. | PO + BA |
+| BR-BTL-02 | Thứ tự đi trước chọn ngẫu nhiên (commit–reveal, BR-PF). Mỗi bên bốc 5 lá đầu trận và được đổi tay một lần (trả cả 5, xào lại, bốc 5). Người đi sau bốc thêm 1 lá đầu trận (Q-55). | PO + BA |
+| BR-BTL-03 | Đầu mỗi lượt bốc 1 lá. Năng lượng Cộng hưởng của lượt thứ n = min(n, 6); không cộng dồn sang lượt sau. | PO + BA |
+| BR-BTL-04 | Anima vừa ra sân không tấn công trong lượt đó, trừ khi có kỹ năng cho phép. Mỗi Anima tấn công tối đa 1 lần mỗi lượt. | PO + BA |
+| BR-BTL-05 | Tấn công một Anima: sát thương = max(100, ATK hiệu lực − DEF hiệu lực của mục tiêu) × hệ số khắc (BR-ELM-04), làm tròn đến hàng chục (từ 5 trở lên làm tròn lên). Chỉ được tấn công thẳng Keeper khi sân Anima đối phương trống; sát thương lên Keeper = ATK hiệu lực. | PO + BA |
+| BR-BTL-06 | Anima có HP ≤ 0 rời sân vào mộ (Ký ức). | PO + BA |
+| BR-BTL-07 | Thắng khi: máu Keeper đối thủ ≤ 0; đối thủ phải bốc khi đã hết bài; đối thủ đầu hàng; đối thủ mất kết nối quá 60 giây. | PO + BA |
+| BR-BTL-08 | Mỗi lượt 20 giây, cộng quỹ dự phòng 30 giây cho cả trận. Hết thời gian thì lượt tự kết thúc; 3 lượt liên tiếp hết giờ thì xử thua. | PO + BA |
+| BR-BTL-09 | **Đột tử:** bắt đầu từ lượt thứ 10 của mỗi người, Keeper của người đang đến lượt mất 500 máu, rồi 1,000, 1,500… tăng 500 mỗi lượt. | PO + BA |
+| BR-BTL-10 | Server quyết định mọi kết quả (xào bài, bốc bài, sát thương, kích hoạt bẫy). Mỗi trận lưu đủ dữ liệu để phát lại. | PO + BA |
+| BR-BTL-11 | Mục tiêu thiết kế: trung vị thời lượng trận 4 phút, 90% số trận trong 3–6 phút; đo bằng mô phỏng máy đấu máy trước khi mở và theo dõi sau khi mở. | PO + BA |
+
+## 10.21. Hệ và nhân quả (ELM)
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-ELM-01 | **Vòng sinh:** Sợ hãi (Umbryx) → Giận dữ (Pyraxis) → Nỗi buồn (Aqualis) → Kiên định (Terrakin) → Tự do (Ventara) → Phấn khích (Voltaris) → Hy vọng (Luminara) → Sợ hãi. | PO + BA |
+| BR-ELM-02 | **Vòng khắc** (mỗi hệ khắc hệ cách một bước trong vòng sinh): Umbryx khắc Aqualis; Pyraxis khắc Terrakin; Aqualis khắc Ventara; Terrakin khắc Voltaris; Ventara khắc Luminara; Voltaris khắc Umbryx; Luminara khắc Pyraxis. | PO + BA |
+| BR-ELM-03 | Nihilum nằm ngoài hai vòng: tấn công 7 hệ còn lại với hệ số ×1.1; Luminara tấn công Nihilum với hệ số ×1.5; Nihilum không hưởng hiệu ứng sinh. | PO + BA |
+| BR-ELM-04 | Hệ số sát thương: tấn công hệ mình khắc ×1.25; tấn công hệ khắc mình ×0.75; còn lại ×1.0 (ngoại lệ Nihilum theo BR-ELM-03). | PO + BA |
+| BR-ELM-05 | **Sinh:** khi một Anima ra sân mà phe mình đang có Anima thuộc hệ sinh ra nó, Anima mới nhận +200 ATK và +200 HP đến hết trận. | PO + BA |
+| BR-ELM-06 | **Chuỗi nhân quả:** khi phe mình có 3 Anima thuộc 3 hệ liên tiếp trong vòng sinh, cả 3 nhận +300 ATK đến hết lượt; tối đa 1 lần mỗi lượt. | PO + BA |
+
+## 10.22. Sàn đấu (ARN)
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-ARN-01 | Có 8 sàn: Thành Luminara (chủ nhà Luminara), Thung lũng Lặng Thinh (Umbryx), Núi Cuồng Nộ (Pyraxis), Biển Hoài Niệm (Aqualis), Cao nguyên Bất Khuất (Terrakin), Đỉnh Gió Ngàn (Ventara), Tháp Sấm (Voltaris), Vết Nứt (Nihilum). | PO + BA |
+| BR-ARN-02 | Anima thuộc hệ chủ nhà nhận +15% ATK và HP; Anima thuộc hệ mà hệ chủ nhà khắc bị −10% ATK và HP. Áp dụng khi vào sân, làm tròn đến hàng chục; DEF không đổi. Sàn Vết Nứt không có hệ bị yếu. | PO + BA |
+| BR-ARN-03 | Mỗi sàn có một luật riêng: Thành Luminara — cuối lượt, Anima ít HP nhất của mỗi bên hồi 200; Thung lũng Lặng Thinh — Anima vừa ra sân không bị chọn làm mục tiêu 1 lượt; Núi Cuồng Nộ — mọi Anima +200 ATK, −200 DEF; Biển Hoài Niệm — mỗi bên 1 lần/trận, Anima đầu tiên bị hạ trở về tay; Cao nguyên Bất Khuất — DEF ×2 trong 3 lượt đầu của mỗi bên; Đỉnh Gió Ngàn — mỗi lượt được đổi vị trí 2 Anima; Tháp Sấm — đầu mỗi lượt, 100 sát thương lên một Anima ngẫu nhiên trên sân; Vết Nứt — tắt mọi luật sàn khác, đột tử bắt đầu từ lượt 8. | PO + BA |
+| BR-ARN-04 | Chọn sàn: xếp hạng — ngẫu nhiên (commit–reveal), công bố trước, người chơi có 15 giây chọn 1 trong các bộ đã lưu, hết giờ thì dùng bộ được đặt làm mặc định (không có bộ mặc định hợp lệ thì hủy ghép, không bị phạt); giao hữu — người thách đấu chọn; sự kiện — "sàn của tuần". | PO + BA |
+
+## 10.23. Cộng minh và Hợp thể (FUS)
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-FUS-01 | Mỗi Anima thuộc tối đa 1 mạch truyện (story arc). | PO + BA |
+| BR-FUS-02 | **Cộng minh:** khi phe mình có 2 Anima cùng mạch trên sân, mỗi thẻ cùng mạch +100 ATK và +200 HP; có 3 thẻ trở lên thì +200 ATK và +400 HP. Hiệu lực mất khi số thẻ cùng mạch giảm. | PO + BA |
+| BR-FUS-03 | **Hợp thể:** hy sinh 2 Anima trên sân khớp một công thức (cùng hệ hoặc liền nhau trong vòng sinh, và cùng mạch truyện) + trả Cộng hưởng ghi trong công thức → dạng Hợp thể vào ô của một trong hai thẻ; tấn công được từ lượt sau. Hai thẻ nguyên liệu vào mộ. Tối đa 1 lần Hợp thể mỗi lượt. | PO + BA |
+| BR-FUS-04 | Hợp thể **theo công thức**: người chơi không cần sở hữu thẻ Hợp thể. Chỉ số dạng Hợp thể ghi trong công thức (định hướng: khoảng 70% tổng ATK và HP của hai nguyên liệu, DEF bằng giá trị cao hơn) cùng kỹ năng riêng. | PO + BA |
+| BR-FUS-05 | Thẻ Hợp thể **bản art đặc biệt** là thẻ sưu tầm, chỉ phát làm phần thưởng cốt truyện hoặc giải đấu; sở hữu thẻ này chỉ đổi hình hiển thị khi Hợp thể, không đổi chỉ số. | PO + BA |
+
+## 10.24. Chế độ chơi và Arena Point (PVP)
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-PVP-01 | Chế độ và release: Trận hướng dẫn, Cốt truyện Act 1, Luyện tập với máy, Giao hữu (R2); Xếp hạng theo mùa, Thách đấu cược Arena Point, Giải đấu (R3); Draft (R3, chờ Q-52). | PO + BA |
+| BR-PVP-02 | Mọi chế độ dùng bộ bài riêng của người chơi đều yêu cầu bộ 30 lá hợp lệ (BR-DECK). Chỉ trận hướng dẫn dùng bộ bài mượn. | PO + BA |
+| BR-PVP-03 | **Arena Point (AP)** chỉ kiếm được qua thi đấu (thắng trận, nhiệm vụ đấu trường, thưởng mùa). AP **không mua được, không đổi sang hoặc từ Gem/Coin/thẻ, không chuyển cho người khác, không rút**. AP chỉ đổi lấy vật phẩm gắn chặt tài khoản (khung thẻ, mặt sau thẻ, danh hiệu, hiệu ứng) và vé giải đấu. | PO + BA |
+| BR-PVP-04 | **Thách đấu cược:** hai bên đồng ý cùng một mức cược AP (tối thiểu 10, tối đa 1,000 và không vượt số dư). AP bị giữ khi trận bắt đầu; người thắng nhận cả hai phần; trận bị hủy trước khi bắt đầu thì hoàn lại; mất kết nối quá hạn tính là thua. | PO + BA |
+| BR-PVP-05 | Phần thưởng có giá trị (Coin, thẻ chưa lật, thẻ Hợp thể bản sưu tầm) **chỉ do công ty cấp** theo hạng mùa, nhiệm vụ, giải đấu; không bao giờ lấy từ người chơi khác. | PO + BA |
+| BR-PVP-06 | Ghép trận xếp hạng theo điểm kỹ năng (Glicko-2). Không ghép hai tài khoản cùng thiết bị, cùng fingerprint hoặc cùng SĐT. Mỗi cặp người chơi tối đa 3 trận xếp hạng hoặc thách đấu cược với nhau mỗi ngày. | PO + BA |
+| BR-PVP-07 | Phát hiện dàn xếp trận: đầu hàng sớm lặp lại, tỷ lệ thắng bất thường giữa một cặp → gắn cờ cho Fraud Analyst; AP, hạng và phần thưởng liên quan có thể bị thu hồi. | PO + BA |
+| BR-PVP-08 | Thể thức **Standard** (thẻ của 2 mùa gần nhất) và **Eternal** (mọi thẻ). Danh sách cấm/hạn chế cập nhật đầu mùa, công bố trước ít nhất 7 ngày. Không sửa chỉ số thẻ đã phát hành. | PO + BA |
+| BR-PVP-09 | Thách đấu cược AP là một tính năng riêng trong ma trận quốc gia (BR-GEO-02), tắt được theo thị trường. | PO + BA |
+
+## 10.25. Người chơi mới (NEW)
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-NEW-01 | **Gói chào mừng:** khi tạo tài khoản, người chơi nhận 1 pack 5 lá **Anima Common** thuộc **5 hệ khác nhau**, chọn ngẫu nhiên trong 7 hệ vòng nhân quả (không có Nihilum, không có bài hỗ trợ, không có thẻ hiếm). | PO + BA |
+| BR-NEW-02 | Không tặng bộ khởi đầu 30 lá. Người chơi có đủ 30 lá bằng cách mua pack hoặc làm nhiệm vụ, xem quảng cáo theo thời gian. | PO + BA |
+| BR-NEW-03 | **Nhiệm vụ Tân thủ 7 ngày** tính từ lúc tạo tài khoản: mỗi ngày 1 nhóm nhiệm vụ; hoàn thành nhóm của ngày 1 → 5 thì nhận 1 **pack cơ bản** (5 Anima Common, có thể trùng hệ); ngày 6 → 7 thưởng Coin (Q-53). Nhiệm vụ của ngày đã qua làm bù được đến hết ngày 7. | PO + BA |
+| BR-NEW-04 | Thẻ chào mừng và thẻ từ pack cơ bản **gắn chặt tài khoản**: không niêm yết, không rút NFT, không rèn; dùng được trong bộ bài và tính vào 30 lá sở hữu. | PO + BA |
+| BR-NEW-05 | Pack cơ bản không cho ra bản thứ 3 của cùng một Card Definition trong số thẻ gắn chặt tài khoản, để 30 lá Tân thủ (5 + 25) luôn lập được một bộ hợp lệ theo BR-DECK-02. | PO + BA |
+| BR-NEW-06 | **Trận hướng dẫn có kịch bản:** mở ngay sau khi nhận gói chào mừng; hai bên dùng bộ bài mượn cố định, đối thủ là máy; không có phần thưởng ngoài đánh dấu hoàn thành; thẻ mượn không vào bộ sưu tập; chơi lại được. | PO + BA |
 
 ---
 
@@ -1256,15 +1378,16 @@ Mọi quyền được kiểm tra ở backend; client chỉ ẩn/hiện theo quy
 | Mua pack | ✘ | ✔ | ✔ | ✘ | ✘ |
 | Mở pack đã mua | ✘ | ✔ | ✔ | ✔ | ✘ |
 | Xem bộ sưu tập | ✘ | ✔ | ✔ | ✔ | ✘ |
-| Điểm danh, xem ads có thưởng | ✘ | ✔ (Q-07) | ✔ | ✘ | ✘ |
+| Điểm danh, xem ads có thưởng (chỉ trên app) | ✘ | ✔ (Q-07) | ✔ | ✘ | ✘ |
 | Niêm yết, mua trên chợ, đấu giá | ✘ | ✘ | ✔ | ✘ | ✘ |
-| Rèn thẻ (CR-002) | ✘ | ✔ (tối đa 5/ngày) | ✔ | ✘ | ✘ |
+| Rèn thẻ | ✘ | ✔ (tối đa 5/ngày) | ✔ | ✘ | ✘ |
 | Đổi Gem → Coin | ✘ | ✔ | ✔ | ✘ | ✘ |
 | Đổi Coin → Gem | ✘ | ✘ | ✔ | ✘ | ✘ |
-| Vào trận đấu với bộ 30 thẻ hợp lệ (CR-004, từ R2) | ✘ | ✔ | ✔ | ✔ (chỉ PvE, luyện tập) | ✘ |
+| Vào trận đấu với bộ 30 thẻ hợp lệ (từ R2) | ✘ | ✔ | ✔ | ✔ (chỉ PvE, luyện tập) | ✘ |
 | Trận xếp hạng, giải đấu (R3) | ✘ | ✔ | ✔ | ✘ | ✘ |
 | Cược Arena Point (R3, theo ma trận quốc gia BR-GEO) | ✘ | ✘ | ✔ | ✘ | ✘ |
 | Liên kết ví, rút/nạp NFT (R2, chỉ web) | ✘ | ✘ | ✔ nếu đã KYC và ≥ 18 tuổi | ✘ | ✘ |
+| Nhận và làm nhiệm vụ Tân thủ | ✘ | ✔ | ✔ | ✔ (trừ nhiệm vụ có ads) | ✘ |
 | Nhận thưởng referral | ✘ | ✘ | ✔ | ✘ | ✘ |
 | Nhắn tin | ✘ | ✘ | ✔ | ✘ | ✘ |
 | Yêu cầu xóa tài khoản | ✘ | ✔ | ✔ | ✔ | ✘ (Q-25) |
@@ -1285,12 +1408,15 @@ Mọi quyền được kiểm tra ở backend; client chỉ ẩn/hiện theo quy
 | Bồi thường Coin/thẻ | M | ✘ | ✘ | C | ✘ | ✘ |
 | Xem dashboard doanh thu | ✘ | ✘ | ✔ | ✘ | ✔ | ✔ |
 | Quản lý tài khoản admin | ✘ | ✘ | ✘ | ✘ | ✘ | ✔ |
-| Tạo mùa, đặt số lượng phát hành (CR-002) | ✘ | M | ✘ | ✘ | ✘ | C |
+| Tạo mùa, đặt số lượng phát hành | ✘ | M | ✘ | ✘ | ✘ | C |
 | Đổi tỷ lệ rèn, phí rèn, tỷ lệ quy đổi, phí rút NFT | ✘ | ✘ | M | ✘ | ✘ | C |
 | Tạm dừng rút NFT toàn hệ thống (sự cố) | ✘ | ✘ | ✘ | ✔ | ✘ | ✔ |
-| Sửa ma trận tính năng theo quốc gia (CR-003) | ✘ | ✘ | M | ✘ | ✘ | C (sau khi Legal duyệt) |
+| Sửa ma trận tính năng theo quốc gia | ✘ | ✘ | M | ✘ | ✘ | C (sau khi Legal duyệt) |
 | Đổi quốc gia pháp lý của tài khoản (có bằng chứng) | ✔ | ✘ | ✘ | ✔ | ✘ | ✔ |
 | Quản lý bản dịch nội dung thẻ, story | ✘ | ✔ | ✘ | ✘ | ✘ | ✘ |
+| Nhập chỉ số chiến đấu, mạch truyện, công thức Hợp thể (trước khi phát hành) | ✘ | M | ✘ | ✘ | ✘ | C |
+| Thể thức, danh sách cấm, mùa xếp hạng, phần thưởng đấu trường (R3) | ✘ | ✘ | M | ✘ | ✘ | C |
+| Xem log trận, thu hồi AP/hạng/thưởng do dàn xếp trận | 👁 | ✘ | ✘ | ✔ | ✘ | ✔ |
 
 **Segregation of duties:**
 - Người tạo thay đổi tham số kinh tế không được tự duyệt (BR-ADM-02).
@@ -1316,11 +1442,20 @@ Mọi quyền được kiểm tra ở backend; client chỉ ẩn/hiện theo quy
 | Pack Opening Record | Pack Instance, version tỷ lệ, kết quả, pity trước/sau, thời gian | Nội bộ — Bằng chứng | ≥ 5 năm |
 | Listing / Auction / Bid | Giá, loại tiền, thời hạn, trạng thái, phí | Nội bộ | ≥ 5 năm |
 | Admin Audit Log | Người thực hiện, hành động, đối tượng, trước/sau, lý do | Nội bộ — Bảo mật | ≥ 5 năm, không sửa được |
-| Season / Edition (CR-002) | Mùa, Card Definition, max supply, số đã phát hành, số đã hủy | Công khai | Vĩnh viễn |
-| Fairness Seed (CR-002) | Tài khoản, mã băm server seed, server seed (công bố khi đổi), client seed, nonce | Nội bộ cho tới khi công bố | Vĩnh viễn |
-| Forge Record (CR-002) | 2 thẻ đầu vào, phí, thẻ chưa lật, kết quả lật, nonce | Nội bộ — Bằng chứng | ≥ 5 năm |
-| Wallet Link / NFT Transfer (CR-002) | Ví, tài khoản, chữ ký liên kết, tx hash, trạng thái, kết quả sàng lọc | PII + Tài chính | ≥ 10 năm (đề xuất, chờ Legal) |
-| KYC (CR-002) | Kết quả xác minh từ nhà cung cấp (không lưu ảnh giấy tờ tại ANIMA) | **PII nhạy cảm** | Theo Legal |
+| Season / Edition | Mùa, Card Definition, max supply, số đã phát hành, số đã hủy | Công khai | Vĩnh viễn |
+| Fairness Seed | Tài khoản, mã băm server seed, server seed (công bố khi đổi), client seed, nonce | Nội bộ cho tới khi công bố | Vĩnh viễn |
+| Forge Record | 2 thẻ đầu vào, phí, thẻ chưa lật, kết quả lật, nonce | Nội bộ — Bằng chứng | ≥ 5 năm |
+| Wallet Link / NFT Transfer | Ví, tài khoản, chữ ký liên kết, tx hash, trạng thái, kết quả sàng lọc | PII + Tài chính | ≥ 10 năm (đề xuất, chờ Legal) |
+| KYC | Kết quả xác minh từ nhà cung cấp (không lưu ảnh giấy tờ tại ANIMA) | **PII nhạy cảm** | Theo Legal |
+| Web Session / Web Payment | Phiên trình duyệt, đơn nạp qua cổng web, IPN, trạng thái | Nội bộ — Tài chính | Phiên: 90 ngày; thanh toán ≥ 10 năm |
+| Country Feature Matrix | Quốc gia, tính năng, bật/tắt, tham số, version, người tạo/duyệt, văn bản Legal | Nội bộ | Vĩnh viễn (có version) |
+| Card Translation | Card Definition, locale, tên hiệu, story, mô tả | Công khai | Vĩnh viễn |
+| Card Battle Profile | Loại thẻ, Cộng hưởng, ATK/DEF/HP, kỹ năng, mạch truyện, công thức Hợp thể — bất biến sau phát hành | Công khai | Vĩnh viễn |
+| Deck | Tài khoản, tên, 30 Card Instance, bộ mặc định, trạng thái hợp lệ | Nội bộ | Đến khi xóa tài khoản |
+| Match / Match Action | Chế độ, sàn, hai bên, seed (công bố khi kết thúc), kết quả, lý do; log hành động theo thứ tự | Nội bộ — Bằng chứng | ≥ 1 năm (trận cược, xếp hạng: ≥ 3 năm) |
+| Arena Point Ledger | Tài khoản, ± AP, lý do, trận, idempotency — append-only, tách khỏi ví Gem/Coin | Nội bộ | ≥ 3 năm |
+| Rating / Season Rank | Tài khoản, mùa, thể thức, điểm Glicko-2, hạng | Công khai (hạng) / Nội bộ | Vĩnh viễn |
+| Newbie Quest Progress | Tài khoản, ngày 1 → 7, hoàn thành, đã nhận | Nội bộ | 1 năm |
 
 **Che dữ liệu:** SĐT hiển thị dạng `090****123`; email dạng `n***@gmail.com` với mọi vai trò trừ Fraud Analyst và Super Admin. Mỗi lần xem đầy đủ được ghi audit log.
 
@@ -1334,6 +1469,12 @@ Mọi quyền được kiểm tra ở backend; client chỉ ẩn/hiện theo quy
 | Social login (Google, Apple, Facebook — Q-22) | Đăng ký/đăng nhập | Provider lỗi: cho phép đăng nhập phương thức khác | Khóa theo provider user ID | — |
 | Mạng xã hội (chia sẻ) | Chia sẻ kết quả | Lỗi: không ảnh hưởng dữ liệu | — | — |
 | Dịch vụ phát hiện thiết bị (root/emulator/VPN) | Chống gian lận | Không xác định được: coi là rủi ro trung bình, vẫn cho thưởng nhưng gắn cờ | — | — |
+| Cổng thanh toán web (Q-31) | Nạp Gem trên website, IPN, hoàn tiền | IPN không tới: server tự truy vấn trạng thái định kỳ tới 24h; return URL không đủ để cộng Gem | Khóa theo gateway transaction ID | Hằng ngày: báo cáo cổng vs ledger Gem |
+| Nhà cung cấp KYC (T-10) | Xác minh danh tính, tuổi trước khi rút NFT | Lỗi: giữ trạng thái chờ, không cho rút | Khóa theo KYC reference | Hằng tháng: số lượt tính phí |
+| Dịch vụ sàng lọc ví | Kiểm tra ví theo danh sách trừng phạt, rửa tiền | Không có kết quả: không cho liên kết/rút | Theo địa chỉ ví + thời điểm | — |
+| Blockchain EVM L2 + indexer (T-09) | Mint NFT, theo dõi NFT nạp về ví lưu ký, neo gốc Merkle | Giao dịch thất bại/quá hạn: trả thẻ về Owned, hoàn phí; chuỗi tắc: tạm dừng rút | Khóa theo serial thẻ (token ID) và tx hash | Hằng ngày: số NFT trên contract vs số thẻ In Wallet |
+| IPFS / Arweave | Lưu ảnh và metadata NFT | Lỗi: thử lại; chưa ghim xong thì chưa cho mint | Theo mã băm nội dung | — |
+| Nền tảng quản lý bản dịch (T-11) | Đồng bộ chuỗi giao diện và nội dung thẻ 4 ngôn ngữ | Lỗi: giữ bản dịch cũ; thiếu bản dịch pháp lý thì chặn phát hành (BR-I18N-02) | Theo khóa chuỗi + version | — |
 
 ## 13.3. API mức nghiệp vụ (tiền và tạo bản ghi)
 
@@ -1347,6 +1488,17 @@ Mọi quyền được kiểm tra ở backend; client chỉ ẩn/hiện theo quy
 | Niêm yết | cardInstanceId, price, currency, duration | listingId | CARD_NOT_TRADABLE, CARD_LOCKED, PRICE_OUT_OF_RANGE, PHONE_VERIFICATION_REQUIRED | Theo cardInstanceId đang Owned |
 | Mua listing | listingId, idempotencyKey | cardInstanceId, số dư mới | LISTING_NOT_AVAILABLE, INSUFFICIENT_BALANCE, SELF_PURCHASE_FORBIDDEN | Bắt buộc idempotencyKey |
 | Đặt bid | auctionId, amount, idempotencyKey | Giá hiện tại, thời điểm kết thúc | BID_TOO_LOW, AUCTION_ENDED, SELF_BID_FORBIDDEN | Bắt buộc idempotencyKey |
+| Nạp Gem web | packageId, idempotencyKey | orderId, URL cổng thanh toán | FEATURE_NOT_AVAILABLE_IN_REGION, AGE_BELOW_MINIMUM | Bắt buộc idempotencyKey; cộng Gem theo gateway transaction ID |
+| Quy đổi Gem ↔ Coin | direction, amount, idempotencyKey | Số nhận, số dư mới | INSUFFICIENT_BALANCE, PHONE_VERIFICATION_REQUIRED, COIN_TO_GEM_DAILY_LIMIT | Bắt buộc idempotencyKey |
+| Rèn | cardInstanceIds (2), feeCurrency, idempotencyKey | sealedCardId, số dư mới | FORGE_REQUIRES_TWO_CARDS, FORGE_DUPLICATE_INPUT, CARD_NOT_FORGEABLE, FORGE_DAILY_LIMIT, INSUFFICIENT_BALANCE | Bắt buộc idempotencyKey |
+| Lật thẻ rèn | sealedCardId | cardInstanceId, rarity, `#n/N`, nonce | SEALED_CARD_NOT_TRADABLE (khi thao tác sai), PACK_SUPPLY_EXHAUSTED | Theo sealedCardId |
+| Đổi seed | clientSeed (tùy chọn) | Server seed cũ, mã băm seed mới | — | Theo (accountId, nonce hiện tại) |
+| Liên kết ví (R2) | address, signature | walletLinkId | WALLET_ALREADY_LINKED, WALLET_SCREENING_FAILED, KYC_REQUIRED | Theo address |
+| Rút NFT (R2) | cardInstanceId, feeCurrency, idempotencyKey | withdrawalId, trạng thái | WALLET_NOT_LINKED, KYC_REQUIRED, WITHDRAW_COOLDOWN, CARD_NOT_TRADABLE, NFT_WITHDRAWALS_PAUSED | Bắt buộc idempotencyKey |
+| Lưu bộ bài (R2) | deckId?, name, cardInstanceIds (30) | deckId, danh sách vi phạm | DECK_SIZE_INVALID, SUPPORT_LIMIT_EXCEEDED, COPY_LIMIT_EXCEEDED, RARITY_LIMIT_EXCEEDED, DECK_SLOT_LIMIT | Theo deckId |
+| Vào trận / hàng chờ (R2–R3) | mode, deckId, arenaId?, wager? | matchId | DECK_INVALID, MATCH_NOT_ALLOWED, WAGER_OUT_OF_RANGE, PAIR_DAILY_LIMIT, FEATURE_NOT_AVAILABLE_IN_REGION | Theo (accountId, hàng chờ) |
+| Hành động trong trận (R2) | matchId, seq, action | Trạng thái mới (đã che bài đối thủ) | INSUFFICIENT_RESONANCE, ATTACK_NOT_ALLOWED, DIRECT_ATTACK_NOT_ALLOWED, FUSION_RECIPE_NOT_FOUND, FUSION_LIMIT_PER_TURN | Theo (matchId, seq) |
+| Nhận thưởng Tân thủ | day | Pack Instance hoặc Coin | — (ngày chưa mở hoặc đã nhận: trả trạng thái hiện tại) | Theo (accountId, day) |
 
 ---
 
@@ -1363,18 +1515,21 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | NFR-05 | Uptime | 99.9%/tháng cho API cốt lõi (đăng nhập, ví, pack, chợ) | MD |
 | NFR-06 | Tương thích | iOS 14+, Android 8+ | MD |
 | NFR-07 | Kích thước | Bản cài < 200MB; asset set thẻ tải sau | MD |
-| NFR-08 | Ngôn ngữ | Tiếng Việt, tiếng Anh, tiếng Trung giản thể, tiếng Trung phồn thể (CR-003); đủ bản dịch theo BR-I18N-02/03; giao diện không vỡ khi chuỗi dài hơn 40% so với tiếng Anh | MD + CR-003 |
+| NFR-08 | Ngôn ngữ | Tiếng Việt, tiếng Anh, tiếng Trung giản thể, tiếng Trung phồn thể; đủ bản dịch theo BR-I18N-02/03; giao diện không vỡ khi chuỗi dài hơn 40% so với tiếng Anh | MD + PO |
 | NFR-09 | Accessibility | Hỗ trợ screen reader, cỡ chữ hệ thống; chế độ giảm chuyển động tắt flash/shake (an toàn cho người nhạy cảm ánh sáng) | MD + BA |
 | NFR-10 | Offline | Xem bộ sưu tập đã đồng bộ khi offline; mọi giao dịch cần online | MD |
 | NFR-11 | Tính đúng của ledger | Sai lệch giữa số dư và tổng bút toán = 0; kiểm tra tự động hằng ngày | BA |
 | NFR-12 | RNG | Dùng CSPRNG; mỗi version drop rate được kiểm thử thống kê: lệch tỷ lệ thực tế so với công bố trong khoảng tin cậy 99% trên ≥ 1 triệu lượt mô phỏng | BA |
 | NFR-13 | Backup | RPO ≤ 5 phút, RTO ≤ 1 giờ cho dữ liệu ví và thẻ (Q-23) | BA |
 | NFR-14 | Observability | Cảnh báo khi: tỷ lệ lỗi API mua/mở pack > 1% trong 5 phút; SSV thất bại > 5%; lệch đối soát IAP | BA |
-| NFR-15 | Quyền riêng tư | Thu thập đồng ý xử lý dữ liệu cá nhân trước khi đăng ký; tuân thủ luật bảo vệ dữ liệu của từng thị trường phát hành: Nghị định 13/2023/NĐ-CP (VN), PDPA (Singapore, Malaysia, Thái Lan), luật dữ liệu cá nhân Đài Loan và Hồng Kông, GDPR (EU, đợt 2), CCPA/CPRA (California, đợt 2) — Legal xác nhận phạm vi | BA + CR-003 |
+| NFR-15 | Quyền riêng tư | Thu thập đồng ý xử lý dữ liệu cá nhân trước khi đăng ký; tuân thủ luật bảo vệ dữ liệu của từng thị trường phát hành: Nghị định 13/2023/NĐ-CP (VN), PDPA (Singapore, Malaysia, Thái Lan), luật dữ liệu cá nhân Đài Loan và Hồng Kông, GDPR (EU, đợt 2), CCPA/CPRA (California, đợt 2) — Legal xác nhận phạm vi | BA + PO |
 | NFR-16 | Chống bot | Rate limit theo tài khoản và thiết bị cho API kinh tế (điểm danh, ads, chợ) | BA |
-| NFR-17 | Độ trễ toàn cầu | API mua/mở pack p95 < 400 ms từ các thị trường đợt 1 (đo tại Singapore, Đài Bắc, Manila, Jakarta); asset tải qua CDN có điểm phân phối tại các thị trường đó | CR-003 |
-| NFR-18 | Kích thước app khi có chữ Trung | Vẫn đạt NFR-07 (< 200MB): font CJK tải theo ngôn ngữ đã chọn qua Addressables, không nhúng sẵn | CR-003 |
-| NFR-19 | Lưu trữ dữ liệu theo quốc gia | Ghi rõ nơi lưu dữ liệu cá nhân cho từng thị trường; có cơ chế chuyển dữ liệu xuyên biên giới hợp lệ (điều khoản hợp đồng mẫu…) theo Legal | CR-003 (Q-50) |
+| NFR-17 | Độ trễ toàn cầu | API mua/mở pack p95 < 400 ms từ các thị trường đợt 1 (đo tại Singapore, Đài Bắc, Manila, Jakarta); asset tải qua CDN có điểm phân phối tại các thị trường đó | PO + BA |
+| NFR-18 | Kích thước app khi có chữ Trung | Vẫn đạt NFR-07 (< 200MB): font CJK tải theo ngôn ngữ đã chọn qua Addressables, không nhúng sẵn | PO + BA |
+| NFR-19 | Lưu trữ dữ liệu theo quốc gia | Ghi rõ nơi lưu dữ liệu cá nhân cho từng thị trường; có cơ chế chuyển dữ liệu xuyên biên giới hợp lệ (điều khoản hợp đồng mẫu…) theo Legal | PO + BA (Q-50) |
+| NFR-20 | Độ trễ trận đấu | p95 < 150 ms từ khi server nhận hành động tới khi phát trạng thái mới, trong cùng region; ghép trận ưu tiên cùng region | BA |
+| NFR-21 | Tính tất định của luật trận | Cùng bộ bài, seed và danh sách hành động cho cùng kết quả trên server và trên mọi client; kiểm tra bằng bộ replay chuẩn trong CI | BA |
+| NFR-22 | An toàn tài sản NFT | Smart contract được audit độc lập trước mainnet; khóa ví lưu ký dùng multisig hoặc HSM; có nút tạm dừng rút toàn hệ thống | BA |
 
 ---
 
@@ -1389,7 +1544,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | CF-05 | Bảng F2P/tuần không khớp phép tính: check-in + 10 ads/ngày = 0.43 + 7 × 0.11 = **$1.20** (MD ghi $1.05); check-in + 5 ads/ngày = 0.43 + 7 × 0.05 = **$0.78** (MD ghi $0.70) | MD §5.5 | Chốt lại bảng sau khi quyết định CF-04 | PO + Finance |
 | CF-06 | Set "Awakening" ghi 100 thẻ nhưng tổng liệt kê là 15+15+12×5+5+1 = **96** | MD §7.8 | Bổ sung 4 thẻ hoặc sửa thành 96 | PO + Content |
 | CF-07 | Giới hạn 200 particle cùng lúc nhưng timeline Legendary có explosion 300 hạt | MD §4.4 vs §4.5 | Cho phép đỉnh 300 trong ≤ 0.5s ở thiết bị cao cấp; máy yếu giảm theo fallback | Designer + Mobile Lead |
-| CF-08 | FR-10 cho phép Gem ↔ Coin hai chiều, mâu thuẫn với mục tiêu chống farm/RMT | MD FR-10 vs §5.6 | **Đã quyết (CR-002):** hai chiều, có hạn mức (BR-WAL-05/06) | PO |
+| CF-08 | FR-10 cho phép Gem ↔ Coin hai chiều, mâu thuẫn với mục tiêu chống farm/RMT | MD FR-10 vs §5.6 | **Đã quyết (PO):** hai chiều, có hạn mức (BR-WAL-05/06) | PO |
 
 ---
 
@@ -1408,7 +1563,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | AS-07 | Pack tiêu chuẩn có 5 thẻ | Drop rate, pity, animation timing |
 | AS-08 | Sau ngày 7, thưởng điểm danh lặp lại chu kỳ 7 ngày | BR-CHK-02 |
 | AS-09 | "5 ads liên tiếp" = lượt thứ 5 trong ngày | BR-ADS-05 |
-| AS-10 | ~~Chỉ có app mobile, không có web~~ — **thay bằng CR-001**: có website người chơi và website admin | Phạm vi |
+| AS-10 | ~~Chỉ có app mobile~~ — **không còn là giả định:** PO đã chốt có website người chơi và website admin (mục 4.4) | — |
 
 ## 16.2. Câu hỏi mở
 
@@ -1418,7 +1573,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Q-02 | ARPU $1 tính trên DAU, MAU hay paying user? Theo tháng hay năm? | PO + Finance | BO-07 |
 | Q-03 | Xác nhận phạm vi MVP theo mục 4.1? | PO | Lập kế hoạch |
 | Q-04 | Mức thưởng ads theo từng tier (Tier 1/2/3)? Có chấp nhận lỗ ở Tier 2 trong giai đoạn đầu để tăng trưởng không? | PO + Finance | EP-07 R1 |
-| Q-05 | Gem ↔ Coin một chiều hay hai chiều? Tỷ lệ và phí? | PO | US-02.4 |
+| Q-05 | ~~Gem ↔ Coin một chiều hay hai chiều?~~ **Đã chốt (2026-10-06): hai chiều.** Tỷ lệ, phí, hạn mức ở BR-WAL-05/06 vẫn là đề xuất. | PO | US-02.4 |
 | Q-06 | Chính sách đổi thiết bị và thiết bị dùng chung trong gia đình? | PO | BR-ACC-03 |
 | Q-07 | Player chưa xác thực SĐT có được nhận thưởng ads/điểm danh không? (Có = tăng chuyển đổi; Không = giảm farm) | PO | BR-ACC-04 |
 | Q-08 | Số thẻ mỗi pack, các loại pack và giá? Có đảm bảo slot (ví dụ ít nhất 1 Rare/pack) không? | PO | EP-03 |
@@ -1470,7 +1625,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Q-54 | Nội dung và độ dài cốt truyện Act 1 (số màn, số trùm)? | PO + Content | US-13.5 |
 | Q-55 | Bù cho người đi sau: bốc thêm 1 lá (đề xuất) hay +1 Cộng hưởng ở lượt đầu? | Game Designer | BR-BTL-02 |
 | Q-56 | Số công thức Hợp thể và số mạch truyện trong set Awakening? | PO + Content | BR-FUS, BR-CARD-07 |
-| Q-57 | Có muốn đưa Đấu trường lên R1 không? (ước tính thêm 3–4 sprint) | PO | Phạm vi 4.1 |
+| Q-57 | Có muốn đưa phần đánh trận của Đấu trường lên R1 không? (ước tính thêm 3–4 sprint) | PO | Phạm vi 4.1 |
 
 ---
 
@@ -1512,7 +1667,9 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 - Thanh toán hàng hóa số trong app tuân thủ chính sách App Store và Google Play.
 - Độ tuổi tối thiểu 13+ (BR-ACC-01).
 - Tuân thủ quy định bảo vệ dữ liệu cá nhân tại VN và các thị trường phát hành (NFR-15, NFR-19).
-- (CR-002) Công ty không mua lại thẻ bằng tiền thật/tiền mã hóa, không hứa giá hay lợi nhuận; NFT chỉ mở sau gate pháp lý.
+- Công ty không mua lại thẻ bằng tiền thật/tiền mã hóa, không hứa giá hay lợi nhuận; NFT chỉ mở sau gate pháp lý.
+- Arena Point không mua được, không quy đổi, không chuyển nhượng; phần thưởng có giá trị trong Đấu trường chỉ do công ty cấp (BR-PVP-03, 05).
+- Chỉ số thẻ bất biến sau phát hành vì gắn với NFT (BR-CARD-06).
 - Công nghệ đã chốt: Unity cho toàn bộ app, backend .NET; cloud chưa chốt (Master Document mục 9, [TECH_STACK.md](TECH_STACK.md)).
 
 ## 17.3. Phụ thuộc
@@ -1524,6 +1681,12 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Tài khoản developer App Store / Google Play | EP-02 | Chưa rõ |
 | Hợp đồng ad network | EP-09 | Chưa rõ |
 | Ý kiến pháp lý (Q-20, Q-21) | Launch | Chưa có |
+| Ma trận pháp lý từng thị trường (Q-46) | Mở từng thị trường | Chưa có |
+| Ý kiến pháp lý về NFT, pháp nhân (Q-41) | EP-12 (R2) | Chưa có |
+| Hợp đồng cổng thanh toán web (Q-31) | Nạp Gem trên web (R1) | Chưa chọn |
+| Hợp đồng KYC, sàng lọc ví (T-10) | EP-12 (R2) | Chưa chọn |
+| Bản dịch 4 ngôn ngữ cho nội dung pháp lý và 100 thẻ | R1 launch | Chưa có |
+| Thiết kế chỉ số 100 thẻ + mô phỏng cân bằng (Q-51, Q-56) | Dữ liệu thẻ R1; Đấu trường R2 | Chưa có |
 
 ---
 
@@ -1538,7 +1701,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | FR-05 | US-01.5 | — | Viết ở FRD | Profile |
 | FR-06 | US-01.6 | BR-ACC-03 | Viết ở FRD | — (backend) |
 | FR-07 → FR-09 | US-02.1 → US-02.3 | BR-WAL-01 → BR-WAL-04 | SC-WAL-01, SC-WAL-02 | Ví, Nạp Gem, Lịch sử |
-| FR-10 | US-02.4 | BR-WAL-05 | Viết ở FRD | Đổi tiền |
+| FR-10 | US-02.4 | BR-WAL-05, BR-WAL-06 | SC-WAL-16 → 21 | Đổi tiền |
 | FR-11 | US-03.1 → US-03.3 | BR-PACK-01, BR-PACK-04, BR-PACK-05 | SC-PACK-05 → SC-PACK-09 | Cửa hàng, Chi tiết pack |
 | FR-12 → FR-21 | US-04.1 → US-04.10 | BR-PACK-02, BR-PACK-06 → BR-PACK-08 | SC-PACK-01 → SC-PACK-04 | Mở pack, Summary |
 | FR-22 → FR-26 | US-05.1 → US-05.7 | — | Viết ở FRD | Album, Chi tiết thẻ |
@@ -1549,10 +1712,11 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | FR-40 → FR-44 | US-08.1 → US-08.5 | — | Viết ở FRD | Feed, Chat, Leaderboard |
 | FR-45, FR-47 → FR-49 | US-09.1, US-09.3 → US-09.5 | BR-ECO-04 | Viết ở FRD | Dashboard doanh thu |
 | FR-50 → FR-55 | US-10.1 → US-10.6 | BR-ADM-01 → BR-ADM-04 | SC-ADM-01 → SC-ADM-14 | Admin |
-| CR-001 (web) | US-01.x, US-02.2, US-03.1, US-04.x, US-05.x trên web | BR-WEB-01 → BR-WEB-07 | SC-WEB-01 → SC-WEB-12 | Toàn bộ màn hình người chơi trên web |
-| CR-004 (Đấu trường) | EP-13 | BR-CARD-*, BR-DECK-*, BR-BTL-*, BR-ELM-*, BR-ARN-*, BR-FUS-*, BR-PVP-*, BR-NEW-* | SC-CARD-*, SC-DECK-*, SC-BTL-*, SC-ELM-*, SC-ARN-*, SC-FUS-*, SC-PVP-*, SC-NEW-* | Xây bộ bài, Trận đấu, Sảnh đấu trường, Nhiệm vụ Tân thủ |
-| CR-003 (toàn cầu, đa ngôn ngữ) | Mọi US có giao diện; tính năng có thể tắt theo quốc gia | BR-GEO-*, BR-I18N-*, NFR-08, NFR-17 → 19 | SC-GEO-*, SC-I18N-* | Mọi màn hình (4 ngôn ngữ); Admin ma trận quốc gia |
-| CR-002 (tài sản số) | Lò rèn, kiểm chứng công bằng, số lượng phát hành, quy đổi, NFT | BR-SUP-*, BR-PF-*, BR-FRG-*, BR-NFT-*, BR-WAL-05/06, BR-ECO-01/02 | SC-SUP-*, SC-PF-*, SC-FRG-*, SC-NFT-*, SC-WAL-16→21 | Lò rèn, Kiểm chứng, Ví NFT (web), Admin mùa & số lượng |
+| — (website, mục 4.4) | US-01.x, US-02.2, US-03.1, US-04.x, US-05.x trên web | BR-WEB-01 → BR-WEB-07 | SC-WEB-01 → SC-WEB-12 | Toàn bộ màn hình người chơi trên web |
+| — (tài sản số) | EP-11, US-02.4, US-10.7 | BR-SUP-*, BR-PF-*, BR-FRG-*, BR-WAL-05/06, BR-ECO-01/02 | SC-SUP-*, SC-PF-*, SC-FRG-*, SC-WAL-16 → 21 | Lò rèn, Kiểm chứng, Đổi tiền, Admin mùa & số lượng |
+| — (NFT, R2) | EP-12 | BR-NFT-* | SC-NFT-* | Ví NFT (web) |
+| — (toàn cầu, đa ngôn ngữ) | Mọi US có giao diện; US-10.8 | BR-GEO-*, BR-I18N-*, NFR-08, NFR-17 → 19 | SC-GEO-*, SC-I18N-* | Mọi màn hình (4 ngôn ngữ); Admin ma trận quốc gia |
+| FR-60 → FR-65 (Master §3.11) | EP-13, US-10.9, US-10.10 | BR-CARD-*, BR-DECK-*, BR-BTL-*, BR-ELM-*, BR-ARN-*, BR-FUS-*, BR-PVP-*, BR-NEW-*, NFR-20, NFR-21 | SC-DECK-*, SC-BTL-*, SC-ELM-*, SC-ARN-*, SC-FUS-*, SC-PVP-*, SC-NEW-* | Xây bộ bài, Trận đấu, Sảnh đấu trường, Nhiệm vụ Tân thủ |
 
 ## 18.2. Analysis Ready checklist
 
@@ -1561,7 +1725,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Business owner, mục tiêu, giá trị, phạm vi xác định | ⚠ Một phần | Chưa định danh PO (Q-01); phạm vi MVP chờ xác nhận (Q-03) |
 | Actor và ranh giới quyền rõ ràng | ✔ | Mục 5.2, 12 |
 | Happy, alternate, exception path | ✔ | Mục 7 |
-| Rule, công thức, trạng thái, phê duyệt xác định | ⚠ Một phần | Drop rate (CF-01), pity (Q-09), thưởng tier (Q-04) chưa chốt |
+| Rule, công thức, trạng thái, phê duyệt xác định | ⚠ Một phần | Drop rate (CF-01), pity (Q-09), thưởng tier (Q-04), hệ số trận đấu (Q-51) chưa chốt |
 | User Story có AC đo được | ✔ | Trừ US-07.5, US-07.6 (cần thiết kế riêng) |
 | Phân loại dữ liệu, lưu trữ, che, audit | ⚠ Một phần | Thời hạn lưu chờ Legal (Q-24) |
 | Lỗi tích hợp, retry, trùng lặp, đối soát | ✔ | Mục 13.2 |
@@ -1585,10 +1749,11 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 
 ## 18.4. Bước tiếp theo đề xuất
 
-1. PO trả lời các câu hỏi chặn R1: Q-01, Q-03, Q-04, Q-07, Q-08, Q-09 và quyết định CF-01, CF-04.
-2. Legal trả lời Q-20, Q-21 trước khi chốt kênh thanh toán.
-3. BA cập nhật BRD lên v0.2, sau đó viết FRD mức màn hình/trường cho EP-01 → EP-04, EP-07 (phạm vi R1).
-4. Chuyển Product Designer làm user flow và wireframe dựa trên mục 7 và ràng buộc mục 10.
+1. PO định danh người duyệt (Q-01) và duyệt baseline v1.0: phạm vi mục 4.1 (Q-03, Q-57).
+2. PO trả lời các câu hỏi chặn R1: Q-04, Q-07, Q-08, Q-09, Q-39, Q-43, Q-53, Q-56 và quyết định CF-01, CF-04, CF-06.
+3. Legal trả lời Q-20, Q-21, Q-31, Q-46 trước khi chốt kênh thanh toán và thị trường đợt 1; Q-41 trước khi làm EP-12.
+4. BA viết FRD mức màn hình/trường cho phạm vi R1 theo thứ tự trong Sprint Plan (T002, T020, T040, T049, T099, T124).
+5. Product Designer làm user flow và wireframe dựa trên mục 7 và ràng buộc mục 10.
 
 ---
 

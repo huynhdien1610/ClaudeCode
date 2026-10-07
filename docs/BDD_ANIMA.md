@@ -6,7 +6,7 @@
 | Mã tài liệu | BDD-ANIMA-001 |
 | Phiên bản | 0.5 (Draft) — thêm 12D Đấu trường (CR-004); 12C toàn cầu (CR-003); 12B tài sản số (CR-002); 12A website (CR-001) |
 | Ngày | 2026-10-06 |
-| Nguồn | [BRD](BRD_ANIMA.md) v0.6, [PRD](PRD_ANIMA.md) v0.5 |
+| Nguồn | [BRD](BRD_ANIMA.md) v1.0, [PRD](PRD_ANIMA.md) v0.5 |
 | Trạng thái | **DRAFT — một số kịch bản phụ thuộc quyết định của PO** |
 
 Tài liệu này là bộ kịch bản đầy đủ. Mục 11 của BRD chỉ là trích đoạn; khi hai bên khác nhau, tài liệu này là bản chuẩn. Các ID kịch bản trong BRD được giữ nguyên.

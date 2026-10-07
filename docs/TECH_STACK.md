@@ -5,7 +5,7 @@
 | Mã tài liệu | TECH-ANIMA-001 |
 | Phiên bản | 0.6 — engine Đấu trường (CR-004); đa ngôn ngữ và phát hành toàn cầu (CR-003) |
 | Ngày | 2026-10-06 |
-| Đầu vào | [Master Document](ANIMA_Master_Document.md) v1.1, [BRD](BRD_ANIMA.md) v0.2, [PRD](PRD_ANIMA.md) v0.1 |
+| Đầu vào | [Master Document](ANIMA_Master_Document.md) v1.1, [BRD](BRD_ANIMA.md) v1.0, [PRD](PRD_ANIMA.md) v0.1 |
 | Tóm tắt trong | Master Document mục 9 |
 | Trạng thái | Đã chốt client và backend; cloud chưa chốt |
 

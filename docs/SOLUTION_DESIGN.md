@@ -5,7 +5,7 @@
 | Mã tài liệu | SAD-ANIMA-001 |
 | Phiên bản | 0.4 (Draft) — thêm kiến trúc Đấu trường (CR-004); quốc tế hóa (CR-003); CR-002 |
 | Ngày | 2026-10-06 |
-| Đầu vào | [BRD](BRD_ANIMA.md) v0.6, [PRD](PRD_ANIMA.md) v0.5, [BDD](BDD_ANIMA.md) v0.5, [Tech Stack](TECH_STACK.md) v0.6 |
+| Đầu vào | [BRD](BRD_ANIMA.md) v1.0, [PRD](PRD_ANIMA.md) v0.5, [BDD](BDD_ANIMA.md) v0.5, [Tech Stack](TECH_STACK.md) v0.6 |
 | Trạng thái | Chờ Tech Lead review |
 
 Tài liệu mô tả **cách xây** hệ thống. Quy tắc nghiệp vụ nằm ở BRD, lựa chọn công nghệ và lý do nằm ở Tech Stack; ở đây chỉ dẫn chiếu ID.
