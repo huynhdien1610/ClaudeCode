@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Anima.SharedKernel/Anima.SharedKernel.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Fairness/Anima.Modules.Fairness.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Economy/Anima.Modules.Economy.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Identity/Anima.Modules.Identity.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Wallet/Anima.Modules.Wallet.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Catalog/Anima.Modules.Catalog.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Collection/Anima.Modules.Collection.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Gacha/Anima.Modules.Gacha.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Forge/Anima.Modules.Forge.csproj" />
+  </ItemGroup>
+</Project>

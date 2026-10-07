@@ -1,0 +1,12 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <!-- Using chung cho các module và host (Anima.Contracts để riêng vì dùng chung với Unity). -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'Anima.Contracts'">
+    <Using Include="Microsoft.AspNetCore.Builder" />
+    <Using Include="Microsoft.AspNetCore.Http" />
+    <Using Include="Microsoft.AspNetCore.Routing" />
+    <Using Include="Microsoft.Extensions.Configuration" />
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+</Project>

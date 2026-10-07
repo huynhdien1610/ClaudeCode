@@ -1,0 +1,964 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Anima.Api | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost/"
+    }
+  ],
+  "paths": {
+    "/v1/economy": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/packs": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/packs/{code}": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/forge/odds": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/cards": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/accounts": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me/locale": {
+      "put": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocaleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me/phone/otp": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me/phone/verify": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OtpVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/fairness": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/fairness/client-seed": {
+      "put": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientSeedRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/fairness/rotate": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RotateRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/fairness/history": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/fairness/server-seed": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/fairness/verify": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/wallet": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/wallet/ledger": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/wallet/convert": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/collection": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "element",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rarity",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/collection/progress": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/cards/{id}": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/packs/{code}/purchase": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurchaseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me/packs": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me/pity/{code}": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/pack-instances/{id}/open": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/pack-instances/{id}/opening": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/forge": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me/sealed": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/forge/sealed/{id}/reveal": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/forge/info": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClientSeedRequest": {
+        "required": [
+          "clientSeed"
+        ],
+        "type": "object",
+        "properties": {
+          "clientSeed": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ConvertRequest": {
+        "required": [
+          "direction",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "ForgeRequest": {
+        "required": [
+          "cardInstanceIds",
+          "feeCurrency"
+        ],
+        "type": "object",
+        "properties": {
+          "cardInstanceIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "feeCurrency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "LocaleRequest": {
+        "required": [
+          "locale"
+        ],
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "LoginRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "password": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "OtpVerifyRequest": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PhoneRequest": {
+        "required": [
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PurchaseRequest": {
+        "required": [
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32",
+            "default": 1
+          }
+        }
+      },
+      "RegisterRequest": {
+        "required": [
+          "email",
+          "password",
+          "birthDate",
+          "country",
+          "locale",
+          "timezone"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "password": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "birthDate": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "country": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "locale": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "timezone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RotateRequest": {
+        "required": [
+          "clientSeed"
+        ],
+        "type": "object",
+        "properties": {
+          "clientSeed": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TopUpRequest": {
+        "required": [
+          "gem"
+        ],
+        "type": "object",
+        "properties": {
+          "gem": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "VerifyRequest": {
+        "required": [
+          "serverSeed",
+          "clientSeed",
+          "nonce",
+          "slots"
+        ],
+        "type": "object",
+        "properties": {
+          "serverSeed": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "clientSeed": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nonce": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "slots": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Anima.Api"
+    }
+  ]
+}

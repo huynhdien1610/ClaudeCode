@@ -1,0 +1,33 @@
+name: backend
+on:
+  push:
+    branches: [main]
+    paths: ["backend/**", "contracts/**", ".github/workflows/backend.yml"]
+  pull_request:
+    paths: ["backend/**", "contracts/**", ".github/workflows/backend.yml"]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env: { POSTGRES_PASSWORD: postgres }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ANIMA_TEST_PG: Host=127.0.0.1;Port=5432;Username=postgres;Password=postgres;Database=postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "10.0.x" }
+      - name: Format
+        run: dotnet format backend/Anima.sln --verify-no-changes
+      - name: Build
+        run: dotnet build backend/Anima.sln -c Release
+      - name: Test (unit, architecture, integration on real PostgreSQL)
+        run: dotnet test backend/Anima.sln -c Release --no-build --logger "trx;LogFileName=test.trx"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: test-results, path: "**/TestResults/*.trx" }

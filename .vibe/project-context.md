@@ -23,7 +23,7 @@
 
 ## Commands
 
-> Trạng thái: **dự kiến** — chưa có code. Task T019 phải chạy thử và đổi trạng thái thành "đã kiểm chứng" trước khi dispatch task code đầu tiên ngoài S001.
+> Trạng thái: **backend đã kiểm chứng** (2026-10-07: build, test, format chạy được; `infra/dev-postgres.sh` thay cho Docker khi không có Docker). Lệnh web và Unity vẫn dự kiến.
 
 | Mục đích | Lệnh |
 |---|---|
