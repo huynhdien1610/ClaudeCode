@@ -9,6 +9,7 @@ using Anima.Fairness;
 using Anima.Forge;
 using Anima.Gacha;
 using Anima.Identity;
+using Anima.Payment;
 using Anima.Quest;
 using Anima.SharedKernel;
 using Anima.Wallet;
@@ -19,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 var isDev = builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Testing";
 
 // Thứ tự module = thứ tự chạy migration.
-IModule[] modules = [new IdentityModule(), new FairnessModule(), new EconomyModule(), new WalletModule(), new CatalogModule(), new CollectionModule(), new GachaModule(), new ForgeModule(), new QuestModule(), new AdminModule()];
+IModule[] modules = [new IdentityModule(), new FairnessModule(), new EconomyModule(), new WalletModule(), new CatalogModule(), new CollectionModule(), new GachaModule(), new ForgeModule(), new QuestModule(), new PaymentModule(), new AdminModule()];
 
 builder.Services.AddSharedKernel(builder.Configuration, isDev);
 foreach (var m in modules) m.ConfigureServices(builder.Services, builder.Configuration);

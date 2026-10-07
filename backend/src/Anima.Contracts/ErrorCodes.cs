@@ -61,6 +61,9 @@ namespace Anima.Contracts
         public const string InvalidState = "INVALID_STATE";
         public const string SelfRoleChangeForbidden = "SELF_ROLE_CHANGE_FORBIDDEN";
         public const string ReasonRequired = "REASON_REQUIRED";
+        public const string PaymentUnavailable = "PAYMENT_UNAVAILABLE";
+        public const string InvalidSignature = "INVALID_SIGNATURE";
+        public const string PaymentAmountMismatch = "PAYMENT_AMOUNT_MISMATCH";
         public const string QuestExpired = "QUEST_EXPIRED";
         public const string QuestNotAvailable = "QUEST_NOT_AVAILABLE";
         public const string QuestNotComplete = "QUEST_NOT_COMPLETE";

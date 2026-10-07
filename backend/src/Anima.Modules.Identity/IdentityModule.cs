@@ -173,6 +173,24 @@ public sealed partial class IdentityService(IUnitOfWork uow, IFieldCipher cipher
         return rows.Count > 0 ? rows[0] : throw new DomainException(ErrorCodes.Unauthorized, "Account not found", 401);
     }
 
+    public async Task<bool> SetNegativeGemRestrictionAsync(Guid id, bool restricted, CancellationToken ct)
+    {
+        var cur = (await uow.QueryAsync("SELECT status, status_before_restriction, restriction_reason, phone_verified_at IS NOT NULL FROM identity.account WHERE id=@i FOR UPDATE",
+            r => (Status: r.GetString(0), Before: r.IsDBNull(1) ? null : r.GetString(1), Reason: r.IsDBNull(2) ? null : r.GetString(2), Phone: r.GetBoolean(3)), ct, ("i", id))).FirstOrDefault();
+        if (cur.Status is null) throw new DomainException(ErrorCodes.Unauthorized, "Account not found", 401);
+        if (restricted && cur.Status is "Unverified" or "Verified")
+        {
+            await uow.ExecAsync("UPDATE identity.account SET status='Restricted', status_before_restriction=@b, restriction_reason='NEGATIVE_GEM' WHERE id=@i", ct, ("b", cur.Status), ("i", id));
+            return true;
+        }
+        if (!restricted && cur.Status == "Restricted" && cur.Reason == "NEGATIVE_GEM")
+        {
+            await uow.ExecAsync("UPDATE identity.account SET status=@s, status_before_restriction=NULL, restriction_reason=NULL WHERE id=@i", ct, ("s", cur.Before ?? (cur.Phone ? "Verified" : "Unverified")), ("i", id));
+            return true;
+        }
+        return false;
+    }
+
     public async Task SetLocaleAsync(Guid id, string? locale, CancellationToken ct)
     {
         if (Array.IndexOf(Locales.Supported, locale) < 0) throw DomainException.Validation("Unsupported locale");

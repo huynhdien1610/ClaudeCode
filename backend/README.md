@@ -15,7 +15,7 @@ Development bật `Dev:MockTopUp` (nạp Gem giả: `POST /v1/dev/topup`) và `I
 | Lệnh | Việc |
 |---|---|
 | `dotnet build backend/Anima.sln` | Build (cảnh báo là lỗi) |
-| `dotnet test backend/Anima.sln` | 192 test (25 đơn vị, 33 kiến trúc, 134 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
+| `dotnet test backend/Anima.sln` | 204 test (25 đơn vị, 36 kiến trúc, 143 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
 | `dotnet format backend/Anima.sln --verify-no-changes` | Kiểm tra định dạng |
 | `UPDATE_OPENAPI=1 dotnet test backend/tests/Anima.IntegrationTests --filter OpenApiContract` | Cập nhật snapshot hợp đồng API khi cố ý đổi API |
 
@@ -44,6 +44,7 @@ backend/
 | Gacha | `gacha` | mua pack idempotent, mở pack, pity, gói chào mừng | BR-PACK-02/04/05/06, BR-NEW-01/04, BR-SUP-04 |
 | Forge | `forge` | rèn 2 → 1, lật thẻ chưa lật, hạn mức ngày | BR-FRG-01 → 07 |
 | Quest | `quest` | nhiệm vụ Tân thủ 7 ngày, nhận thưởng (pack cơ bản gắn chặt tài khoản, 200 Coin ngày 6–7), làm bù đến hết ngày 7 | BR-NEW-03/04/05 |
+| Payment | `payment` | nạp Gem qua cổng web: bảng giá công khai, đơn hàng, webhook ký HMAC idempotent, hoàn tiền thu hồi Gem (có thể âm → Restricted NEGATIVE_GEM, nạp bù tự gỡ); cổng giả lập `sandbox`, cổng thật cài `IPaymentGateway` | BR-WEB-04/05, BR-WAL-02/04, SC-WAL-01/02/06/07/10–15 |
 | Admin | `admin` | đăng nhập quản trị (JWT riêng), 6 vai trò, audit log append-only, tra cứu tài khoản (PII che), khóa/mở, tỷ lệ rơi maker-checker, tham số kinh tế, bồi thường, dashboard | BR-ADM-*, SC-ADM-01..14 |
 
 Ranh giới module do `Anima.ArchTests` canh: chỉ tham chiếu module được phép, không có vòng, không dùng lớp cài đặt (`*Service`) của module khác, không dùng `System.Random`.
@@ -81,3 +82,16 @@ Luồng chơi trên website: đăng ký → nhận 100 Coin + gói chào mừng 
 - **Dữ liệu tạm:** 100 thẻ và chỉ số trong `CatalogSeeder` là placeholder theo khung BR-CARD-03; kỹ năng và truyện (trừ 8 thẻ có tên) chờ Game Designer và Content (T125).
 - **Chờ quyết định PO:** tỷ lệ rơi phương án A (CF-01), ngưỡng pity 49 (Q-09), cách xử lý khi hết bản giữa chừng — hiện hạ xuống rarity gần nhất và ghi lý do (Q-39).
 - **Trạng thái cổng:** Intake/Analysis chưa qua (`.vibe/checkpoint.json`); code được bắt đầu theo chỉ đạo trực tiếp của PO. Task trong backlog chưa chuyển trạng thái.
+
+## Cổng thanh toán (nạp Gem trên web)
+
+Cấu hình ở mục `Payment` (appsettings hoặc biến môi trường `Payment__*`):
+
+| Khóa | Ý nghĩa |
+| --- | --- |
+| `Provider` | tên cổng đang dùng; mặc định `sandbox` (cổng giả lập, không có tiền thật) |
+| `WebhookSecret` | khóa HMAC-SHA256 ký webhook, header `X-Signature` = hex(HMAC(secret, thân request gốc)). **Bắt buộc đặt riêng** ở môi trường thật |
+| `Sandbox` | `true` bật trang thanh toán thử và `POST /v1/payments/sandbox/{orderId}/simulate`. **Không bật ở production** |
+| `PublicBaseUrl` | địa chỉ website người chơi |
+
+Webhook của cổng gọi `POST /payments/webhook/{provider}` (không JWT). Gem chỉ được cộng khi chữ ký đúng và số tiền/tiền tệ khớp đơn; mỗi gateway transaction ID chỉ ghi nhận một lần; mọi webhook (kể cả sai chữ ký) vào `payment.webhook_log`. **Chưa có cổng thật nào được tích hợp**: cần hợp đồng merchant (VNPay, MoMo, Stripe...) rồi cài `IPaymentGateway` (tạo phiên thanh toán + xác thực webhook của cổng đó) và, nếu cổng yêu cầu, thêm truy vấn trạng thái chủ động (BR-WEB-04).

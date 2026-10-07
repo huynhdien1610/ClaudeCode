@@ -23,5 +23,6 @@
     <ProjectReference Include="../../src/Anima.Modules.Forge/Anima.Modules.Forge.csproj" />
     <ProjectReference Include="../../src/Anima.Modules.Admin/Anima.Modules.Admin.csproj" />
     <ProjectReference Include="../../src/Anima.Modules.Quest/Anima.Modules.Quest.csproj" />
+    <ProjectReference Include="../../src/Anima.Modules.Payment/Anima.Modules.Payment.csproj" />
   </ItemGroup>
 </Project>

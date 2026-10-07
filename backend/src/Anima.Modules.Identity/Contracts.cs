@@ -13,6 +13,11 @@ public sealed record AccountInfo(Guid Id, string Status, bool PhoneVerified, str
 public interface IIdentityApi
 {
     Task<AccountInfo> GetAsync(Guid accountId, CancellationToken ct);
+    /// <summary>
+    /// BR-WAL-04: bật/tắt hạn chế NEGATIVE_GEM. Bật: Unverified/Verified → Restricted (nhớ trạng thái cũ). Tắt: chỉ khi đang Restricted vì NEGATIVE_GEM
+    /// thì trả về trạng thái trước đó. Không đụng tới Restricted vì FRAUD, Banned, PendingDeletion, Deleted. Trả về true nếu trạng thái đổi.
+    /// </summary>
+    Task<bool> SetNegativeGemRestrictionAsync(Guid accountId, bool restricted, CancellationToken ct);
 }
 
 public sealed record AdminAccountRow(Guid Id, string EmailMasked, string? PhoneMasked, string Status, string? RestrictionReason, string LegalCountry, string Locale, DateTimeOffset CreatedAt);

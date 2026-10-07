@@ -18,6 +18,11 @@ public interface IWalletApi
     /// <summary>Trừ tiền; ném INSUFFICIENT_BALANCE nếu không đủ. Phải gọi trong transaction của nghiệp vụ gọi nó.</summary>
     Task<LedgerEntryDto> DebitAsync(Guid accountId, string currency, long amount, string reason, string? refType, string? refId, string? idempotencyKey, CancellationToken ct);
     Task<Balances> GetBalancesAsync(Guid accountId, CancellationToken ct);
+    /// <summary>
+    /// BR-WAL-04: thu hồi Gem khi hoàn tiền. Khác <see cref="DebitAsync"/>, số dư Gem được phép xuống âm (Coin thì không bao giờ).
+    /// Trả về bút toán, trong đó <c>BalanceAfter</c> là số dư Gem sau khi thu hồi.
+    /// </summary>
+    Task<LedgerEntryDto> ClawbackGemAsync(Guid accountId, long amount, string reason, string? refType, string? refId, string? idempotencyKey, CancellationToken ct);
 }
 
 public sealed class WalletModule : IModule
@@ -65,9 +70,12 @@ public sealed class WalletService(IUnitOfWork uow, IClock clock, IEconomyApi eco
     public Task<LedgerEntryDto> DebitAsync(Guid accountId, string currency, long amount, string reason, string? refType, string? refId, string? idem, CancellationToken ct) =>
         ApplyAsync(accountId, currency, -Positive(amount), reason, refType, refId, idem, ct);
 
+    public Task<LedgerEntryDto> ClawbackGemAsync(Guid accountId, long amount, string reason, string? refType, string? refId, string? idem, CancellationToken ct) =>
+        ApplyAsync(accountId, Currencies.Gem, -Positive(amount), reason, refType, refId, idem, ct, allowNegative: true);
+
     private static long Positive(long a) => a > 0 ? a : throw new DomainException(ErrorCodes.InvalidAmount, "Amount must be positive");
 
-    private Task<LedgerEntryDto> ApplyAsync(Guid acc, string currency, long delta, string reason, string? refType, string? refId, string? idem, CancellationToken ct)
+    private Task<LedgerEntryDto> ApplyAsync(Guid acc, string currency, long delta, string reason, string? refType, string? refId, string? idem, CancellationToken ct, bool allowNegative = false)
     {
         if (!Currencies.IsValid(currency)) throw DomainException.Validation("Unknown currency");
         return uow.RunAsync(async () =>
@@ -80,7 +88,7 @@ public sealed class WalletService(IUnitOfWork uow, IClock clock, IEconomyApi eco
             await uow.ExecAsync("INSERT INTO wallet.balance(account_id,currency) VALUES(@a,@c) ON CONFLICT DO NOTHING", ct, ("a", acc), ("c", currency));
             var cur = await uow.ScalarAsync<long>("SELECT amount FROM wallet.balance WHERE account_id=@a AND currency=@c FOR UPDATE", ct, ("a", acc), ("c", currency));
             var next = cur + delta;
-            if (next < 0) throw new DomainException(ErrorCodes.InsufficientBalance, $"Insufficient {currency}", 402, new { currency, required = -delta, available = cur });
+            if (next < 0 && delta < 0 && !(allowNegative && currency == Currencies.Gem)) throw new DomainException(ErrorCodes.InsufficientBalance, $"Insufficient {currency}", 402, new { currency, required = -delta, available = cur });
             await uow.ExecAsync("UPDATE wallet.balance SET amount=@n, version=version+1 WHERE account_id=@a AND currency=@c", ct, ("n", next), ("a", acc), ("c", currency));
             var rows = await uow.QueryAsync($@"INSERT INTO wallet.ledger_entry(account_id,currency,amount,balance_after,reason,ref_type,ref_id,idempotency_key,created_at)
                 VALUES(@a,@c,@d,@n,@r,@rt,@ri,@k,@now) RETURNING {Cols}", Map, ct,

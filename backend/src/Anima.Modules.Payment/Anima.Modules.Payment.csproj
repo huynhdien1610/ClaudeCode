@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../Anima.SharedKernel/Anima.SharedKernel.csproj" />
+    <ProjectReference Include="../Anima.Modules.Identity/Anima.Modules.Identity.csproj" />
+    <ProjectReference Include="../Anima.Modules.Wallet/Anima.Modules.Wallet.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations/*.sql" />
+  </ItemGroup>
+</Project>
