@@ -42,7 +42,7 @@ export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary" | "se
 export const RARITIES: Rarity[] = ["common", "uncommon", "rare", "epic", "legendary", "secret"];
 export type Element = "Umbryx" | "Pyraxis" | "Aqualis" | "Terrakin" | "Ventara" | "Voltaris" | "Luminara" | "Nihilum";
 
-export type Account = { id: string; status: string; phoneVerified: boolean; locale: string; timezone: string; legalCountry: string; restrictionReason: string | null; createdAt: string };
+export type Account = { id: string; status: string; phoneVerified: boolean; locale: string; timezone: string; legalCountry: string; restrictionReason: string | null; createdAt: string; isMinor: boolean; guardianConsent: boolean };
 export type AuthResponse = { accessToken: string; expiresAt: string; account: Account };
 export type Balances = { gem: number; coin: number };
 export type LedgerEntry = { id: number; currency: "GEM" | "COIN"; amount: number; balanceAfter: number; reason: string; refType: string | null; refId: string | null; createdAt: string };
@@ -99,6 +99,8 @@ export const api = {
   me: () => request<Account>("GET", "/v1/me"),
   // keepalive: không bị huỷ khi người dùng đổi ngôn ngữ rồi chuyển trang ngay
   setLocale: (locale: string) => request<void>("PUT", "/v1/me/locale", { locale }, { keepalive: true }),
+  requestGuardian: (guardianEmail: string) => request<void>("POST", "/v1/me/guardian-consent", { guardianEmail }),
+  confirmGuardian: (token: string) => request<void>("POST", "/v1/guardian/confirm", { token }),
   sendOtp: (phone: string) => request<void>("POST", "/v1/me/phone/otp", { phone }, { idem: true }),
   verifyOtp: (code: string) => request<Account>("POST", "/v1/me/phone/verify", { code }, { idem: true }),
 

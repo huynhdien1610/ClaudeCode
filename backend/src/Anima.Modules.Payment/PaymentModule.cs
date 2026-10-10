@@ -131,6 +131,7 @@ public sealed class PaymentService(IUnitOfWork uow, IClock clock, IOptions<Payme
         var pkg = (await PackagesAsync(ct)).FirstOrDefault(p => p.Code == packageCode) ?? throw DomainException.NotFound("Gem package");
         // BRD 8.1: Restricted vì FRAUD không được nạp; Restricted vì NEGATIVE_GEM thì được nạp bù.
         var info = await identity.GetAsync(acc, ct);
+        if (info.IsMinor && !info.GuardianConsent) throw new DomainException(ErrorCodes.GuardianConsentRequired, "A parent or guardian must agree before this account can top up", 403);   // BR-ACC-01, BR-WEB-07
         if (info.Status is "Banned" or "PendingDeletion" or "Deleted" || (info.Status == "Restricted" && info.RestrictionReason != "NEGATIVE_GEM"))
             throw new DomainException(ErrorCodes.AccountRestricted, "This account cannot top up", 403);
         var order = (await uow.QueryAsync($@"INSERT INTO payment.payment_order(id,account_id,package_code,gem,amount_minor,currency,provider,status,created_at)

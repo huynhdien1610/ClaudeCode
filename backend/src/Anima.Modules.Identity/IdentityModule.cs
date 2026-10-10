@@ -28,6 +28,7 @@ public sealed class IdentityModule : IModule
         s.AddScoped<IIdentityAdminApi>(sp => sp.GetRequiredService<IdentityAdminService>());
         s.AddScoped<IStatsContributor>(sp => sp.GetRequiredService<IdentityAdminService>());
         s.AddSingleton<IOtpSender, LoggingOtpSender>();
+        s.AddSingleton<IGuardianNotifier, LoggingGuardianNotifier>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
@@ -42,6 +43,10 @@ public sealed class IdentityModule : IModule
         { await svc.SetLocaleAsync(u.AccountId(), r.Locale, ct); return Results.NoContent(); });
         me.MapPost("/phone/otp", async (ClaimsPrincipal u, PhoneRequest r, IdentityService svc, CancellationToken ct) =>
         { await svc.SendOtpAsync(u.AccountId(), r.Phone, ct); return Results.Accepted(); });
+        me.MapPost("/guardian-consent", async (ClaimsPrincipal u, GuardianRequest r, IdentityService svc, CancellationToken ct) =>
+        { await svc.RequestGuardianConsentAsync(u.AccountId(), r.GuardianEmail, ct); return Results.Accepted(); });
+        anon.MapPost("/guardian/confirm", async (GuardianConfirm r, IdentityService svc, CancellationToken ct) =>
+        { await svc.ConfirmGuardianAsync(r.Token, ct); return Results.NoContent(); });
         me.MapPost("/phone/verify", async (ClaimsPrincipal u, OtpVerifyRequest r, IdentityService svc, CancellationToken ct) =>
             Results.Ok(await svc.VerifyOtpAsync(u.AccountId(), r.Code, ct)));
     }
@@ -67,6 +72,26 @@ public sealed record PhoneRequest(string? Phone);
 public sealed record OtpVerifyRequest(string? Code);
 public sealed record AuthResponse(string AccessToken, DateTimeOffset ExpiresAt, AccountInfo Account);
 
+public sealed record GuardianRequest(string? GuardianEmail);
+public sealed record GuardianConfirm(string? Token);
+
+/// <summary>Gửi email xin người giám hộ đồng ý. Bản dev chỉ ghi log; thay bằng nhà cung cấp email thật khi chọn.</summary>
+public interface IGuardianNotifier { Task SendAsync(string guardianEmail, string token, CancellationToken ct); }
+
+public sealed partial class LoggingGuardianNotifier(ILogger<LoggingGuardianNotifier> log, Microsoft.Extensions.Options.IOptions<IdentityOptions> opt) : IGuardianNotifier
+{
+    public Task SendAsync(string guardianEmail, string token, CancellationToken ct)
+    {
+        if (opt.Value.DevLogOtp) LogToken(log, guardianEmail, token);
+        else LogNotSent(log);
+        return Task.CompletedTask;
+    }
+    [LoggerMessage(Level = LogLevel.Warning, Message = "DEV guardian consent token for {Email}: {Token}")]
+    private static partial void LogToken(ILogger l, string email, string token);
+    [LoggerMessage(Level = LogLevel.Error, Message = "No email provider configured: guardian consent request was not sent")]
+    private static partial void LogNotSent(ILogger l);
+}
+
 public interface IOtpSender { Task SendAsync(string phoneE164, string code, CancellationToken ct); }
 
 /// <summary>Bản dev: không gửi SMS. Chỉ ghi mã ra log khi Identity:DevLogOtp = true. Thay bằng nhà cung cấp SMS thật khi chọn (T026).</summary>
@@ -87,7 +112,7 @@ public sealed partial class LoggingOtpSender(ILogger<LoggingOtpSender> log, Micr
 }
 
 public sealed partial class IdentityService(IUnitOfWork uow, IFieldCipher cipher, IClock clock, IDomainEventPublisher events,
-    Microsoft.Extensions.Options.IOptions<IdentityOptions> opt, IOtpSender otp) : IIdentityApi
+    Microsoft.Extensions.Options.IOptions<IdentityOptions> opt, IOtpSender otp, IGuardianNotifier guardian) : IIdentityApi
 {
     private readonly IdentityOptions _o = opt.Value;
 
@@ -168,9 +193,43 @@ public sealed partial class IdentityService(IUnitOfWork uow, IFieldCipher cipher
 
     public async Task<AccountInfo> GetAsync(Guid accountId, CancellationToken ct)
     {
-        var rows = await uow.QueryAsync("SELECT id,status,phone_verified_at IS NOT NULL,locale,timezone,legal_country,restriction_reason,created_at FROM identity.account WHERE id=@id",
-            r => new AccountInfo(r.GetGuid(0), r.GetString(1), r.GetBoolean(2), r.GetString(3), r.GetString(4), r.GetString(5).Trim(), r.IsDBNull(6) ? null : r.GetString(6), r.GetFieldValue<DateTimeOffset>(7)), ct, ("id", accountId));
+        var today = DateOnly.FromDateTime(clock.UtcNow.UtcDateTime);
+        var rows = await uow.QueryAsync("SELECT id,status,phone_verified_at IS NOT NULL,locale,timezone,legal_country,restriction_reason,created_at,birth_date_enc,guardian_consent_at IS NOT NULL FROM identity.account WHERE id=@id",
+            r => new AccountInfo(r.GetGuid(0), r.GetString(1), r.GetBoolean(2), r.GetString(3), r.GetString(4), r.GetString(5).Trim(), r.IsDBNull(6) ? null : r.GetString(6), r.GetFieldValue<DateTimeOffset>(7),
+                IsMinor(cipher.Decrypt(r.GetFieldValue<byte[]>(8)), today), r.GetBoolean(9)), ct, ("id", accountId));
         return rows.Count > 0 ? rows[0] : throw new DomainException(ErrorCodes.Unauthorized, "Account not found", 401);
+    }
+
+    /// <summary>Dưới 18 tuổi tính theo ngày sinh đã khai (BR-ACC-01, mặc định theo ma trận quốc gia BR-GEO-04).</summary>
+    private static bool IsMinor(string birthDate, DateOnly today)
+    {
+        var birth = DateOnly.ParseExact(birthDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        return today < birth.AddYears(18);
+    }
+
+    public async Task RequestGuardianConsentAsync(Guid id, string? guardianEmail, CancellationToken ct)
+    {
+        var email = (guardianEmail ?? "").Trim().ToLowerInvariant();
+        if (!EmailRx().IsMatch(email) || email.Length > 200) throw DomainException.Validation("Invalid guardian email");
+        var info = await GetAsync(id, ct);
+        if (!info.IsMinor) throw DomainException.Validation("Guardian consent is only needed for accounts under 18");
+        if (info.GuardianConsent) throw DomainException.Conflict(ErrorCodes.InvalidState, "Guardian consent was already given");
+        var token = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)).Replace('+', '-').Replace('/', '_').TrimEnd('=');
+        await uow.ExecAsync(@"INSERT INTO identity.guardian_request(account_id,email_enc,token_hash,expires_at,created_at) VALUES(@a,@e,@t,@x,@now)
+            ON CONFLICT (account_id) DO UPDATE SET email_enc=@e, token_hash=@t, expires_at=@x, created_at=@now", ct,
+            ("a", id), ("e", cipher.Encrypt(email)), ("t", cipher.LookupHash("guardian:" + token)), ("x", clock.UtcNow.AddDays(7)), ("now", clock.UtcNow));
+        await guardian.SendAsync(email, token, ct);
+    }
+
+    public async Task ConfirmGuardianAsync(string? token, CancellationToken ct)
+    {
+        var hash = cipher.LookupHash("guardian:" + (token ?? ""));
+        await uow.RunAsync(async () =>
+        {
+            var acc = await uow.ScalarAsync<Guid?>("DELETE FROM identity.guardian_request WHERE token_hash=@t AND expires_at > @now RETURNING account_id", ct, ("t", hash), ("now", clock.UtcNow));
+            if (acc is null) throw new DomainException(ErrorCodes.GuardianTokenInvalid, "This confirmation link is invalid or has expired", 400);
+            await uow.ExecAsync("UPDATE identity.account SET guardian_consent_at=@now WHERE id=@a", ct, ("now", clock.UtcNow), ("a", acc));
+        }, ct);
     }
 
     public async Task<bool> SetNegativeGemRestrictionAsync(Guid id, bool restricted, CancellationToken ct)

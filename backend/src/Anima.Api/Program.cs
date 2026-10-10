@@ -84,6 +84,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+Anima.Api.RateLimiting.Add(builder.Services, builder.Configuration);
 builder.Services.AddOpenApi();
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
     .WithOrigins((builder.Configuration["Cors:Origins"] ?? "http://localhost:3000,http://localhost:5173").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
@@ -96,6 +97,7 @@ app.UseMiddleware<DomainErrorMiddleware>();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
 app.MapGet("/readyz", async (Npgsql.NpgsqlDataSource ds, CancellationToken ct) =>

@@ -8,7 +8,7 @@ public sealed record AccountRegistered(Guid AccountId, string LegalCountry, stri
 /// <summary>Phát khi người chơi xác thực SĐT thành công (người nhận: Quest).</summary>
 public sealed record PhoneVerified(Guid AccountId) : IDomainEvent;
 
-public sealed record AccountInfo(Guid Id, string Status, bool PhoneVerified, string Locale, string Timezone, string LegalCountry, string? RestrictionReason, DateTimeOffset CreatedAt);
+public sealed record AccountInfo(Guid Id, string Status, bool PhoneVerified, string Locale, string Timezone, string LegalCountry, string? RestrictionReason, DateTimeOffset CreatedAt, bool IsMinor = false, bool GuardianConsent = false);
 
 public interface IIdentityApi
 {

@@ -72,6 +72,9 @@ namespace Anima.Contracts
         public const string NotYourTurn = "NOT_YOUR_TURN";
         public const string InsufficientResonance = "INSUFFICIENT_RESONANCE";
         public const string MatchFinished = "MATCH_FINISHED";
+        public const string RateLimited = "RATE_LIMITED";
+        public const string GuardianConsentRequired = "GUARDIAN_CONSENT_REQUIRED";
+        public const string GuardianTokenInvalid = "GUARDIAN_TOKEN_INVALID";
         public const string QuestExpired = "QUEST_EXPIRED";
         public const string QuestNotAvailable = "QUEST_NOT_AVAILABLE";
         public const string QuestNotComplete = "QUEST_NOT_COMPLETE";

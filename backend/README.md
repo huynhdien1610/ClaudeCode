@@ -15,7 +15,7 @@ Development bật `Dev:MockTopUp` (nạp Gem giả: `POST /v1/dev/topup`) và `I
 | Lệnh | Việc |
 |---|---|
 | `dotnet build backend/Anima.sln` | Build (cảnh báo là lỗi) |
-| `dotnet test backend/Anima.sln` | 275 test (81 đơn vị, 42 kiến trúc, 152 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
+| `dotnet test backend/Anima.sln` | 282 test (81 đơn vị, 42 kiến trúc, 159 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
 | `dotnet format backend/Anima.sln --verify-no-changes` | Kiểm tra định dạng |
 | `UPDATE_OPENAPI=1 dotnet test backend/tests/Anima.IntegrationTests --filter OpenApiContract` | Cập nhật snapshot hợp đồng API khi cố ý đổi API |
 
@@ -97,3 +97,9 @@ Cấu hình ở mục `Payment` (appsettings hoặc biến môi trường `Payme
 | `PublicBaseUrl` | địa chỉ website người chơi |
 
 Webhook của cổng gọi `POST /payments/webhook/{provider}` (không JWT). Gem chỉ được cộng khi chữ ký đúng và số tiền/tiền tệ khớp đơn; mỗi gateway transaction ID chỉ ghi nhận một lần; mọi webhook (kể cả sai chữ ký) vào `payment.webhook_log`. **Chưa có cổng thật nào được tích hợp**: cần hợp đồng merchant (VNPay, MoMo, Stripe...) rồi cài `IPaymentGateway` (tạo phiên thanh toán + xác thực webhook của cổng đó) và, nếu cổng yêu cầu, thêm truy vấn trạng thái chủ động (BR-WEB-04).
+
+## Giới hạn tần suất và đồng ý của người giám hộ
+
+**Rate limit (NFR-16)** — cấu hình mục `RateLimit` (mặc định bật, cửa sổ 60 giây): `AuthPermit` 30 (đăng ký, đăng nhập, OTP, đăng nhập admin, theo IP), `EconomyPermit` 120 (mua/mở pack, đổi tiền, rèn, nạp, nhiệm vụ, bộ bài, trận; theo tài khoản), `DefaultPermit` 600. Vượt ngưỡng trả `429 RATE_LIMITED` kèm `Retry-After`. `/healthz` và webhook cổng thanh toán được miễn. Khi API nằm sau proxy/LB tin cậy, đặt `RateLimit:TrustForwardedFor=true` để lấy IP thật từ `X-Forwarded-For` (nếu không, mọi người dùng qua web Next sẽ chung một IP ở nhóm auth). Bộ đếm nằm trong bộ nhớ từng instance: chạy nhiều instance thì ngưỡng thực tế nhân lên, cần giới hạn ở tầng LB/gateway hoặc bộ đếm dùng chung (Redis) trước khi mở rộng.
+
+**Người giám hộ (BR-ACC-01, BR-WEB-07)** — tài khoản dưới 18 tuổi không tạo được đơn nạp (`GUARDIAN_CONSENT_REQUIRED`) cho tới khi người giám hộ bấm liên kết xác nhận (`POST /v1/me/guardian-consent` rồi `POST /v1/guardian/confirm`, mã dùng một lần, hết hạn sau 7 ngày). Đây là cơ chế tối thiểu: **chưa có nhà cung cấp email thật** (cài `IGuardianNotifier`), **chưa kiểm chứng người xác nhận có đúng là người giám hộ**, và ngưỡng 18 là mặc định, chưa theo ma trận quốc gia — phạm vi cuối cùng chờ Legal (Q-21, Q-46).

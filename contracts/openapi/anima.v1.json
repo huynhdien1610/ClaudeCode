@@ -145,6 +145,28 @@
         }
       }
     },
+    "/v1/guardian/confirm": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardianConfirm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/v1/me": {
       "get": {
         "tags": [
@@ -189,6 +211,28 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/PhoneRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/me/guardian-consent": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuardianRequest"
               }
             }
           },
@@ -1969,6 +2013,34 @@
               "string"
             ],
             "format": "int64"
+          }
+        }
+      },
+      "GuardianConfirm": {
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "GuardianRequest": {
+        "required": [
+          "guardianEmail"
+        ],
+        "type": "object",
+        "properties": {
+          "guardianEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

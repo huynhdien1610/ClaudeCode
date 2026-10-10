@@ -23,12 +23,20 @@ public sealed class CapturingOtpSender : IOtpSender
 /// Chạy API thật trên PostgreSQL thật (không giả lập DB). Mỗi lớp test có một database riêng, tạo mới với migration và seed.
 /// Chuỗi kết nối quản trị lấy từ ANIMA_TEST_PG (mặc định: PostgreSQL do infra/dev-postgres.sh khởi động).
 /// </summary>
+public sealed class CapturingGuardianNotifier : IGuardianNotifier
+{
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> _tokens = new();
+    public Task SendAsync(string guardianEmail, string token, CancellationToken ct) { _tokens[guardianEmail] = token; return Task.CompletedTask; }
+    public string TokenFor(string email) => _tokens[email];
+}
+
 public sealed class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly string _admin = Environment.GetEnvironmentVariable("ANIMA_TEST_PG") ?? "Host=127.0.0.1;Port=55432;Username=postgres;Database=postgres";
     private readonly string _dbName = "anima_test_" + Guid.NewGuid().ToString("N")[..12];
     public const string TestWebhookSecret = "test-webhook-secret";
     public CapturingOtpSender Otp { get; } = new();
+    public CapturingGuardianNotifier Guardian { get; } = new();
     public NpgsqlDataSource Db { get; private set; } = null!;
     public string ConnectionString => new NpgsqlConnectionStringBuilder(_admin) { Database = _dbName }.ConnectionString;
 
@@ -60,9 +68,10 @@ public sealed class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
         b.UseSetting("Identity:Pbkdf2Iterations", "1000");
         b.UseSetting("Admin:Pbkdf2Iterations", "1000");
         b.UseSetting("Payment:Sandbox", "true");
+        b.UseSetting("RateLimit:Enabled", "false");
         b.UseSetting("Payment:WebhookSecret", TestWebhookSecret);
         b.UseSetting("Admin:SeedDemoUsers", "true");
-        b.ConfigureServices(s => { s.RemoveAll<IOtpSender>(); s.AddSingleton<IOtpSender>(Otp); });
+        b.ConfigureServices(s => { s.RemoveAll<IOtpSender>(); s.AddSingleton<IOtpSender>(Otp); s.RemoveAll<IGuardianNotifier>(); s.AddSingleton<IGuardianNotifier>(Guardian); });
     }
 
     public async Task<int> Sql(string sql, params (string, object?)[] p)

@@ -6,6 +6,7 @@ import { PageTitle, LanguageSelect } from "@/components/Shell";
 
 export default function AccountPage() {
   const { t, account, refresh, notify, fail } = useApp(); const { busy, run } = useAction();
+  const [guardian, setGuardian] = useState(""); const [guardianSent, setGuardianSent] = useState(false);
   const [phone, setPhone] = useState(""); const [code, setCode] = useState(""); const [sent, setSent] = useState(false);
   const [seed, setSeed] = useState<SeedPublic | null>(null); const [client, setClient] = useState("");
   const [revealed, setRevealed] = useState<RevealedSeed | null>(null); const [history, setHistory] = useState<RevealedSeed[]>([]);
@@ -30,6 +31,18 @@ export default function AccountPage() {
           </>)}
         </section>
       </div>
+
+      {account?.isMinor && (
+        <section className="panel grid" data-testid="guardian-panel">
+          <h3>{t("account.guardianTitle")}</h3>
+          {account.guardianConsent ? <p className="chip" data-testid="guardian-done">✓ {t("account.guardianDone")}</p> : (<>
+            <p className="muted">{t("account.guardianText")}</p>
+            <div className="row wrap"><input type="email" placeholder={t("account.guardianEmail")} value={guardian} onChange={(e) => setGuardian(e.target.value)} data-testid="guardian-email" />
+              <button className="btn" disabled={busy || !guardian} data-testid="guardian-send" onClick={() => run(async () => { await api.requestGuardian(guardian.trim()); setGuardianSent(true); notify("ok", t("account.guardianSent")); })}>{t("account.guardianSend")}</button></div>
+            {guardianSent && <p className="muted">{t("account.guardianSent")}</p>}
+          </>)}
+        </section>
+      )}
 
       <section className="panel grid" data-testid="fair-panel">
         <h3>{t("fair.title")}</h3><p className="muted">{t("fair.text")}</p>
