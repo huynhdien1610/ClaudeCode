@@ -9,7 +9,7 @@ using Anima.SharedKernel;
 namespace Anima.Battle;
 
 public sealed record PracticeRequest(Guid? DeckId);
-public sealed record ActionRequest(string? Type, int? Hand, int? Slot, int? Target);
+public sealed record ActionRequest(string? Type, int? Hand, int? Slot, int? Target, string? Id = null);
 
 public sealed class BattleModule : IModule
 {
@@ -45,7 +45,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
         (await uow.QueryAsync($"SELECT {Cols} FROM battle.match WHERE id=@i AND account_id=@a" + (forUpdate ? " FOR UPDATE" : ""), Map, ct, ("i", id), ("a", acc))).FirstOrDefault()
         ?? throw DomainException.NotFound("Match");
 
-    private static BattleCard ToBattle(CardDefinition d) => new(d.Id, d.Name, d.Element, d.CardType, d.Rarity, d.Cost, d.Atk ?? 0, d.Def ?? 0, d.Hp ?? 0);
+    private static BattleCard ToBattle(CardDefinition d) => new(d.Id, d.Name, d.Element, d.CardType, d.Rarity, d.Cost, d.Atk ?? 0, d.Def ?? 0, d.Hp ?? 0, d.Skill);
 
     /// <summary>Bộ bài của máy: 15 Anima khác nhau (Common → Rare) × 2 bản, chọn tất định từ seed.</summary>
     private async Task<List<BattleCard>> BotDeckAsync(byte[] seed, CancellationToken ct)
@@ -116,11 +116,11 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
         var log = new List<BattleAction>();
         try
         {
-            var a = new BattleAction(Human, req.Type ?? "", req.Hand, req.Slot, req.Target);
+            var a = new BattleAction(Human, req.Type ?? "", req.Hand, req.Slot, req.Target, req.Id);
             BattleEngine.Apply(s, a); log.Add(a);
             RunBot(s, log);
         }
-        catch (BattleException e) { throw new DomainException(e.Code, e.Message, e.Code == "INVALID_ACTION" ? 400 : 409); }
+        catch (BattleException e) { throw new DomainException(e.Code, e.Message, e.Code is "INVALID_ACTION" or "TARGET_INVALID" ? 400 : 409); }
 
         var all = m.Actions.Concat(log).ToList();
         await uow.ExecAsync("UPDATE battle.match SET actions=@l::jsonb, status=@st, winner=@w, reason=@r, finished_at=@f WHERE id=@i", ct,
@@ -148,11 +148,36 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
     }
 
     // ---- Góc nhìn của người chơi: giấu tay và bộ bài đối thủ ----
-    private static object Anima(FieldAnima? f) => f is null ? null! : new { name = f.Card.Name, element = f.Card.Element, defId = f.Card.DefId, atk = f.EffAtk, def = f.EffDef, hp = f.Hp, maxHp = f.MaxHp, canAttack = !f.Summoned && !f.Attacked, summoned = f.Summoned };
+    private static object? Anima(FieldAnima? f)
+    {
+        if (f is null) return null;
+        var def = SkillCatalog.Find(f.SkillId);
+        return new
+        {
+            name = f.Card.Name,
+            element = f.Card.Element,
+            defId = f.Card.DefId,
+            atk = f.EffAtk,
+            def = f.EffDef,
+            hp = f.Hp,
+            maxHp = f.MaxHp,
+            canAttack = !f.Summoned && !f.Attacked && !f.Statuses.Any(x => x.Kind == "stun"),
+            summoned = f.Summoned,
+            skill = def is null ? null : new { id = def.Id, name = def.Name, kind = def.Kind.ToString().ToLowerInvariant(), target = def.Target.ToString().ToLowerInvariant(), cooldown = f.Cd.GetValueOrDefault(def.Id), cooldownMax = def.Cooldown },
+            dodge = f.DodgePct,
+            statuses = f.Statuses.Select(x => new { kind = x.Kind, turns = x.Turns >= 90 ? (int?)null : x.Turns, value = x.Value, stacks = x.Stacks }),
+        };
+    }
 
     private static object View(MatchRow m, BattleState s)
     {
         var me = s.Players[Human]; var opp = s.Players[BotSide];
+        var fusions = SkillCatalog.All.Where(d => d.Kind == SkillKind.Fusion).Select(d =>
+        {
+            var (a, b) = SkillCatalog.FusionElements[d.Id];
+            var onField = me.Field.Any(f => f?.Card.Element == a) && me.Field.Any(f => f?.Card.Element == b);
+            return new { id = d.Id, name = d.Name, elements = new[] { a, b }, target = d.Target.ToString().ToLowerInvariant(), used = me.TeamUsed.Contains("fusion:" + d.Id), available = onField && !me.TeamUsed.Contains("fusion:" + d.Id) && !me.FusionThisTurn };
+        });
         return new
         {
             id = m.Id,
@@ -161,10 +186,12 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
             yourTurn = s.Phase == BattlePhase.Main && s.Active == Human,
             turn = me.OwnTurns,
             firstPlayer = s.First == Human ? "you" : "opponent",
-            you = new { keeper = me.Keeper, energy = me.Energy, deck = me.Deck.Count, mulliganAvailable = s.Phase == BattlePhase.Mulligan && !me.Decided && !me.MulliganUsed, decided = me.Decided, hand = me.Hand.Select((c, i) => new { index = i, c.DefId, c.Name, c.Element, c.Type, c.Rarity, c.Cost, c.Atk, c.Def, c.Hp }), field = me.Field.Select(Anima), graveyard = me.Graveyard.Count },
+            meter = s.Meter,
+            surge = new { you = me.SurgeLeft, opponent = opp.SurgeLeft },
+            you = new { keeper = me.Keeper, energy = me.Energy, deck = me.Deck.Count, mulliganAvailable = s.Phase == BattlePhase.Mulligan && !me.Decided && !me.MulliganUsed, decided = me.Decided, hand = me.Hand.Select((c, i) => new { index = i, c.DefId, c.Name, c.Element, c.Type, c.Rarity, c.Cost, c.Atk, c.Def, c.Hp }), field = me.Field.Select(Anima), graveyard = me.Graveyard.Count, fusions },
             opponent = new { keeper = opp.Keeper, hand = opp.Hand.Count, deck = opp.Deck.Count, field = opp.Field.Select(Anima), graveyard = opp.Graveyard.Count },
             result = s.Result is null ? null : new { won = s.Result.Winner == Human, reason = s.Result.Reason },
-            events = s.Events.TakeLast(40).Select(e => new { e.Seq, e.Kind, side = e.Player == Human ? "you" : "opponent", data = e.Data }),
+            events = s.Events.TakeLast(60).Select(e => new { e.Seq, e.Kind, side = e.Player == Human ? "you" : "opponent", data = e.Data }),
             actionCount = m.Actions.Count,
         };
     }

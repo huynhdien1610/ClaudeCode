@@ -39,8 +39,10 @@ public sealed class BattleTests(ApiFixture fx) : IClassFixture<ApiFixture>
                 var attacker = field.FindIndex(f => f.ValueKind != JsonValueKind.Null && f.GetProperty("canAttack").GetBoolean());
                 if (attacker >= 0)
                 {
-                    var target = oppField.FindIndex(f => f.ValueKind != JsonValueKind.Null);
-                    next = await Act(p, id, "attack", slot: attacker, target: target);      // -1 = Keeper khi sân đối phương trống
+                    // Có Taunt thì buộc đánh Anima đó; -1 = Keeper khi sân đối phương trống.
+                    var taunt = oppField.FindIndex(f => f.ValueKind != JsonValueKind.Null && f.GetProperty("statuses").EnumerateArray().Any(x => x.GetProperty("kind").GetString() == "taunt"));
+                    var target = taunt >= 0 ? taunt : oppField.FindIndex(f => f.ValueKind != JsonValueKind.Null);
+                    next = await Act(p, id, "attack", slot: attacker, target: target);
                 }
                 else next = await Act(p, id, "end");
             }
@@ -118,5 +120,26 @@ public sealed class BattleTests(ApiFixture fx) : IClassFixture<ApiFixture>
         Assert.True(c.Ok, c.Body.ToString());
         Assert.False(c["result"].GetProperty("won").GetBoolean()); Assert.Equal("CONCEDE", c["result"].GetProperty("reason").GetString());
         Assert.True((await p.Get($"/v1/battles/{id}/replay")).Ok);
+    }
+
+    [Fact(DisplayName = "Kỹ năng: skill_id của thẻ seed khớp danh mục kỹ năng và đúng hệ; view có Emotion Meter, Surge và 6 Fusion; hành động kỹ năng sai bị từ chối")]
+    public async Task SkillsInView()
+    {
+        var (p, deck) = await PlayerWithDeck();                                                      // khởi động host → chạy migration và seed
+        var rows = new List<(string Element, string Skill)>();
+        await using (var cmd = fx.Db.CreateCommand("SELECT element, skill_id FROM catalog.card_definition WHERE card_type='anima'"))
+        await using (var r = await cmd.ExecuteReaderAsync()) while (await r.ReadAsync()) rows.Add((r.GetString(0), r.IsDBNull(1) ? "" : r.GetString(1)));
+        Assert.Equal(80, rows.Count);
+        Assert.All(rows, x => Assert.Contains(x.Skill, Anima.Battle.Engine.SkillCatalog.CardSkills(x.Element)));
+
+        var v = await p.Post("/v1/battles/practice", new { deckId = deck });
+        Assert.Equal(0, v["meter"].GetInt32());
+        Assert.Equal(6, v["you"].GetProperty("fusions").GetArrayLength());
+        Assert.Equal(JsonValueKind.Number, v["surge"].GetProperty("you").ValueKind);
+        var id = v["id"].GetGuid();
+        Assert.True((await Act(p, id, "keep")).Ok);
+        Assert.Equal("FUSION_NOT_AVAILABLE", (await p.Post($"/v1/battles/{id}/actions", new { type = "fusion", id = "silent_storm" })).Code);
+        Assert.Equal("INVALID_ACTION", (await Act(p, id, "skill", slot: 0, target: 0)).Code);          // chưa có Anima nào trên sân
+        Assert.Equal("INVALID_ACTION", (await Act(p, id, "ultimate", slot: 0)).Code);
     }
 }

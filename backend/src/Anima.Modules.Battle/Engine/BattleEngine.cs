@@ -8,7 +8,7 @@ public sealed record BattleSetup(byte[] Seed, IReadOnlyList<BattleCard> Deck0, I
 /// Luật trận đấu thuần logic (BR-BTL, BR-ELM). Không đụng DB/đồng hồ/ngẫu nhiên hệ thống: cùng <see cref="BattleSetup"/> và cùng chuỗi
 /// <see cref="BattleAction"/> luôn cho cùng kết quả (BR-BTL-10). Chưa có: kỹ năng thẻ, Tiếng vọng, Ký ức phong ấn, luật sàn (xem README).
 /// </summary>
-public static class BattleEngine
+public static partial class BattleEngine
 {
     public const int KeeperHp = 8000, OpeningHand = 5, MaxEnergy = 6, SuddenDeathFromTurn = 10, SuddenDeathStep = 500, MinDamage = 100, TimeoutsToLose = 3;
 
@@ -59,6 +59,7 @@ public static class BattleEngine
         s.Active = s.First;
         foreach (var p in s.Players) for (var i = 0; i < OpeningHand && p.Deck.Count > 0; i++) Draw(p);
         Emit(s, "start", s.First, ("first", s.First));
+        Recalc(s);
         return s;
     }
 
@@ -99,6 +100,9 @@ public static class BattleEngine
         {
             case "play": Play(s, a); break;
             case "attack": Attack(s, a); break;
+            case "skill": UseSkill(s, a); break;
+            case "ultimate": UseUltimate(s, a); break;
+            case "fusion": UseFusion(s, a); break;
             case "end": EndTurn(s); break;
             default: throw new BattleException("INVALID_ACTION", $"Unknown action '{a.Type}'");
         }
@@ -152,11 +156,12 @@ public static class BattleEngine
             Emit(s, "sudden_death", player, ("loss", loss), ("keeper", p.Keeper));
             if (p.Keeper <= 0) Finish(s, 1 - player, "SUDDEN_DEATH");
         }
+        if (s.Phase != BattlePhase.Finished) StartTurnEffects(s, player);
     }
 
     private static void EndTurn(BattleState s)
     {
-        foreach (var f in s.Me.Field) if (f is not null) f.TempAtk = 0;
+        EndTurnEffects(s, s.Active);
         Emit(s, "end", s.Active);
         StartTurn(s, 1 - s.Active);
     }
@@ -173,12 +178,13 @@ public static class BattleEngine
         if (card.Cost > me.Energy) throw new BattleException("INSUFFICIENT_RESONANCE", "Not enough Resonance");
 
         me.Energy -= card.Cost; me.Hand.RemoveAt(hi);
-        var f = new FieldAnima { Card = card, Atk = card.Atk, Def = card.Def, Hp = card.Hp, MaxHp = card.Hp, Summoned = true };
+        var f = new FieldAnima { Card = card, Uid = s.NextUid++, Atk = card.Atk, Def = card.Def, Hp = card.Hp, MaxHp = card.Hp, BaseMaxHp = card.Hp, Summoned = true };
         // BR-ELM-05: khi ra sân mà phe mình có Anima thuộc hệ sinh ra nó → +200 ATK và +200 HP đến hết trận. Nihilum không nhận.
         var generated = card.Element != Elements.Nihilum && me.Field.Any(x => x is not null && Generates(x.Card.Element, card.Element));
-        if (generated) { f.Atk += 200; f.Hp += 200; f.MaxHp += 200; }
+        if (generated) { f.Atk += 200; f.Hp += 200; f.MaxHp += 200; f.BaseMaxHp += 200; }
         me.Field[slot] = f;
         Emit(s, "play", s.Active, ("card", card.Name), ("slot", slot), ("generated", generated));
+        AfterPlay(s, s.Active);
     }
 
     // ---- Tấn công ----
@@ -187,23 +193,26 @@ public static class BattleEngine
         var me = s.Me; var opp = s.Opp;
         if (a.Slot is not { } si || si < 0 || si >= BattlePlayer.Slots || me.Field[si] is not { } atk) throw new BattleException("INVALID_ACTION", "Pick one of your Anima");
         if (a.Target is not { } target || target < -1 || target >= BattlePlayer.Slots) throw new BattleException("INVALID_ACTION", "Pick a target");
-        if (atk.Summoned || atk.Attacked) throw new BattleException("ATTACK_NOT_ALLOWED", atk.Summoned ? "This Anima entered this turn" : "This Anima already attacked this turn");   // BR-BTL-04
+        if (atk.Summoned || atk.Attacked || Has(atk, "stun")) throw new BattleException("ATTACK_NOT_ALLOWED", atk.Summoned ? "This Anima entered this turn" : Has(atk, "stun") ? "This Anima is stunned" : "This Anima already attacked this turn");   // BR-BTL-04
+        if (target == -1 && !opp.FieldEmpty) throw new BattleException("DIRECT_ATTACK_NOT_ALLOWED", "Defeat the opposing Anima first");
+        FieldAnima? def = null;
+        if (target != -1) def = EnemyAt(s, s.Active, target);                                              // có Taunt thì buộc đánh Anima đó
 
         TryChain(s);                                                                                       // BR-ELM-06: kiểm ở đầu giai đoạn tấn công
         atk.Attacked = true;
-        if (target == -1)
+        if (def is null)
         {
-            if (!opp.FieldEmpty) { atk.Attacked = false; throw new BattleException("DIRECT_ATTACK_NOT_ALLOWED", "Defeat the opposing Anima first"); }
             opp.Keeper -= atk.EffAtk;
             Emit(s, "attack_keeper", s.Active, ("slot", si), ("damage", atk.EffAtk), ("keeper", opp.Keeper));
+            AddMeter(s, 2);
             if (opp.Keeper <= 0) Finish(s, s.Active, "KEEPER_DOWN");
             return;
         }
-        if (opp.Field[target] is not { } def) { atk.Attacked = false; throw new BattleException("INVALID_ACTION", "There is no Anima in that slot"); }
         var dmg = Damage(atk.Card.Element, atk.EffAtk, def.Card.Element, def.EffDef);
-        def.Hp -= dmg;
-        Emit(s, "attack", s.Active, ("slot", si), ("target", target), ("damage", dmg), ("hp", Math.Max(0, def.Hp)));
-        if (def.Hp <= 0) { opp.Graveyard.Add(def.Card); opp.Field[target] = null; Emit(s, "defeated", 1 - s.Active, ("card", def.Card.Name), ("slot", target)); }   // BR-BTL-06
+        Emit(s, "attack", s.Active, ("slot", si), ("target", target), ("damage", dmg));
+        AddMeter(s, 2);
+        Hit(s, s.Active, atk, 1 - s.Active, target, dmg, HitKind.Attack, canDodge: true);                  // BR-BTL-06: về 0 thì vào mộ (trong Kill)
+        Recalc(s);
     }
 
     /// <summary>BR-ELM-06: 3 Anima thuộc 3 hệ liên tiếp trong vòng sinh → cả 3 +300 ATK đến hết lượt; tối đa 1 lần mỗi lượt.</summary>

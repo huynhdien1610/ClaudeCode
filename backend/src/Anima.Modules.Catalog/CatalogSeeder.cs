@@ -35,11 +35,25 @@ internal sealed class CatalogSeeder(IUnitOfWork uow) : IModuleSeeder
         ("Nihilum", ["Void Echo", "Empty Bell", "Hollow Choir", "Silent Static", "Blankmask", "Faded Page", "Grayfather", "Ashen Mirror", "Nullwalker", "The Nameless"]),
     ];
 
+    /// <summary>
+    /// 4 kỹ năng cấp thẻ của mỗi hệ, gán lần lượt cho 10 Anima theo thứ tự (Active A, Passive, Trigger, Active B, lặp). Id khớp danh mục kỹ năng của máy đấu
+    /// (docs/SKILLS_ANIMA.md); module Catalog không tham chiếu module Battle nên một test tích hợp kiểm hai bên khớp nhau.
+    /// </summary>
+    internal static readonly Dictionary<string, string[]> CardSkills = new()
+    {
+        ["Luminara"] = ["luminara.dawns_embrace", "luminara.radiant_aura", "luminara.hopes_echo", "luminara.blinding_light"],
+        ["Umbryx"] = ["umbryx.silent_tear", "umbryx.veil_of_sorrow", "umbryx.lonely_howl", "umbryx.nightmare_touch"],
+        ["Pyraxis"] = ["pyraxis.ember_strike", "pyraxis.rage_bound", "pyraxis.fury_unleashed", "pyraxis.flame_vortex"],
+        ["Aqualis"] = ["aqualis.tidal_memory", "aqualis.deep_calm", "aqualis.echo_of_loss", "aqualis.undertow"],
+        ["Terrakin"] = ["terrakin.stone_wall", "terrakin.unyielding", "terrakin.avalanche", "terrakin.earths_grasp"],
+        ["Ventara"] = ["ventara.wind_step", "ventara.free_spirit", "ventara.curiosity", "ventara.gust_barrier"],
+        ["Voltaris"] = ["voltaris.surge_bolt", "voltaris.overcharge", "voltaris.chain_reaction", "voltaris.static_field"],
+        ["Nihilum"] = ["nihilum.void_touch", "nihilum.emptiness", "nihilum.despair", "nihilum.oblivion"],
+    };
+
     private static readonly Dictionary<string, (string Skill, string? Arc)> Specials = new()
     {
-        ["Seraphel"] = ("heal", null),
-        ["Zephyrion"] = ("rush", null),
-        ["Tidemourn"] = ("wave", "harbor"),
+        ["Tidemourn"] = ("", "harbor"),
         ["Quietshade"] = ("", "weeper"),
         ["Nocturne"] = ("", "weeper"),
         ["Tidelet"] = ("", "harbor"),
@@ -113,7 +127,7 @@ internal sealed class CatalogSeeder(IUnitOfWork uow) : IModuleSeeder
                 {
                     var rarity = el == "Nihilum" && i == 9 ? "secret" : Rarity10[i];
                     var sp = Specials.GetValueOrDefault(names[i]);
-                    all.Add(new Def(names[i], el, rarity, CardTypes.Anima, Cost10[i], Style10[i], string.IsNullOrEmpty(sp.Skill) ? null : sp.Skill, sp.Arc));
+                    all.Add(new Def(names[i], el, rarity, CardTypes.Anima, Cost10[i], Style10[i], CardSkills[el][i % 4], sp.Arc));
                 }
             foreach (var (n, el, r, t) in Support)
                 all.Add(new Def(n, el, r, t, r switch { "rare" => 2, "epic" => 3, _ => 1 }));
