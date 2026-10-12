@@ -99,6 +99,13 @@ export type BattleView = {
 };
 export type BattleSummary = { id: string; status: "InProgress" | "Finished"; won: boolean | null; reason: string | null; createdAt: string };
 
+export type Listing = {
+  id: string; status: "Active" | "Sold" | "Cancelled" | "Expired" | "Removed"; currency: "GEM" | "COIN"; price: number; fee: number; sellerReceives: number;
+  createdAt: string; expiresAt: string; closedAt: string | null; mine: boolean; boughtByMe: boolean; cardInstanceId: string; serial: number; edition: string; card: Card;
+};
+export type MarketRules = { feePercent: number; durations: number[]; ranges: { rarity: string; coin: { min: number; max: number }; gem: { min: number; max: number } }[] };
+export type MarketQuery = { element?: string; rarity?: string; type?: string; currency?: string; q?: string; sort?: string; limit?: number; offset?: number };
+
 export const api = {
   register: (b: { email: string; password: string; birthDate: string; country: string; locale: string; timezone: string }) => request<AuthResponse>("POST", "/v1/accounts", b),
   login: (b: { email: string; password: string }) => request<AuthResponse>("POST", "/v1/auth/login", b),
@@ -142,6 +149,15 @@ export const api = {
   battles: () => request<BattleSummary[]>("GET", "/v1/battles"),
   battle: (id: string) => request<BattleView>("GET", `/v1/battles/${id}`),
   battleAct: (id: string, a: { type: string; hand?: number; slot?: number; target?: number; id?: string }) => request<BattleView>("POST", `/v1/battles/${id}/actions`, a),
+  marketRules: () => request<MarketRules>("GET", "/v1/market/rules"),
+  marketListings: (q: MarketQuery, locale: string) => {
+    const p = new URLSearchParams({ locale }); Object.entries(q).forEach(([k, v]) => v !== undefined && v !== "" && p.set(k, String(v)));
+    return request<{ total: number; items: Listing[] }>("GET", `/v1/market/listings?${p}`);
+  },
+  marketMine: (locale: string) => request<{ items: Listing[] }>("GET", `/v1/market/mine?locale=${locale}`),
+  marketList: (cardInstanceId: string, currency: string, price: number, days: number) => request<Listing>("POST", "/v1/market/listings", { cardInstanceId, currency, price, days }),
+  marketBuy: (id: string) => request<{ listingId: string; price: number; fee: number; balances: Balances }>("POST", `/v1/market/listings/${id}/buy`, {}, { idem: true }),
+  marketCancel: (id: string) => request<{ status: string }>("POST", `/v1/market/listings/${id}/cancel`, {}),
   progress: () => request<Progress>("GET", "/v1/collection/progress"),
   card: (id: number, locale: string) => request<Card>("GET", `/v1/cards/${id}?locale=${locale}`),
 
