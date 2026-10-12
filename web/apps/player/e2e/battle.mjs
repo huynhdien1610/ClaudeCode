@@ -60,10 +60,15 @@ try {
   ok((await page.getByTestId("battle-mulligan").count()) === 0, "không được đổi tay lần hai");
 
   const enabled = (id) => page.getByTestId(id).and(page.locator(":not([disabled])"));
-  let turns = 0;
+  let turns = 0, skills = 0, ultimates = 0, fusions = 0;
   for (let step = 0; step < 900; step++) {
     if (await page.getByTestId("battle-result").count()) break;
     if (!(await enabled("battle-end").count())) { await page.waitForTimeout(60); continue; }          // chưa tới lượt hoặc đang gửi
+    if (await page.getByText(/Chọn mục tiêu cho/).count()) {                            // đang chờ chọn mục tiêu (kỹ năng/Fusion)
+      const foe = page.locator('[data-testid^="opp-slot-"]:not([disabled])').first();
+      if (await foe.count()) await foe.click(); else await page.locator('[data-testid^="my-slot-"]:not([disabled])').first().click();
+      await page.waitForTimeout(60); continue;
+    }
     const mySlotEmpty = async () => { const n = await page.locator('[data-testid^="my-slot-"]').count(); for (let i = 0; i < n; i++) { const b = page.getByTestId(`my-slot-${i}`); if (!(await b.isDisabled()) && (await b.innerText()).trim() === "—") return b; } return null; };
     if (await enabled("hand-card").count()) {
       await enabled("hand-card").first().click();
@@ -76,10 +81,24 @@ try {
     for (let i = 0; i < await attackers.count(); i++) {
       const b = attackers.nth(i); if ((await b.innerText()).trim() === "—") continue;
       await b.click();
-      if (await enabled("attack-keeper").count()) await page.getByTestId("attack-keeper").click();
-      else { const t = page.locator('[data-testid^="opp-slot-"]:not([disabled])').first(); if (await t.count()) await t.click(); else continue; }
+      if (await enabled("act-ultimate").count()) {                                      // đủ Meter thì dùng Tuyệt chiêu
+        await page.getByTestId("act-ultimate").click(); ultimates++;
+      } else if (await enabled("act-skill").count()) {
+        await page.getByTestId("act-skill").click(); skills++;
+      } else await page.getByTestId("act-attack").click();
+      await page.waitForTimeout(80);
+      const hintAttack = await page.getByText(/Chọn mục tiêu:/).count();               // đòn thường: mục tiêu là địch hoặc Keeper
+      if (hintAttack) {
+        if (await enabled("attack-keeper").count()) await page.getByTestId("attack-keeper").click();
+        else { const t = page.locator('[data-testid^="opp-slot-"]:not([disabled])').first(); if (await t.count()) await t.click(); else continue; }
+      } else if (await page.getByText(/Chọn mục tiêu cho/).count()) {                  // kỹ năng cần mục tiêu
+        const foe = page.locator('[data-testid^="opp-slot-"]:not([disabled])').first();
+        if (await foe.count()) await foe.click(); else await page.locator('[data-testid^="my-slot-"]:not([disabled])').first().click();
+      }
       acted = true; await page.waitForTimeout(40); break;
     }
+    if (!acted && (await page.getByRole("button", { name: "Hủy chọn" }).count())) await page.getByRole("button", { name: "Hủy chọn" }).first().click();
+    if (!acted && (await enabled("fusion").count())) { await page.getByTestId("fusion").first().click(); fusions++; await page.waitForTimeout(80); continue; }
     if (acted) continue;
     await page.getByTestId("battle-end").click(); turns++; await page.waitForTimeout(60);
   }
@@ -91,7 +110,8 @@ try {
   await page.getByTestId("battle-back").click();
   await page.getByTestId("battle-history").waitFor();
   ok((await page.getByTestId("battle-history").locator("tr").count()) === 1, "lịch sử phải có 1 trận");
-  console.log(`PASS - Trận luyện tập: chơi trọn ${turns} lượt kết thúc bằng giao diện, kết quả ${won === "true" ? "thắng" : "thua"}, lịch sử có 1 trận`);
+  ok(skills + ultimates + fusions > 0, "chưa dùng kỹ năng nào trong cả trận");
+  console.log(`PASS - Trận luyện tập: chơi trọn ${turns} lượt bằng giao diện (kỹ năng ${skills}, tuyệt chiêu ${ultimates}, hợp thể ${fusions}), kết quả ${won === "true" ? "thắng" : "thua"}, lịch sử có 1 trận`);
 } catch (e) {
   await page.screenshot({ path: `${SHOTS}/battle-failure.png` }).catch(() => undefined);
   console.error("FAIL -", e.message); code = 1;

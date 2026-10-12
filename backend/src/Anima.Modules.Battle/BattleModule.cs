@@ -152,6 +152,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
     {
         if (f is null) return null;
         var def = SkillCatalog.Find(f.SkillId);
+        var ult = SkillCatalog.UltimateOf(f.Card.Element);
         return new
         {
             name = f.Card.Name,
@@ -164,6 +165,8 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
             canAttack = !f.Summoned && !f.Attacked && !f.Statuses.Any(x => x.Kind == "stun"),
             summoned = f.Summoned,
             skill = def is null ? null : new { id = def.Id, name = def.Name, kind = def.Kind.ToString().ToLowerInvariant(), target = def.Target.ToString().ToLowerInvariant(), cooldown = f.Cd.GetValueOrDefault(def.Id), cooldownMax = def.Cooldown },
+            ultimate = new { name = ult.Name, target = ult.Target.ToString().ToLowerInvariant() },
+            feared = f.Statuses.Any(x => x.Kind == "fear"),
             dodge = f.DodgePct,
             statuses = f.Statuses.Select(x => new { kind = x.Kind, turns = x.Turns >= 90 ? (int?)null : x.Turns, value = x.Value, stacks = x.Stacks }),
         };
@@ -176,6 +179,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
         {
             var (a, b) = SkillCatalog.FusionElements[d.Id];
             var onField = me.Field.Any(f => f?.Card.Element == a) && me.Field.Any(f => f?.Card.Element == b);
+            if (d.Id == "hopes_last_stand") onField &= me.Field.Where(f => f is not null).Sum(f => f!.Hp) * 100 < me.Field.Where(f => f is not null).Sum(f => f!.MaxHp) * 30;
             return new { id = d.Id, name = d.Name, elements = new[] { a, b }, target = d.Target.ToString().ToLowerInvariant(), used = me.TeamUsed.Contains("fusion:" + d.Id), available = onField && !me.TeamUsed.Contains("fusion:" + d.Id) && !me.FusionThisTurn };
         });
         return new

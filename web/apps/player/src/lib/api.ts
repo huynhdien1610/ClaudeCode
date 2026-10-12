@@ -82,12 +82,18 @@ export type PaymentOrder = { id: string; packageCode: string; gem: number; amoun
 
 export type DeckView = { id: string; name: string; isDefault: boolean; valid: boolean; violations: { rule: string; message: string }[]; cardInstanceIds: string[]; count: number; updatedAt: string };
 
-export type BattleAnima = { name: string; element: string; defId: number; atk: number; def: number; hp: number; maxHp: number; canAttack: boolean; summoned: boolean } | null;
+export type BattleStatus = { kind: string; turns: number | null; value: number; stacks: number };
+export type BattleSkill = { id: string; name: string; kind: string; target: "none" | "enemy" | "ally" | "self" | "allenemies" | "allallies"; cooldown: number; cooldownMax: number };
+export type BattleAnima = {
+  name: string; element: string; defId: number; atk: number; def: number; hp: number; maxHp: number; canAttack: boolean; summoned: boolean; feared: boolean; dodge: number;
+  skill: BattleSkill | null; ultimate: { name: string; target: BattleSkill["target"] }; statuses: BattleStatus[];
+} | null;
+export type BattleFusion = { id: string; name: string; elements: string[]; target: "none" | "enemy" | "ally"; used: boolean; available: boolean };
 export type BattleHandCard = { index: number; defId: number; name: string; element: string; type: string; rarity: string; cost: number; atk: number; def: number; hp: number };
 export type BattleEvent = { seq: number; kind: string; side: "you" | "opponent"; data: Record<string, unknown> };
 export type BattleView = {
-  id: string; status: "InProgress" | "Finished"; phase: "mulligan" | "main" | "finished"; yourTurn: boolean; turn: number; firstPlayer: "you" | "opponent";
-  you: { keeper: number; energy: number; deck: number; mulliganAvailable: boolean; decided: boolean; hand: BattleHandCard[]; field: BattleAnima[]; graveyard: number };
+  id: string; status: "InProgress" | "Finished"; phase: "mulligan" | "main" | "finished"; yourTurn: boolean; turn: number; firstPlayer: "you" | "opponent"; meter: number; surge: { you: number; opponent: number };
+  you: { keeper: number; energy: number; deck: number; mulliganAvailable: boolean; decided: boolean; hand: BattleHandCard[]; field: BattleAnima[]; graveyard: number; fusions: BattleFusion[] };
   opponent: { keeper: number; hand: number; deck: number; field: BattleAnima[]; graveyard: number };
   result: { won: boolean; reason: string } | null; events: BattleEvent[]; actionCount: number;
 };
@@ -135,7 +141,7 @@ export const api = {
   startPractice: (deckId: string) => request<BattleView>("POST", "/v1/battles/practice", { deckId }),
   battles: () => request<BattleSummary[]>("GET", "/v1/battles"),
   battle: (id: string) => request<BattleView>("GET", `/v1/battles/${id}`),
-  battleAct: (id: string, a: { type: string; hand?: number; slot?: number; target?: number }) => request<BattleView>("POST", `/v1/battles/${id}/actions`, a),
+  battleAct: (id: string, a: { type: string; hand?: number; slot?: number; target?: number; id?: string }) => request<BattleView>("POST", `/v1/battles/${id}/actions`, a),
   progress: () => request<Progress>("GET", "/v1/collection/progress"),
   card: (id: number, locale: string) => request<Card>("GET", `/v1/cards/${id}?locale=${locale}`),
 
