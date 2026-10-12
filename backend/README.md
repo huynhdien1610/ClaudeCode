@@ -15,7 +15,7 @@ Development bật `Dev:MockTopUp` (nạp Gem giả: `POST /v1/dev/topup`) và `I
 | Lệnh | Việc |
 |---|---|
 | `dotnet build backend/Anima.sln` | Build (cảnh báo là lỗi) |
-| `dotnet test backend/Anima.sln` | 361 test (145 đơn vị, 45 kiến trúc, 171 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
+| `dotnet test backend/Anima.sln` | 373 test (157 đơn vị, 45 kiến trúc, 171 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
 | `dotnet format backend/Anima.sln --verify-no-changes` | Kiểm tra định dạng |
 | `UPDATE_OPENAPI=1 dotnet test backend/tests/Anima.IntegrationTests --filter OpenApiContract` | Cập nhật snapshot hợp đồng API khi cố ý đổi API |
 

@@ -7,8 +7,8 @@ public enum HitKind { Attack, Skill, Reflect, Spread, Burn, SelfDamage, Ultimate
 /// <summary>Kỹ năng, trạng thái, Emotion Meter, Resonance, Ultimate, Fusion. Số liệu và quy ước: docs/SKILLS_ANIMA.md.</summary>
 public static partial class BattleEngine
 {
-    public const int SkillScale = 10, UltimateCost = 50, MeterMax = 100, SurgeTurns = 2, SurgePct = 20, OverchargeCap = 5, BaseSpd = 100;
-    private const double SpdDodgeFactor = 0.25, DefReduction = 0.10;
+    public const int SkillScale = 10, UltimateCost = 50, UltimateRefund = 30, MeterMax = 100, SurgeTurns = 2, SurgePct = 20, OverchargeStacks = 8, OverchargeCapPct = 75, BurnStacks = 3, BurnStacksTwinFury = 5, SlowStacks = 2, ShieldStacks = 3, EchoTurnsDefault = 2, BaseSpd = 100;
+    private const double SpdDodgeFactor = 0.25, DefReductionCap = 0.5, DefHalfPoint = 100;
 
     // ---------- Tra cứu ----------
     private static IEnumerable<(int Slot, FieldAnima F)> Alive(BattlePlayer p) =>
@@ -16,11 +16,12 @@ public static partial class BattleEngine
 
     private static bool HasSkill(FieldAnima f, string id) => f.SkillId == id;
     private static bool Has(FieldAnima f, string kind) => f.Statuses.Any(s => s.Kind == kind);
-    private static int CountElement(BattlePlayer p, string element) => p.Field.Count(f => f is not null && f.Card.Element == element);
+    /// <summary>Số Anima thật cùng hệ trên sân (Echo tạm thời không tính vào Resonance/Fusion).</summary>
+    private static int CountElement(BattlePlayer p, string element) => p.Field.Count(f => f is not null && !f.IsEcho && f.Card.Element == element);
     private static bool AnySkill(BattlePlayer p, string id) => p.Field.Any(f => f is not null && f.SkillId == id);
 
     private static bool IsDebuffKind(string kind, double value) =>
-        kind is "fear" or "stun" or "root" or "nododge" or "burn" || (kind.EndsWith("_pct", StringComparison.Ordinal) && value < 0);
+        kind is "fear" or "stun" or "root" or "nododge" or "burn" or "slow" || (kind.EndsWith("_pct", StringComparison.Ordinal) && value < 0);
 
     /// <summary>Tương khắc lên kỹ năng: +20% nếu người dùng khắc mục tiêu, −20% nếu bị khắc (docs/SKILLS_ANIMA.md §2).</summary>
     public static double ElementMod(string source, string target)
@@ -54,7 +55,8 @@ public static partial class BattleEngine
                         case "dodge_pct": dodge += st.Value; break;
                         case "hp_pct": hp += st.Value; break;
                         case "aura_def": def += 5 * st.Stacks; break;
-                        case "overcharge": atk += 10 * st.Stacks; break;
+                        case "overcharge": atk += Math.Min(OverchargeCapPct, 10 * st.Stacks); break;
+                        case "slow": spd += st.Value * st.Stacks; break;
                     }
                 var ratio = f.MaxHp == 0 ? 1.0 : (double)f.Hp / f.MaxHp;
                 if (HasSkill(f, "pyraxis.rage_bound")) atk += Math.Min(50, Math.Floor((1 - ratio) * 10 + 1e-9) * 5);
@@ -94,7 +96,7 @@ public static partial class BattleEngine
         if (Immune(f, kind, value)) { Emit(s, "immune", side, ("card", f.Card.Name), ("status", kind)); return false; }
         var existing = f.Statuses.FirstOrDefault(x => x.Kind == kind && Math.Sign(x.Value) == Math.Sign(value));
         if (existing is null) f.Statuses.Add(new Status { Kind = kind, Turns = turns, Value = value });
-        else if (kind is "burn" or "overcharge") { existing.Stacks = Math.Min(maxStacks, existing.Stacks + 1); existing.Turns = Math.Max(existing.Turns, turns); existing.Value = Math.Max(existing.Value, value); }
+        else if (kind is "burn" or "overcharge" or "slow" or "shield_hit") { existing.Stacks = Math.Min(maxStacks, existing.Stacks + 1); existing.Turns = Math.Max(existing.Turns, turns); existing.Value = Math.Max(existing.Value, value); }
         else { existing.Turns = Math.Max(existing.Turns, turns); if (Math.Abs(value) > Math.Abs(existing.Value)) existing.Value = value; }
         Emit(s, "status", side, ("card", f.Card.Name), ("status", kind), ("turns", turns));
         return true;
@@ -137,7 +139,12 @@ public static partial class BattleEngine
     private static int SkillDamageAmount(FieldAnima caster, FieldAnima target, double points, bool ignoreDef = false, double mult = 1)
     {
         var raw = points * SkillScale * (1 + ElementMod(caster.Card.Element, target.Card.Element)) * mult;
-        if (!ignoreDef) raw = Math.Max(raw * 0.5, raw - target.EffDef * DefReduction);
+        if (!ignoreDef)
+        {
+            // D-2: giảm tối đa 50%, reduction = min(0,5; d/(d+100)) với d = DEF theo đơn vị thiết kế (DEF thẻ ÷ SkillScale).
+            var d = Math.Max(0, target.EffDef) / (double)SkillScale;
+            raw *= 1 - Math.Min(DefReductionCap, d / (d + DefHalfPoint));
+        }
         return Math.Max(10, Round10(raw));
     }
 
@@ -146,7 +153,13 @@ public static partial class BattleEngine
     {
         var tp = s.Players[tSide]; var t = tp.Field[tSlot];
         if (t is null || amount <= 0) return 0;
-        if (Has(t, "invuln")) { Emit(s, "blocked", tSide, ("card", t.Card.Name)); return 0; }
+        if (Has(t, "invuln"))
+        {
+            // D-6: bất tử chặn mọi sát thương trực tiếp; Burn vẫn gây sát thương nhưng HP không xuống dưới 1.
+            if (kind != HitKind.Burn) { Emit(s, "blocked", tSide, ("card", t.Card.Name)); return 0; }
+            amount = Math.Min(amount, t.Hp - 1);
+            if (amount <= 0) return 0;
+        }
         if (canDodge && Roll(s, t.DodgePct))
         {
             Emit(s, "dodge", tSide, ("card", t.Card.Name));
@@ -154,8 +167,8 @@ public static partial class BattleEngine
             Recalc(s);
             return 0;
         }
-        var shield = t.Statuses.FirstOrDefault(x => x.Kind == "shield_hit");
-        if (shield is not null) { amount /= 2; t.Statuses.Remove(shield); }
+        var shield = kind == HitKind.Burn ? null : t.Statuses.FirstOrDefault(x => x.Kind == "shield_hit");
+        if (shield is not null) { amount /= 2; if (--shield.Stacks <= 0) t.Statuses.Remove(shield); }
         if (t.Card.Element == "Aqualis" && CountElement(tp, "Aqualis") >= 2 && kind is not HitKind.Burn and not HitKind.SelfDamage) amount = amount * 90 / 100;
         amount = Math.Max(1, amount);
 
@@ -203,7 +216,7 @@ public static partial class BattleEngine
         var before = t.Hp; t.Hp -= amount;
         if (t.Hp > 0) { Recalc(s); return amount; }
         if (HasSkill(t, "terrakin.unyielding") && ratioBefore < 0.3 && t.Used.Add("unyielding")) { t.Hp = 1; Emit(s, "survive", side, ("card", t.Card.Name)); Recalc(s); return before - 1; }
-        if (t.Card.Element == "Nihilum" && CountElement(p, "Nihilum") >= 2 && p.TeamUsed.Add("void_calls"))
+        if (t.Card.Element == "Nihilum" && !t.IsEcho && CountElement(p, "Nihilum") >= 2 && t.Used.Add("void_calls"))   // D-9: mỗi Nihilum hồi sinh tối đa 1 lần; hồi sinh không tính là "ngã"
         {
             t.Hp = Math.Max(1, t.MaxHp * 30 / 100); Emit(s, "revive", side, ("card", t.Card.Name)); Recalc(s); return before - t.Hp;
         }
@@ -214,18 +227,33 @@ public static partial class BattleEngine
     private static void Kill(BattleState s, int side, int slot, FieldAnima t)
     {
         var p = s.Players[side];
-        p.Graveyard.Add(t.Card); p.Field[slot] = null;
+        p.Field[slot] = null;
+        if (t.IsEcho) { Emit(s, "echo_fades", side, ("card", t.Card.Name)); Recalc(s); return; }          // Echo ngã không kích hoạt gì, không vào mộ
+        p.Graveyard.Add(t.Card);
         Recalc(s);                                                                      // Resonance/HP tối đa phụ thuộc số Anima còn trên sân
         Emit(s, "defeated", side, ("card", t.Card.Name), ("slot", slot));
         AddMeter(s, 5);
         foreach (var (_, ally) in Alive(p).ToList())
         {
+            if (ally.IsEcho) continue;
             if (HasSkill(ally, "luminara.hopes_echo") && ally.Used.Add("hopes_echo"))
                 foreach (var (_, other) in Alive(p)) if (other != ally) Heal(s, side, other, 15);
             if (HasSkill(ally, "umbryx.lonely_howl") && ally.Used.Add("lonely_howl"))
                 foreach (var (_, foe) in Alive(s.Players[1 - side]).ToList()) Debuff(s, 1 - side, ally, foe, "atk_pct", 2, -15);
         }
+        if (s.Phase != BattlePhase.Finished && p.Field[slot] is null && Roll(s, s.EchoChancePct)) SpawnEcho(s, side, slot, t);
         Recalc(s);
+    }
+
+    /// <summary>D-8: Echo = 50% ATK/DEF/HP của Anima gốc, chỉ giữ kỹ năng Passive, tồn tại 2 lượt của chủ, đánh và bị đánh được.</summary>
+    private static void SpawnEcho(BattleState s, int side, int slot, FieldAnima origin)
+    {
+        var c = origin.Card;
+        var passive = SkillCatalog.Find(c.Skill) is { Kind: SkillKind.Passive } ? c.Skill : null;
+        var card = new BattleCard(c.DefId, $"Echo of {c.Name}", c.Element, "echo", c.Rarity, 0, c.Atk / 2, c.Def / 2, c.Hp / 2, passive);
+        var f = new FieldAnima { Card = card, Uid = s.NextUid++, IsEcho = true, EchoTurns = EchoTurnsDefault, Atk = Math.Max(1, c.Atk / 2), Def = c.Def / 2, Hp = Math.Max(1, c.Hp / 2), MaxHp = Math.Max(1, c.Hp / 2), BaseMaxHp = Math.Max(1, c.Hp / 2) };
+        s.Players[side].Field[slot] = f;
+        Emit(s, "echo", side, ("card", card.Name), ("slot", slot));
     }
 
     // ---------- Mục tiêu ----------
@@ -286,7 +314,7 @@ public static partial class BattleEngine
                 foreach (var (slot, t) in Alive(foes).ToList()) { Hit(s, side, f, 1 - side, slot, SkillDamageAmount(f, t, 25), HitKind.Skill); if (foes.Field[slot] == t) Burn(s, side, f, t, 3); }
                 break;
             case "aqualis.tidal_memory": { var t = foe()!; Skill(t, target, 20); AddMeter(s, 5); break; }
-            case "aqualis.undertow": { var t = foe()!; Debuff(s, 1 - side, f, t, "spd_pct", 2, -30); AddStatus(s, 1 - side, t, "nododge", 2); break; }
+            case "aqualis.undertow": { var t = foe()!; AddStatus(s, 1 - side, t, "slow", 2, -30 * (1 + ElementMod(f.Card.Element, t.Card.Element)), SlowStacks); AddStatus(s, 1 - side, t, "nododge", 2); break; }
             case "terrakin.stone_wall": AddStatus(s, side, f, "def_pct", 2, 50); AddStatus(s, side, f, "taunt", 2); break;
             case "terrakin.earths_grasp": { var t = foe()!; AddStatus(s, 1 - side, t, "root", 2); break; }
             case "ventara.wind_step":
@@ -295,7 +323,7 @@ public static partial class BattleEngine
                     if (t != f) { me.Field[from] = t; me.Field[target] = f; }
                     AddStatus(s, side, f, "spd_pct", 2, 20); AddStatus(s, side, t, "spd_pct", 2, 20); break;
                 }
-            case "ventara.gust_barrier": AddStatus(s, side, f, "shield_hit", 99); AddStatus(s, side, f, "dodge_pct", 2, 15); break;
+            case "ventara.gust_barrier": AddStatus(s, side, f, "shield_hit", 99, 0, ShieldStacks); AddStatus(s, side, f, "dodge_pct", 2, 15); break;
             case "voltaris.surge_bolt": { var t = foe()!; Skill(t, target, 40); if (foes.Field[target] == t && Roll(s, 30 * (1 + ElementMod(f.Card.Element, t.Card.Element)))) AddStatus(s, 1 - side, t, "stun", 1); break; }
             case "voltaris.static_field":
                 foreach (var (slot, t) in Alive(foes).ToList())
@@ -304,13 +332,13 @@ public static partial class BattleEngine
                     if (Roll(s, 20 * (1 + ElementMod(f.Card.Element, t.Card.Element)))) AddStatus(s, 1 - side, t, "stun", 1);
                 }
                 break;
-            case "nihilum.void_touch": { var t = foe()!; Skill(t, target, 50); SelfLoss(s, side, f, 10); break; }
+            case "nihilum.void_touch": { var t = foe()!; Skill(t, target, 50, ignoreDef: true); SelfLoss(s, side, f, 10); break; }
             case "nihilum.oblivion":
                 {
                     var t = foe()!;
                     var buff = t.Statuses.FirstOrDefault(x => !IsDebuffKind(x.Kind, x.Value));
                     if (buff is not null) { t.Statuses.Remove(buff); Emit(s, "dispel", 1 - side, ("card", t.Card.Name), ("status", buff.Kind)); }
-                    Skill(t, target, 30); break;
+                    Skill(t, target, 30, ignoreDef: true); break;
                 }
             default: throw new BattleException("SKILL_NOT_AVAILABLE", "Unknown skill");
         }
@@ -318,7 +346,7 @@ public static partial class BattleEngine
 
     private static void Burn(BattleState s, int side, FieldAnima caster, FieldAnima target, double perTurn)
     {
-        var cap = CountElement(s.Players[side], "Pyraxis") >= 2 ? 3 : 1;
+        var cap = CountElement(s.Players[side], "Pyraxis") >= 2 ? BurnStacksTwinFury : BurnStacks;
         var v = perTurn * SkillScale * (1 + ElementMod(caster.Card.Element, target.Card.Element));
         if (Immune(target, "burn", 1)) return;
         var ex = target.Statuses.FirstOrDefault(x => x.Kind == "burn");
@@ -344,14 +372,14 @@ public static partial class BattleEngine
         var side = s.Active; var me = s.Me; var foes = s.Opp; var target = a.Target ?? -1;
         if (def.Target == SkillTarget.Enemy) EnemyAt(s, side, target);
         if (def.Target == SkillTarget.Ally) AllyAt(s, side, target);
-        s.Meter -= UltimateCost; f.Attacked = true;
+        s.Meter = s.Meter - UltimateCost + UltimateRefund; f.Attacked = true;      // D-4: tiêu 50, hoàn 30 (net −20)
         Emit(s, "ultimate", side, ("card", f.Card.Name), ("skill", def.Name), ("id", def.Id));
 
         // Echo of Loss: một Aqualis bên địch (sẵn sàng) giảm 50% sát thương Ultimate này.
         var echo = Alive(foes).Select(x => x.F).FirstOrDefault(x => HasSkill(x, "aqualis.echo_of_loss") && x.Cd.GetValueOrDefault("aqualis.echo_of_loss") == 0 && !Has(x, "stun"));
         var mult = 1.0;
         if (echo is not null) { mult = 0.5; echo.Cd["aqualis.echo_of_loss"] = 2; Emit(s, "echo_of_loss", 1 - side, ("card", echo.Card.Name)); }
-        void Ult(FieldAnima t, int slot, double pts) => Hit(s, side, f, 1 - side, slot, SkillDamageAmount(f, t, pts, mult: mult), HitKind.Ultimate);
+        void Ult(FieldAnima t, int slot, double pts, bool ignoreDef = false) => Hit(s, side, f, 1 - side, slot, SkillDamageAmount(f, t, pts, ignoreDef, mult), HitKind.Ultimate);
 
         switch (def.Id)
         {
@@ -381,9 +409,8 @@ public static partial class BattleEngine
                     if (foes.Field[slot] == t && Roll(s, 50 * (1 + ElementMod(f.Card.Element, t.Card.Element)))) AddStatus(s, 1 - side, t, "stun", 1);
                 }
                 break;
-            case "nihilum.ultimate": { var t = foes.Field[target]!; Ult(t, target, 120); SelfLoss(s, side, f, 30); break; }
+            case "nihilum.ultimate": { var t = foes.Field[target]!; Ult(t, target, 120, ignoreDef: true); SelfLoss(s, side, f, 30); break; }
         }
-        if (s.Phase != BattlePhase.Finished) AddMeter(s, 5);
         Recalc(s);
     }
 
@@ -413,7 +440,14 @@ public static partial class BattleEngine
             case "silent_storm":
                 foreach (var (slot, t) in Alive(foes).ToList()) { Hit(s, side, caster, 1 - side, slot, SkillDamageAmount(caster, t, 40), HitKind.Ultimate); if (foes.Field[slot] == t) AddStatus(s, 1 - side, t, "stun", 1); }
                 break;
-            case "eternal_tide": foreach (var (_, t) in Alive(me)) { AddStatus(s, side, t, "invuln", 2); Heal(s, side, t, 20); } break;   // 2 = lượt hiện tại + lượt kế của địch
+            case "eternal_tide":
+                foreach (var (_, t) in Alive(me))
+                {
+                    AddStatus(s, side, t, "invuln", 2); Heal(s, side, t, 20);
+                    var burn = t.Statuses.FirstOrDefault(x => x.Kind == "burn");
+                    if (burn is not null && --burn.Stacks <= 0) t.Statuses.Remove(burn);                       // D-6: xóa 1 lớp Burn
+                }
+                break;   // 2 = lượt hiện tại + lượt kế của địch
             case "chaos_theory_fusion":
                 foreach (var (_, t) in Alive(foes).ToList())
                 {
@@ -459,7 +493,7 @@ public static partial class BattleEngine
             var st = f.Statuses.FirstOrDefault(x => x.Kind == "aura_def");
             if (aura) { if (st is null) f.Statuses.Add(new Status { Kind = "aura_def", Turns = 99, Stacks = 1 }); else st.Stacks = Math.Min(5, st.Stacks + 1); }
             else if (st is not null) f.Statuses.Remove(st);
-            if (HasSkill(f, "voltaris.overcharge")) AddStatus(s, side, f, "overcharge", 99, 10, OverchargeCap);
+            if (HasSkill(f, "voltaris.overcharge")) AddStatus(s, side, f, "overcharge", 99, 10, OverchargeStacks);
         }
         Recalc(s);
 
@@ -505,6 +539,8 @@ public static partial class BattleEngine
             foreach (var st in f.Statuses.ToList()) if (st.Turns < 90 && --st.Turns <= 0) f.Statuses.Remove(st);
             f.TempAtk = 0;
         }
+        for (var i = 0; i < BattlePlayer.Slots; i++)
+            if (p.Field[i] is { IsEcho: true } echo && --echo.EchoTurns <= 0) { p.Field[i] = null; Emit(s, "echo_fades", side, ("card", echo.Card.Name)); }
         if (p.SurgeLeft > 0) p.SurgeLeft--;
         Recalc(s);
     }

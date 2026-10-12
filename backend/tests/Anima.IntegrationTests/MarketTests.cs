@@ -49,11 +49,11 @@ public sealed class MarketTests(ApiFixture fx) : IClassFixture<ApiFixture>
     [Fact(DisplayName = "Điều kiện niêm yết: chưa xác thực SĐT, bị hạn chế, thẻ gắn chặt, thẻ đang niêm yết, thẻ người khác, tiền/ngày sai")]
     public async Task ListingPreconditions()
     {
-        var s = await Trader(); var card = await TradableCard(s);
+        var s = await Trader(5); var card = await TradableCard(s);
         var unverified = await fx.NewPlayer(); await unverified.BuyAndOpen(1);
-        Assert.Equal("PHONE_VERIFICATION_REQUIRED", (await List(unverified, await TradableCard(unverified), 100)).Code);
+        Assert.Equal("PHONE_VERIFICATION_REQUIRED", (await List(unverified, await TradableCard(unverified, null), 100)).Code);
 
-        var restricted = await Trader(); var rc = await TradableCard(restricted);
+        var restricted = await Trader(); var rc = await TradableCard(restricted, null);
         await fx.Sql("UPDATE identity.account SET status='Restricted', restriction_reason='FRAUD' WHERE id=@i", ("i", restricted.Id));
         Assert.Equal("ACCOUNT_RESTRICTED", (await List(restricted, rc, 100)).Code);
 

@@ -85,7 +85,7 @@ export type DeckView = { id: string; name: string; isDefault: boolean; valid: bo
 export type BattleStatus = { kind: string; turns: number | null; value: number; stacks: number };
 export type BattleSkill = { id: string; name: string; kind: string; target: "none" | "enemy" | "ally" | "self" | "allenemies" | "allallies"; cooldown: number; cooldownMax: number };
 export type BattleAnima = {
-  name: string; element: string; defId: number; atk: number; def: number; hp: number; maxHp: number; canAttack: boolean; summoned: boolean; feared: boolean; dodge: number;
+  name: string; element: string; defId: number; atk: number; def: number; hp: number; maxHp: number; canAttack: boolean; summoned: boolean; echo?: number | null; feared: boolean; dodge: number;
   skill: BattleSkill | null; ultimate: { name: string; target: BattleSkill["target"] }; statuses: BattleStatus[];
 } | null;
 export type BattleFusion = { id: string; name: string; elements: string[]; target: "none" | "enemy" | "ally"; used: boolean; available: boolean };

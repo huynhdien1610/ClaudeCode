@@ -29,6 +29,9 @@ public sealed class FieldAnima
     public bool Summoned { get; set; }      // vừa ra sân trong lượt này
     public bool Attacked { get; set; }      // đã dùng hành động trong lượt này (đánh hoặc kỹ năng)
     public List<Status> Statuses { get; } = [];
+    /// <summary>Thẻ Tiếng vọng tạm thời sinh ra khi một Anima ngã (docs/SKILLS_ANIMA.md D-8): 50% chỉ số, chỉ giữ Passive, tồn tại 2 lượt, không sưu tầm được.</summary>
+    public bool IsEcho { get; init; }
+    public int EchoTurns { get; set; }
     public Dictionary<string, int> Cd { get; } = [];
     public HashSet<string> Used { get; } = [];
     // Tính lại sau mỗi thay đổi (BattleEngine.Recalc):
@@ -88,6 +91,8 @@ public sealed class BattleState
     /// <summary>Emotion Meter chung hai bên, 0–100.</summary>
     public int Meter { get; set; }
     public int NextUid { get; set; } = 1;
+    /// <summary>Xác suất (%) một Anima ngã sinh ra Echo trong ô của nó. Test đặt 0 để kiểm riêng.</summary>
+    public int EchoChancePct { get; set; } = 30;
     public BattlePlayer Me => Players[Active];
     public BattlePlayer Opp => Players[1 - Active];
 }

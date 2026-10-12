@@ -18,7 +18,7 @@ public class BattleEngineTests
     /// <summary>Hai bên giữ tay đầu → vào lượt 1 của người đi trước.</summary>
     private static BattleState Playing(byte seed = 1, List<BattleCard>? d0 = null, List<BattleCard>? d1 = null)
     {
-        var s = Fresh(seed, d0, d1);
+        var s = Fresh(seed, d0, d1); s.EchoChancePct = 0;                                  // Echo có test riêng
         BattleEngine.Apply(s, new BattleAction(0, "keep")); BattleEngine.Apply(s, new BattleAction(1, "keep"));
         Assert.Equal(BattlePhase.Main, s.Phase);
         return s;

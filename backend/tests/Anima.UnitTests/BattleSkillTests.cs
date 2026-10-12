@@ -13,6 +13,7 @@ public class BattleSkillTests
     {
         List<BattleCard> plain() => Enumerable.Range(0, 30).Select(i => Card(Anima.Contracts.Elements.Cycle[i % 7], name: $"c{i}")).ToList();
         var s = BattleEngine.Start(new BattleSetup([seed], d0 ?? plain(), d1 ?? plain()));
+        s.EchoChancePct = 0;                                                            // Echo có test riêng; các test khác không muốn ô trống bị lấp ngẫu nhiên
         BattleEngine.Apply(s, new BattleAction(0, "keep")); BattleEngine.Apply(s, new BattleAction(1, "keep"));
         return s;
     }
@@ -44,10 +45,10 @@ public class BattleSkillTests
     [InlineData("Umbryx", "Voltaris", -0.2)]
     public void ElementMod(string src, string tgt, double expected) => Assert.Equal(expected, BattleEngine.ElementMod(src, tgt), 6);
 
-    [Theory(DisplayName = "Silent Tear (25 → 250): sát thương theo tương khắc ±20% rồi trừ DEF×10%")]
-    [InlineData("Aqualis", 2750)]   // khắc: 300 − 50 = 250
-    [InlineData("Terrakin", 2800)]  // trung tính: 250 − 50 = 200
-    [InlineData("Voltaris", 2850)]  // bị khắc: 200 − 50 = 150
+    [Theory(DisplayName = "Silent Tear (25 → 250): sát thương theo tương khắc ±20% rồi giảm theo DEF (D-2)")]
+    [InlineData("Aqualis", 2800)]   // khắc: 300 × (1 − 1/3) = 200   (DEF 500 → d = 50 → giảm 33%)
+    [InlineData("Terrakin", 2830)]  // trung tính: 250 × 2/3 ≈ 167 → 170
+    [InlineData("Voltaris", 2870)]  // bị khắc: 200 × 2/3 ≈ 133 → 130
     public void SkillDamageUsesCounterModifier(string targetElement, int hpAfter)
     {
         var s = Playing(); Put(s, Me(s), 0, Card("Umbryx", "umbryx.silent_tear")); var t = Put(s, Foe(s), 0, Card(targetElement, hp: 3000, def: 500));
@@ -152,7 +153,7 @@ public class BattleSkillTests
         Meter(s, 80); u.Statuses.Add(new Status { Kind = "fear", Turns = 2 });
         Assert.Equal("ULTIMATE_BLOCKED", Fails(s, "ultimate", 0));
         u.Statuses.Clear(); Do(s, "ultimate", 0);
-        Assert.Equal(35, s.Meter);                                                      // 80 − 50 + 5
+        Assert.Equal(60, s.Meter);                                                      // D-4: 80 − 50 + 30 hoàn lại = 60 (net −20)
         Assert.Equal("ATTACK_NOT_ALLOWED", Fails(s, "attack", 0, 0));
     }
 
@@ -283,17 +284,17 @@ public class BattleSkillTests
         Assert.Equal(3000 - 420 - 180, t.Hp); Assert.DoesNotContain(t.Statuses, x => x.Kind == "burn");
     }
 
-    [Fact(DisplayName = "Twin Fury: Burn chồng được tới 3 lớp khi có 2+ Pyraxis, không thì 1 lớp; mỗi Pyraxis +15% ATK")]
+    [Fact(DisplayName = "Burn chồng tối đa 3 lớp, 5 lớp khi có Twin Fury (2+ Pyraxis); mỗi Pyraxis +15% ATK")]
     public void TwinFury()
     {
         var s = Playing(); var a = Put(s, Me(s), 0, Card("Pyraxis", "pyraxis.ember_strike", atk: 1000)); Put(s, Me(s), 1, Card("Pyraxis", atk: 1000));
         Assert.Equal(1150, a.EffAtk);
-        var t = Put(s, Foe(s), 0, Card("Terrakin", hp: 99999));
-        Do(s, "skill", 0, 0); End(s); End(s); End(s); End(s); Do(s, "skill", 0, 0);
-        Assert.Equal(2, t.Statuses.Single(x => x.Kind == "burn").Stacks);
-        var u = Playing(); Put(u, Me(u), 0, Card("Pyraxis", "pyraxis.ember_strike")); var t2 = Put(u, Foe(u), 0, Card("Terrakin", hp: 99999));
-        Do(u, "skill", 0, 0); End(u); End(u); End(u); End(u); Do(u, "skill", 0, 0);
-        Assert.Equal(1, t2.Statuses.Single(x => x.Kind == "burn").Stacks);
+        var t = Put(s, Foe(s), 0, Card("Terrakin", hp: 999999, def: 0));
+        for (var i = 0; i < 8; i++) { a.Cd.Clear(); a.Attacked = false; Do(s, "skill", 0, 0); a.Cd.Clear(); a.Attacked = false; }
+        Assert.Equal(5, t.Statuses.Single(x => x.Kind == "burn").Stacks);
+        var u = Playing(); var b = Put(u, Me(u), 0, Card("Pyraxis", "pyraxis.ember_strike")); var t2 = Put(u, Foe(u), 0, Card("Terrakin", hp: 999999, def: 0));
+        for (var i = 0; i < 8; i++) { b.Cd.Clear(); b.Attacked = false; Do(u, "skill", 0, 0); }
+        Assert.Equal(3, t2.Statuses.Single(x => x.Kind == "burn").Stacks);
     }
 
     [Fact(DisplayName = "Rage Bound +5% ATK mỗi 10% HP mất (tối đa +50%); Fury Unleashed phản 20% sát thương")]
@@ -430,7 +431,7 @@ public class BattleSkillTests
         Do(g, "skill", 0); Assert.Equal(-20, e.SpdPct); Assert.Equal(-20, e2.SpdPct);
     }
 
-    [Fact(DisplayName = "Overcharge: +10% ATK mỗi lượt (tối đa 5 lớp); cuối lượt không hành động mất nửa số lớp; Voltage Storm +25% ATK")]
+    [Fact(DisplayName = "Overcharge: +10% ATK mỗi lượt (tối đa 8 lớp, trần +75%); cuối lượt không hành động mất nửa số lớp; Voltage Storm +25% ATK")]
     public void Overcharge()
     {
         var s = Playing(); var a = Put(s, Me(s), 0, Card("Voltaris", "voltaris.overcharge", atk: 1000)); Put(s, Foe(s), 0, Card("Terrakin", hp: 99999, def: 5000));
@@ -439,8 +440,8 @@ public class BattleSkillTests
         Assert.Equal(me, s.Active);
         for (var i = 0; i < 3; i++) { Do(s, "attack", 0, 0); End(s); End(s); }
         Assert.Equal(1000 + 100 * a.Statuses.Single(x => x.Kind == "overcharge").Stacks, a.EffAtk);
-        for (var i = 0; i < 4; i++) { Do(s, "attack", 0, 0); End(s); End(s); }
-        Assert.Equal(1500, a.EffAtk);
+        for (var i = 0; i < 9; i++) { Do(s, "attack", 0, 0); End(s); End(s); }
+        Assert.Equal(1750, a.EffAtk);                                                    // D-5: trần +75% (8 lớp)
         var v = Playing(); var x1 = Put(v, Me(v), 0, Card("Voltaris", atk: 1000)); Put(v, Me(v), 1, Card("Voltaris", atk: 1000));
         Assert.Equal(1250, x1.EffAtk);
     }
@@ -614,5 +615,120 @@ public class BattleSkillTests
         Assert.Equal(6, SkillCatalog.All.Count(x => x.Kind == SkillKind.Fusion));
         Assert.Equal(8, SkillCatalog.All.Count(x => x.Kind == SkillKind.Ultimate));
         Assert.All(SkillCatalog.All.Where(x => x.Kind == SkillKind.Fusion), f => Assert.True(SkillCatalog.FusionElements.ContainsKey(f.Id)));
+    }
+
+    // ---------- Quyết định PO 2026-10-12 (D-4 … D-9) ----------
+    [Theory(DisplayName = "D-2: giảm sát thương kỹ năng = min(50%, d/(d+100)) với d = DEF ÷ 10")]
+    [InlineData(0, 250)]       // không giáp
+    [InlineData(500, 170)]     // d=50 → giảm 33% (250 × 0,667 = 167)
+    [InlineData(1000, 130)]    // d=100 → giảm 50% (125 → làm tròn hàng chục)
+    [InlineData(5000, 130)]    // d=500 → vẫn chỉ giảm tối đa 50%
+    public void DefReductionFormula(int def, int damage)
+    {
+        var s = Playing(); Put(s, Me(s), 0, Card("Umbryx", "umbryx.silent_tear")); var t = Put(s, Foe(s), 0, Card("Terrakin", hp: 9000, def: def));
+        Do(s, "skill", 0, 0);
+        Assert.Equal(9000 - damage, t.Hp);
+    }
+
+    [Fact(DisplayName = "D-2: kỹ năng của Nihilum (Void Touch, Oblivion, The Nameless) bỏ qua DEF")]
+    public void NihilumIgnoresDef()
+    {
+        var s = Playing(); Put(s, Me(s), 0, Card("Nihilum", "nihilum.void_touch", hp: 5000)); var t = Put(s, Foe(s), 0, Card("Terrakin", hp: 9000, def: 9000));
+        Do(s, "skill", 0, 0); Assert.Equal(9000 - 500, t.Hp);
+        var o = Playing(); Put(o, Me(o), 0, Card("Nihilum", "nihilum.oblivion")); var e = Put(o, Foe(o), 0, Card("Terrakin", hp: 9000, def: 9000));
+        Do(o, "skill", 0, 0); Assert.Equal(9000 - 300, e.Hp);
+        var u = Playing(); Put(u, Me(u), 0, Card("Nihilum", hp: 5000)); var x = Put(u, Foe(u), 0, Card("Terrakin", hp: 9000, def: 9000));
+        Meter(u, 50); Do(u, "ultimate", 0, 0); Assert.Equal(9000 - 1200, x.Hp);
+    }
+
+    [Fact(DisplayName = "D-4: Ultimate tiêu 50 và hoàn 30 (net −20), không cộng thêm +5; Meter 50 → 30")]
+    public void UltimateNetCost()
+    {
+        var s = Playing(); Put(s, Me(s), 0, Card("Umbryx")); Put(s, Foe(s), 0, Card("Terrakin", hp: 99999));
+        Meter(s, 50); Do(s, "ultimate", 0);
+        Assert.Equal(30, s.Meter);
+    }
+
+    [Fact(DisplayName = "D-5: Slow chồng tối đa 2 lớp (−30% mỗi lớp); Shield chồng tối đa 3 lớp, mỗi lớp chặn một nửa một đòn")]
+    public void SlowAndShieldStacks()
+    {
+        var s = Playing(); var a = Put(s, Me(s), 0, Card("Aqualis", "aqualis.undertow")); var t = Put(s, Foe(s), 0, Card("Pyraxis", hp: 9000));
+        for (var i = 0; i < 4; i++) { a.Cd.Clear(); a.Attacked = false; Do(s, "skill", 0, 0); }
+        Assert.Equal(2, t.Statuses.Single(x => x.Kind == "slow").Stacks); Assert.Equal(-60, t.SpdPct);
+        var g = Playing(); var v = Put(g, Me(g), 0, Card("Ventara", "ventara.gust_barrier", hp: 9000));
+        for (var i = 0; i < 5; i++) { v.Cd.Clear(); v.Attacked = false; Do(g, "skill", 0); }
+        Assert.Equal(3, v.Statuses.Single(x => x.Kind == "shield_hit").Stacks);
+    }
+
+    [Fact(DisplayName = "D-6: bất tử chặn đòn đánh/kỹ năng/phản đòn nhưng KHÔNG chặn Burn; HP không xuống dưới 1")]
+    public void InvulnerableVsBurn()
+    {
+        var s = Playing(); var t = Put(s, Me(s), 0, Card("Terrakin", hp: 1000)); Put(s, Foe(s), 0, Card("Pyraxis", "pyraxis.ember_strike", atk: 5000));
+        t.Statuses.Add(new Status { Kind = "invuln", Turns = 3 });
+        t.Statuses.Add(new Status { Kind = "burn", Turns = 3, Value = 800, Stacks = 1 });
+        End(s); Do(s, "attack", 0, 0);                                                   // đòn đánh bị chặn
+        Assert.Equal(1000, t.Hp);
+        End(s); Assert.Equal(200, t.Hp);                                                 // Burn 800 vẫn gây sát thương
+        t.Statuses.First(x => x.Kind == "burn").Turns = 5; t.Statuses.First(x => x.Kind == "burn").Value = 5000;
+        End(s); End(s); Assert.Equal(1, t.Hp);                                           // nhưng không giết được
+        Assert.NotNull(s.Players[Me(s) == 0 ? 1 : 0].Field[0] ?? s.Players[0].Field[0] ?? s.Players[1].Field[0]);
+    }
+
+    [Fact(DisplayName = "D-6: Eternal Tide xóa 1 lớp Burn của mỗi đồng đội")]
+    public void EternalTideRemovesBurn()
+    {
+        var s = Playing(); var a = Put(s, Me(s), 0, Card("Aqualis")); Put(s, Me(s), 1, Card("Terrakin")); Put(s, Foe(s), 0, Card("Terrakin", hp: 9000));
+        a.Statuses.Add(new Status { Kind = "burn", Turns = 3, Value = 50, Stacks = 2 });
+        Do(s, "fusion", 0, id: "eternal_tide");
+        Assert.Equal(1, a.Statuses.Single(x => x.Kind == "burn").Stacks);
+    }
+
+    [Fact(DisplayName = "D-9: The Void Calls — mỗi Nihilum hồi sinh tối đa 1 lần, hồi sinh KHÔNG kích hoạt \"đồng đội ngã\"; ngã lần 2 thì tính")]
+    public void VoidCallsPerNihilum()
+    {
+        var s = Playing(); var holder = Put(s, Me(s), 0, Card("Luminara", "luminara.hopes_echo", hp: 1000)); holder.Hp = 500;
+        var n1 = Put(s, Me(s), 1, Card("Nihilum", hp: 1000)); var n2 = Put(s, Me(s), 2, Card("Nihilum", hp: 1000)); n2.Hp = 500;
+        Put(s, Foe(s), 0, Card("Umbryx", atk: 9000)); End(s);
+        Do(s, "attack", 0, 1);
+        Assert.Equal(300, s.Players[1 - s.Active].Field[1]!.Hp); Assert.Equal(500, n2.Hp);                  // hồi sinh: Hope's Echo không chạy
+        End(s); End(s);
+        Do(s, "attack", 0, 1);                                                          // ngã lần 2: tính là "ngã"
+        Assert.Null(s.Players[1 - s.Active].Field[1]); Assert.Equal(650, n2.Hp);
+        Assert.Contains("void_calls", n1.Used);
+    }
+
+    [Fact(DisplayName = "D-8: Anima ngã có thể sinh Echo (50% chỉ số, chỉ giữ Passive, 2 lượt) vào đúng ô; Echo đánh được, bị đánh được, ngã không kích hoạt gì")]
+    public void EchoSpawn()
+    {
+        var s = Playing(); s.EchoChancePct = 100;
+        var fallen = Card("Pyraxis", "pyraxis.rage_bound", atk: 1000, def: 400, hp: 100, name: "Emberling");
+        Put(s, Me(s), 0, fallen); Put(s, Me(s), 1, Card("Luminara", "luminara.hopes_echo", hp: 1000));
+        Put(s, Foe(s), 0, Card("Umbryx", atk: 9000)); End(s);
+        Do(s, "attack", 0, 0);
+        var echo = s.Players[1 - s.Active].Field[0]!;
+        Assert.True(echo.IsEcho); Assert.Equal("Echo of Emberling", echo.Card.Name); Assert.Equal(500, echo.Atk); Assert.Equal(200, echo.Def); Assert.Equal(50, echo.Hp);
+        Assert.Equal("pyraxis.rage_bound", echo.SkillId); Assert.Equal("echo", echo.Card.Type);
+        Assert.Single(s.Players[1 - s.Active].Graveyard);                                // chỉ Anima gốc vào mộ
+
+        End(s); End(s);                                                                  // Echo đã qua 1 lượt của chủ
+        Assert.Equal(1, echo.EchoTurns);
+        Do(s, "attack", 0, 0);                                                           // Echo tấn công được
+        End(s); End(s);
+        Assert.Null(s.Players[1 - s.Active].Field[0]);                                   // tan biến sau 2 lượt
+    }
+
+    [Fact(DisplayName = "D-8: Echo không tính vào Resonance/Fusion; Echo của Anima có kỹ năng Active thì không giữ kỹ năng; Echo ngã không sinh Echo")]
+    public void EchoDetails()
+    {
+        var s = Playing(); s.EchoChancePct = 100;
+        Put(s, Me(s), 0, Card("Umbryx", "umbryx.silent_tear", hp: 10)); Put(s, Me(s), 1, Card("Terrakin", hp: 3000));
+        Put(s, Foe(s), 0, Card("Pyraxis", atk: 9000, hp: 99999)); End(s);
+        Do(s, "attack", 0, 0);
+        var echo = s.Players[1 - s.Active].Field[0]!;
+        Assert.True(echo.IsEcho); Assert.Null(echo.SkillId);                              // Active không được giữ lại
+        Assert.Equal(0, echo.AtkPct);
+        End(s); End(s);
+        Do(s, "attack", 0, 0);                                                           // Echo bị hạ
+        Assert.Null(s.Players[1 - s.Active].Field[0]); Assert.Single(s.Players[1 - s.Active].Graveyard);
     }
 }

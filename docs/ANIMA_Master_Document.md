@@ -1051,6 +1051,41 @@ Backend gồm các module: Identity, Wallet (ledger), Catalog (thẻ, pack, tỷ
 
 ---
 
+# 10. QUYẾT ĐỊNH THIẾT KẾ
+
+Các quyết định PO chốt ngày 2026-10-12 cho hệ thống kỹ năng và trận đấu. Bản triển khai chi tiết: [SKILLS_ANIMA.md](SKILLS_ANIMA.md).
+
+## 10.1 Chi phí Ultimate
+- Cần Emotion Meter ≥ 50; sau khi dùng, Meter = Meter − 20 (tiêu 50, hoàn 30).
+- Ultimate của thẻ Secret Rare có thể tiêu đủ 50 để đổi lấy hiệu ứng mạnh hơn.
+
+## 10.2 Sát thương kỹ năng và DEF
+- Giảm sát thương kỹ năng = min(0,5; DEF/(DEF+100)).
+- Kỹ năng hệ Nihilum và kỹ năng "sát thương thật" (Oblivion, Void Touch, Void's Edge) bỏ qua DEF.
+
+## 10.3 Trần cộng dồn
+- Overcharge +75% (8 lượt; không tấn công thì giảm nửa số lớp, làm tròn xuống). Rage Bound +50%. Radiant Aura +25% DEF.
+- Burn 5 lớp (5 sát thương/lớp), Poison 3, Slow 2 (−30%/lớp), Shield 3, Regen 3 (5% HP/lớp).
+
+## 10.4 Bất tử
+- Chặn sát thương trực tiếp (đòn thường, kỹ năng, Ultimate, phản đòn, môi trường), không chặn Burn/Poison. HP không xuống dưới 1.
+- Eternal Tide gỡ 1 lớp Burn/Poison.
+
+## 10.5 Thẻ Tiếng vọng và Ký ức phong ấn
+- **Echo**: đơn vị tạm thời, không sưu tầm. 30% sinh ra khi một Anima ngã; 50% ATK/DEF/HP, SPD 100%; chỉ có kỹ năng Passive; tồn tại 2 lượt; đánh và bị đánh được; có thể làm lá chắn.
+- **Ký ức phong ấn**: sưu tầm được, không giao dịch, là vật phẩm tiêu hao. Kích hoạt Passive của Anima gốc 1 lượt; cần ≥ 1 Anima cùng hệ trên sân; CD 3; tối đa 5 trong kho; mỗi lần một thẻ; không dùng trong Ranked PvP. Nguồn: Story, sự kiện, mua Gem (1 lần/tuần), Battle Pass.
+
+## 10.6 Hồi sinh
+- Hồi sinh (The Void Calls, vật phẩm) không tính là "đồng đội ngã"; rút bài khỏi sân cũng không. Ngã lần hai sau hồi sinh có tính.
+- The Void Calls: 1 lần/Nihilum, giữ nguyên buff/debuff, hồi 30% HP.
+
+## 10.7 Trạng thái triển khai và điểm cần PO chốt thêm
+- Đã cài trong máy đấu: 10.1 (trừ ngoại lệ Secret Rare), 10.2, 10.3 (trừ Poison/Regen), 10.4, Echo, 10.6.
+- Chưa cài: Ký ức phong ấn, ngoại lệ Secret Rare, Poison/Regen.
+- Mâu thuẫn cần xử lý: BR-CARD-01 vẫn ghi Echo và Ký ức phong ấn là thẻ sưu tầm và giao dịch được; chợ P2P và dữ liệu seed đang theo BR-CARD-01.
+
+---
+
 ## GHI CHÚ CUỐI
 
 Tài liệu này là **bản thiết kế tổng thể** cho dự án ANIMA: Echoes of the Heart.

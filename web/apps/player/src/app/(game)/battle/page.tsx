@@ -105,7 +105,7 @@ export default function BattlePage() {
     <button className={`btn slot ${extra ?? ""}`} data-testid={testid} disabled={busy || !onClick} onClick={onClick} style={{ minHeight: 96, flexDirection: "column", alignItems: "flex-start", textAlign: "left" }}>
       {a ? <>
         <b>{a.name}</b><small>{a.element}{a.skill ? ` · ${a.skill.name}${a.skill.cooldown > 0 ? ` (${t("battle.cd", { n: a.skill.cooldown })})` : ""}` : ""}</small>
-        <small>ATK {a.atk} · DEF {a.def} · HP {a.hp}/{a.maxHp}{a.summoned ? " ✦" : ""}</small>
+        <small>ATK {a.atk} · DEF {a.def} · HP {a.hp}/{a.maxHp}{a.summoned ? " ✦" : ""}{a.echo != null ? ` ✧ ${a.echo}` : ""}</small>
         {a.statuses.length > 0 && <small className="muted" data-testid="statuses">{a.statuses.map(statusLabel).join(" · ")}</small>}
       </> : <span className="muted">—</span>}
     </button>

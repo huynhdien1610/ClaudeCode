@@ -26,7 +26,7 @@ public static class Bot
             foreach (var (id, (a, b)) in SkillCatalog.FusionElements)
             {
                 if (p.TeamUsed.Contains("fusion:" + id) || id == "hopes_last_stand") continue;
-                if (!p.Field.Any(f => f?.Card.Element == a) || !p.Field.Any(f => f?.Card.Element == b)) continue;
+                if (!p.Field.Any(f => f is { IsEcho: false } && f.Card.Element == a) || !p.Field.Any(f => f is { IsEcho: false } && f.Card.Element == b)) continue;
                 return new BattleAction(me, "fusion", Id: id, Target: id == "voids_edge" ? EnemyTarget(opp) : null);
             }
 

@@ -168,6 +168,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
             ultimate = new { name = ult.Name, target = ult.Target.ToString().ToLowerInvariant() },
             feared = f.Statuses.Any(x => x.Kind == "fear"),
             dodge = f.DodgePct,
+            echo = f.IsEcho ? (int?)f.EchoTurns : null,
             statuses = f.Statuses.Select(x => new { kind = x.Kind, turns = x.Turns >= 90 ? (int?)null : x.Turns, value = x.Value, stacks = x.Stacks }),
         };
     }

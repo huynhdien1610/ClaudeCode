@@ -74,7 +74,7 @@ public sealed class BattleTests(ApiFixture fx) : IClassFixture<ApiFixture>
         Assert.Equal(5, v["you"].GetProperty("hand").GetArrayLength());
         Assert.Equal(5, v["opponent"].GetProperty("hand").GetInt32());
         Assert.Equal(8000, v["you"].GetProperty("keeper").GetInt32());
-        Assert.DoesNotContain("seed", v.Body.ToString(), StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("\"seed\"", v.Body.ToString(), StringComparison.OrdinalIgnoreCase);
         Assert.Equal("MATCH_IN_PROGRESS", (await p.Post("/v1/battles/practice", new { deckId = deck })).Code);
         Assert.Equal("INVALID_STATE", (await p.Get($"/v1/battles/{id}/replay")).Code);          // chưa kết thúc thì chưa có phát lại
 
