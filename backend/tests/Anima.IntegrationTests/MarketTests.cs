@@ -195,7 +195,7 @@ public sealed class MarketTests(ApiFixture fx) : IClassFixture<ApiFixture>
     [Fact(DisplayName = "Thẻ đang niêm yết bị khóa: không rèn được (CARD_LOCKED) và rời khỏi bộ bài")]
     public async Task ListedCardIsLocked()
     {
-        var s = await Trader(); var items = (await s.Collection()).Where(i => !i.GetProperty("soulbound").GetBoolean()).Take(2).Select(i => i.GetProperty("id").GetGuid()).ToList();
+        var s = await Trader(5); var items = (await s.Collection()).Where(i => !i.GetProperty("soulbound").GetBoolean() && i.GetProperty("card").GetProperty("rarity").GetString() == "common").Take(2).Select(i => i.GetProperty("id").GetGuid()).ToList();
         var deck = (await s.Post("/v1/decks", new { name = "d", cardInstanceIds = items }))["id"].GetGuid();
         Assert.True((await List(s, items[0], 100)).Ok);
         Assert.Equal(1, (await s.Get($"/v1/decks/{deck}"))["count"].GetInt32());
