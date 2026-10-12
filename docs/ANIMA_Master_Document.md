@@ -205,11 +205,11 @@ Giá: **1 pack 5 thẻ = $1** (100 Gem hoặc 1,000 Coin). Chi tiết quy tắc 
 
 > Chi tiết luật: BRD mục 10.18 → 10.25 (BR-CARD, BR-DECK, BR-BTL, BR-ELM, BR-ARN, BR-FUS, BR-PVP, BR-NEW); kịch bản: BDD mục 12D. Hệ số cuối cùng chốt sau mô phỏng (BRD Q-51).
 
-**Thẻ.** 3 loại: Anima (chiến đấu: Cộng hưởng 1–6, ATK, DEF, HP, tối đa 1 kỹ năng), Tiếng vọng (Buff) và Ký ức phong ấn (Bẫy, tự kích hoạt). Chỉ số bất biến sau phát hành vì gắn với NFT. Khung chỉ số theo chi phí như nhau cho mọi rarity: rarity cao khác ở kỹ năng, không ở tổng chỉ số. Set Awakening = 80 Anima + 20 bài hỗ trợ.
+**Thẻ.** 2 loại sưu tầm: Anima (chiến đấu: Cộng hưởng 1–6, ATK, DEF, HP, 1 kỹ năng) và Ký ức phong ấn (vật phẩm tiêu hao trong kho, kích hoạt Passive của Anima gốc 1 lượt, không giao dịch). Tiếng vọng là đơn vị tạm thời sinh trong trận (mục 10.5). Chỉ số bất biến sau phát hành vì gắn với NFT. Khung chỉ số theo chi phí như nhau cho mọi rarity: rarity cao khác ở kỹ năng, không ở tổng chỉ số. Set Awakening = 100 Anima.
 
-**Bộ bài.** 30 lá: ≥ 24 Anima, ≤ 6 bài hỗ trợ; tối đa 2 bản mỗi thẻ (Legendary, Secret: 1); mỗi bộ tối đa 4 Epic, 2 Legendary, 1 Secret; lưu được 10 bộ.
+**Bộ bài.** 30 lá Anima; tối đa 2 bản mỗi thẻ (Legendary, Secret: 1); mỗi bộ tối đa 4 Epic, 2 Legendary, 1 Secret; lưu được 10 bộ.
 
-**Trận đấu.** Keeper 8,000 HP; 3 ô Anima + 2 ô Ký ức mỗi bên. Cộng hưởng lượt n = min(n, 6). 20 giây mỗi lượt + 30 giây dự trữ. Từ lượt 10 đột tử: −500, −1,000, … mỗi lượt. Mục tiêu trận 3–5 phút. Kết quả do server quyết định.
+**Trận đấu.** Keeper 8,000 HP; 3 ô Anima mỗi bên và một mộ. Cộng hưởng lượt n = min(n, 6). 20 giây mỗi lượt + 30 giây dự trữ. Từ lượt 10 đột tử: −500, −1,000, … mỗi lượt. Mục tiêu trận 3–5 phút. Kết quả do server quyết định.
 
 **Sát thương** = max(100, ATK − DEF) × hệ số hệ, làm tròn chục. Khắc ×1.25, bị khắc ×0.75, còn lại ×1.0; Nihilum ×1.1 với mọi hệ; Luminara đánh Nihilum ×1.5.
 
@@ -1079,10 +1079,15 @@ Các quyết định PO chốt ngày 2026-10-12 cho hệ thống kỹ năng và 
 - Hồi sinh (The Void Calls, vật phẩm) không tính là "đồng đội ngã"; rút bài khỏi sân cũng không. Ngã lần hai sau hồi sinh có tính.
 - The Void Calls: 1 lần/Nihilum, giữ nguyên buff/debuff, hồi 30% HP.
 
-## 10.7 Trạng thái triển khai và điểm cần PO chốt thêm
-- Đã cài trong máy đấu: 10.1 (trừ ngoại lệ Secret Rare), 10.2, 10.3 (trừ Poison/Regen), 10.4, Echo, 10.6.
-- Chưa cài: Ký ức phong ấn, ngoại lệ Secret Rare, Poison/Regen.
-- Mâu thuẫn cần xử lý: BR-CARD-01 vẫn ghi Echo và Ký ức phong ấn là thẻ sưu tầm và giao dịch được; chợ P2P và dữ liệu seed đang theo BR-CARD-01.
+## 10.7 Quyết định bổ sung (đóng các điểm còn mở)
+Chốt theo ủy quyền của PO ngày 2026-10-12; PO có thể đảo lại bằng cách sửa mục này và BRD.
+- **Loại thẻ:** sưu tầm còn Anima và Ký ức phong ấn. Echo không còn là thẻ; bài Buff và bài Bẫy cũ, ô Ký ức trên sân bị bỏ (BR-CARD-01/04/05). Set Awakening = 100 Anima; bộ bài = 30 Anima.
+- **Ký ức phong ấn:** gắn 1-1 với Anima có Passive (≈ 25 loại), nằm trong kho (tối đa 5, không NFT, không giao dịch, không rèn, không ra từ pack, không giới hạn phát hành); nguồn Story, sự kiện, Battle Pass, Gem (1 lần/tuần, giá chờ Finance: Q-58).
+- **Ultimate Secret Rare:** tiêu đủ 50 Meter (không hoàn), độ lớn hiệu ứng ×1,5; hệ số tinh chỉnh khi mô phỏng cân bằng (Q-51).
+- **Poison, Regen:** trạng thái dự trữ, Set Awakening chưa có kỹ năng gây ra (BR-CARD-10).
+- **Echo:** chỉ kích hoạt Passive của bản gốc (Trigger không).
+- **Diễn giải đã xác nhận:** DEF quy đổi ÷10 trong công thức giảm sát thương; Emotional Surge cộng cả ATK và DEF; Unyielding giúp sống sót một lần ở 1 HP; trần Burn 3 lớp, 5 khi Twin Fury.
+- **Việc code còn lại** (sau khi tài liệu đóng): bỏ Echo khỏi loại thẻ (seed, chợ, bộ bài); đổi luật bộ bài thành 30 Anima; thêm kho Ký ức phong ấn và API dùng trong trận; Ultimate Secret Rare ×1,5; cập nhật giao diện và test.
 
 ---
 

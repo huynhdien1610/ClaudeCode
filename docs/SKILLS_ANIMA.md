@@ -15,6 +15,13 @@ Nguồn: bản thiết kế "Hệ thống Kỹ năng Thẻ & Các Chế độ Đ
 | D-7 | Bất tử | Chặn sát thương trực tiếp (đòn thường, kỹ năng, Ultimate, phản đòn, môi trường), **không** chặn Burn/Poison; HP không xuống dưới 1. Eternal Tide gỡ 1 lớp Burn/Poison mỗi đồng đội. |
 | D-8 | Thẻ Tiếng vọng (Echo) | Đơn vị tạm thời không sưu tầm: khi một Anima ngã, 30% sinh Echo (50% ATK/DEF/HP, SPD 100%, chỉ giữ kỹ năng Passive, tồn tại 2 lượt, đánh và bị đánh được, có thể làm lá chắn). Echo không tính vào Resonance/Fusion/đồng đội ngã. |
 | D-9 | Hồi sinh vs "ngã" | Hồi sinh (The Void Calls, vật phẩm) **không** tính "đồng đội ngã"; rút bài khỏi sân cũng không; ngã lần 2 sau hồi sinh có tính. The Void Calls 1 lần/Nihilum, giữ buff/debuff, hồi 30% HP. |
+| D-10 | Loại thẻ | Sưu tầm còn Anima và Ký ức phong ấn; Echo là đơn vị tạm thời trong trận. Bỏ bài Buff/Bẫy và 2 ô Ký ức trên sân. Đã sửa BRD (BR-CARD-01/04/05, BR-DECK-01, BR-BTL-01). |
+| D-11 | Ký ức phong ấn | Vật phẩm kho gắn 1-1 với Anima gốc có Passive; tối đa 5; không NFT, không giao dịch, không rèn, không ra từ pack; nguồn Story/sự kiện/Battle Pass/Gem 1 lần/tuần. Dùng: Passive gốc 1 lượt, cần ≥1 Anima cùng hệ, CD chung 3, 1 cái/lượt, cấm Ranked. |
+| D-12 | Ultimate Secret Rare | Tiêu đủ 50 Meter (không hoàn), độ lớn hiệu ứng ×1,5 (sát thương, hồi máu); không đổi thời lượng hay số mục tiêu. |
+| D-13 | Poison, Regen | Trạng thái dự trữ (trần 3 lớp, Regen 5% HP/lớp); Set Awakening không có nguồn nên engine chưa cần cài. |
+| D-14 | Echo và Trigger | Echo chỉ giữ Passive; dòng "kích hoạt Trigger" trong bản thiết kế gốc bỏ. |
+| D-15 | Diễn giải ⚑ | Xác nhận: DEF ÷10, Surge cộng cả DEF, Unyielding sống sót 1 lần ở 1 HP, Burn 3/5. |
+| D-16 | Thành phần set | Set Awakening = 100 Anima; Ký ức phong ấn (≈ 25) nằm ngoài 100. |
 
 ## 2. Bổ sung: tương khắc ±20% lên kỹ năng
 
@@ -37,7 +44,7 @@ Lấy từ yêu cầu của PO: *"ngũ hành tương khắc sẽ giảm 20% kh�
 - **Resonance**: tự động khi có từ 2 Anima cùng hệ trên sân (không tốn hành động).
 - **Fusion**: cần đủ hai hệ trên sân; **1 lần/trận mỗi Fusion** mỗi bên; không tốn hành động của Anima nào. Tối đa 1 Fusion mỗi lượt.
 - **Dodge** = dodge cộng thêm + (SPD hiệu lực − 100) × 0,25 điểm %, tối đa 75%. Né được thì đòn trúng bị hủy hoàn toàn. Không né được khi bị Undertow/Earth's Grasp. Burn, phản đòn, lan sét, Ultimate/Fusion AoE không né được.
-- **Giá trị tôi tự diễn giải** (⚑): quy đổi DEF ÷10 trong công thức D-5; Surge cộng cả DEF; "không thể one-shot" của Unyielding hiểu là sống sót 1 lần ở 1 HP; trần Burn 3 (5 khi Twin Fury).
+- **Diễn giải đã được xác nhận (D-15)**: quy đổi DEF ÷10 trong công thức D-5; Surge cộng cả DEF; "không thể one-shot" của Unyielding hiểu là sống sót 1 lần ở 1 HP; trần Burn 3 (5 khi Twin Fury).
 
 ## 4. Kỹ năng cấp thẻ (mỗi Anima giữ 1; phân theo thứ tự thẻ trong hệ: Active A, Passive, Trigger, Active B, lặp)
 
@@ -143,10 +150,11 @@ Lấy từ yêu cầu của PO: *"ngũ hành tương khắc sẽ giảm 20% kh�
 
 ## 6. Việc còn mở
 
-Đã chốt (D-4…D-9): chi phí Ultimate, DEF, trần cộng dồn, bất tử vs Burn, Echo, hồi sinh.
+Không còn câu hỏi thiết kế mở. Chốt D-4…D-16 đã vào BRD v1.1 (BR-CARD-01/04/05/07/08/09/10, BR-SKL-01…07) và Master mục 10. Còn một điểm ngoài phạm vi kỹ năng: giá Gem của Ký ức phong ấn (Q-58, Finance).
 
-1. **Mâu thuẫn BRD**: BR-CARD-01 cho cả 3 loại thẻ (Anima, Echo, Sealed Memory) sưu tầm và giao dịch; quyết định D-8 nói Echo không sưu tầm và Ký ức phong ấn không giao dịch. Dữ liệu seed và chợ P2P hiện vẫn coi hai loại này là thẻ thường. Cần PO chọn: sửa BRD, hay giữ thẻ cũ làm loại khác.
-2. **Ký ức phong ấn** chưa cài: vật phẩm tiêu hao trong kho (tối đa 5, CD 3, 1 lần/lượt, cần ≥1 Anima cùng hệ, kích hoạt Passive của Anima gốc 1 lượt, cấm Ranked PvP; nguồn Story/sự kiện/mua Gem 1 lần/tuần/Battle Pass). Thẻ seed chưa liên kết với "Anima gốc".
-3. **Ultimate Secret Rare** tiêu đủ 50 Meter, hiệu ứng mạnh hơn: chưa có số liệu hiệu ứng.
-4. **Poison, Regen** chưa có kỹ năng nào gây ra nên chưa cài.
-5. Dòng "Echo kích hoạt Trigger của bản gốc" mâu thuẫn "chỉ Passive": đang theo Passive.
+**Việc code còn lại** (làm sau khi tài liệu đóng):
+1. Bỏ Echo khỏi loại thẻ: seed, chợ, bộ bài, giao diện sưu tầm.
+2. Bộ bài đổi thành 30 Anima (BR-DECK-01); bỏ giới hạn bài hỗ trợ.
+3. Kho Ký ức phong ấn (tối đa 5, liên kết Anima gốc), API dùng trong trận, cấm Ranked, mua Gem 1 lần/tuần.
+4. Ultimate Secret Rare: tiêu 50, ×1,5.
+5. Cập nhật test và giao diện theo các mục trên.

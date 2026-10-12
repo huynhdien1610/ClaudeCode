@@ -246,7 +246,7 @@ Nguồn yêu cầu duy nhất: **[BRD](BRD_ANIMA.md) v1.0** (2026-10-07). Vì d�
 | T119 | Xin ma trận pháp lý theo thị trường đợt 1 (Q-44, Q-46) | release | ship-and-operate | T001 | CR-003; RK-17 | Ma trận tính năng từng nước có Legal ký | high | 1d | story (tách khi lập sprint) |
 | T116 | Glossary lore + nền tảng quản lý bản dịch (T-11) + CI kiểm tra khóa thiếu | content | senior-business-analyst | T114, T115 | BR-I18N-02; BR-I18N-03; RK-18 | CI đỏ khi thiếu bản dịch nội dung pháp lý/tiền tệ | low | 1d | story (tách khi lập sprint) |
 | T118 | FRD Compliance: quốc gia pháp lý, ma trận tính năng, tuổi theo quốc gia | analysis | senior-business-analyst | T001 | BR-GEO-* | Đạt FRD checklist | high | 1d | story (tách khi lập sprint) |
-| T125 | Thiết kế 100 thẻ Awakening: 80 Anima + 20 bài hỗ trợ, chỉ số theo khung chi phí, 15–20 mạch truyện, công thức Hợp thể | content | senior-business-analyst | T124 | BR-CARD-03; BR-CARD-07; BR-FUS-01..05; Q-56 | Mọi Anima nằm trong khung ±10%; mỗi hệ có đủ Cộng hưởng 1–6; đủ 4 Epic+ mỗi hệ | high | 4d | story (tách khi lập sprint) |
+| T125 | Thiết kế 100 thẻ Awakening: 100 Anima, chỉ số theo khung chi phí, 15–20 mạch truyện, công thức Hợp thể | content | senior-business-analyst | T124 | BR-CARD-03; BR-CARD-07; BR-FUS-01..05; Q-56 | Mọi Anima nằm trong khung ±10%; mỗi hệ có đủ Cộng hưởng 1–6; đủ 4 Epic+ mỗi hệ | high | 4d | story (tách khi lập sprint) |
 
 ### S004 — Gacha: mua và mở pack (server + cửa hàng) (Tuần 7–8)
 

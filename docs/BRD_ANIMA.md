@@ -4,7 +4,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BRD-ANIMA-001 |
-| Phiên bản | 1.0 (Baseline hợp nhất — Draft, chờ PO duyệt) |
+| Phiên bản | 1.1 (Draft, chờ PO duyệt) |
 | Ngày | 2026-10-07 |
 | Nguồn | [ANIMA_Master_Document.md](ANIMA_Master_Document.md) v1.0 (2026-10-05) |
 | Trạng thái | **DRAFT — Chờ Product Owner xác nhận** |
@@ -22,6 +22,7 @@
 | 0.4 | 2026-10-06 | Tài sản số: số lượng phát hành, commit–reveal, Lò rèn, quy đổi Gem ↔ Coin, NFT (trước là CR-002) |
 | 0.5 | 2026-10-06 | Phát hành toàn cầu, 4 ngôn ngữ, ma trận quốc gia (trước là CR-003) |
 | 0.6 | 2026-10-06 | Đấu trường, gói chào mừng, nhiệm vụ Tân thủ (trước là CR-004) |
+| **1.1** | 2026-10-12 | Chốt hệ thống kỹ năng và luật Echo / Ký ức phong ấn (PO, [SKILLS_ANIMA.md](SKILLS_ANIMA.md) D-1…D-15): thẻ sưu tầm còn 2 loại (Anima, Ký ức phong ấn); Echo thành đơn vị tạm thời trong trận; bộ bài 30 Anima; bỏ ô Ký ức trên sân; sửa BR-CARD-01/04/05/07, BR-DECK-01, BR-BTL-01; thêm BR-CARD-08…10, BR-SKL-01…07 |
 | **1.0** | 2026-10-07 | Hợp nhất baseline: bỏ nhãn CR; sửa các chỗ mâu thuẫn giữa phần gốc và phần bổ sung (đổi Gem ↔ Coin, FTUE, phạm vi, trạng thái thẻ); bổ sung luồng Lò rèn, NFT, trận đấu (7.7 → 7.9), vòng đời thẻ chưa lật và trận đấu (8.5, 8.6), thực thể, tích hợp, API, NFR còn thiếu |
 
 > **Lưu ý trạng thái:** Tài liệu này **chưa đạt Analysis Ready**. Mục 15 có 8 điểm mâu thuẫn (1 đã quyết) và mục 16 có 57 câu hỏi (3 đã chốt) cần PO, Legal và Finance quyết định. Không có approval nào được gắn sẵn. Mục 18 liệt kê các xác nhận còn thiếu.
@@ -342,7 +343,7 @@ Quy đổi hai chiều do PO quyết định (trả lời Q-05). Rủi ro farm C
 |---|---|---|
 | Card Definition | Mẫu thẻ: tên, hệ, rarity, art, Story Fragment, set | — |
 | Card Instance | Một bản thẻ cụ thể, serial duy nhất toàn hệ thống, thuộc một edition có số lượng giới hạn (BR-SUP) | Có, qua chợ P2P; rút về ví dưới dạng NFT (BR-NFT, R2) |
-| Thẻ Anima, Tiếng vọng, Ký ức phong ấn | Ba loại thẻ; Anima có chỉ số chiến đấu (BR-CARD) | Như Card Instance |
+| Thẻ Anima, Ký ức phong ấn | Hai loại sưu tầm; Anima có chỉ số chiến đấu, Ký ức phong ấn là vật phẩm tiêu hao trong kho (BR-CARD) | Anima: như Card Instance; Ký ức phong ấn: không |
 | Bộ bài | 30 Card Instance do người chơi chọn và lưu (BR-DECK) | Không |
 | Arena Point | Điểm thi đấu, chỉ đổi vật phẩm gắn chặt tài khoản (BR-PVP-03) | **Không** |
 | Thẻ chưa lật (Sealed Card) | Kết quả của Lò rèn; lật ra thành một Card Instance theo tỷ lệ rèn công khai | Không |
@@ -928,7 +929,7 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-SUP-01 | Mỗi Card Definition (mọi loại thẻ — BR-CARD-01) có **số lượng phát hành tối đa** (max supply) cố định trong một mùa, công khai trong app. Ví dụ đề xuất: Common 50,000; Uncommon 20,000; Rare 5,000; Epic 1,000; Legendary 300; Secret Rare 100. | PO + BA (Q-39) |
+| BR-SUP-01 | Mỗi Card Definition **Anima** có **số lượng phát hành tối đa** (max supply) cố định trong một mùa, công khai trong app. Ví dụ đề xuất: Common 50,000; Uncommon 20,000; Rare 5,000; Epic 1,000; Legendary 300; Secret Rare 100. | PO + BA (Q-39) |
 | BR-SUP-02 | Mỗi Card Instance mang số thứ tự trong edition, dạng `#37/100`, và serial duy nhất toàn hệ thống. Không có hai Card Instance cùng serial. | PO + BA |
 | BR-SUP-03 | Khi quay được một rarity, hệ thống chọn đều một Card Definition **còn bản** trong rarity đó. Card Definition hết bản bị loại khỏi lượt chọn. | PO + BA |
 | BR-SUP-04 | Khi mọi Card Definition của một rarity trong pack đã hết bản, pack đó **tự động ngừng bán** cho đến khi có version tỷ lệ mới được công bố. Hệ thống không được tự hạ tỷ lệ một cách ngầm. | PO + BA |
@@ -1002,19 +1003,22 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-CARD-01 | Có 3 loại thẻ: **Anima** (sinh vật chiến đấu), **Tiếng vọng** (bài Buff) và **Ký ức phong ấn** (bài Bẫy). Cả 3 loại đều có rarity, hệ, mùa, số lượng phát hành, ra từ pack, rèn được, rút NFT được như nhau. | PO + BA |
+| BR-CARD-01 | Có 2 loại thẻ sưu tầm: **Anima** (sinh vật chiến đấu) và **Ký ức phong ấn** (vật phẩm tiêu hao, BR-CARD-05). Anima có rarity, hệ, mùa, số lượng phát hành, ra từ pack, rèn được, giao dịch được, rút NFT được. Ký ức phong ấn không giao dịch, không rèn, không rút NFT, không ra từ pack. **Tiếng vọng** không phải thẻ sưu tầm mà là đơn vị tạm thời sinh ra trong trận (BR-CARD-04). | PO (D-8, D-10) |
 | BR-CARD-02 | Anima có: Cộng hưởng (chi phí 1–6), ATK, DEF, HP, hệ, tối đa 1 kỹ năng, mạch truyện (0–1), danh sách công thức Hợp thể. Thang chỉ số: ATK và DEF 0–3,000; HP 100–4,000; bước 50. | PO + BA |
 | BR-CARD-03 | Khung chỉ số theo chi phí, áp dụng như nhau cho mọi rarity: ATK + DEF + HP ÷ 2 ≈ 600 × Cộng hưởng + 300 (sai lệch tối đa ±10%). Rarity cao khác ở kỹ năng, không ở tổng chỉ số. Hệ số cuối cùng chỉnh bằng mô phỏng (Q-51). | PO + BA |
-| BR-CARD-04 | Tiếng vọng: có Cộng hưởng; dùng một lần hoặc gắn vào một Anima; hiệu lực mạnh hơn khi dùng lên Anima cùng hệ. | PO + BA |
-| BR-CARD-05 | Ký ức phong ấn: úp vào một trong 2 ô Ký ức; **tự kích hoạt** khi điều kiện ghi trên thẻ xảy ra, người chơi không phải bấm phản ứng; dùng xong vào mộ. | PO + BA |
+| BR-CARD-04 | **Tiếng vọng (Echo)** là đơn vị tạm thời, không sưu tầm, không nằm trong bộ bài hay kho. Khi một Anima ngã, 30% sinh ra Echo của nó vào chính ô đó: 50% ATK/DEF/HP, SPD 100%, chỉ giữ kỹ năng Passive của bản gốc (không Active, Trigger), tồn tại 2 lượt của chủ. Echo đánh và bị đánh được, có thể làm lá chắn (Taunt hay chặn đường tới Keeper). Echo ngã thì biến mất, không sinh Echo khác, không vào mộ, không kích hoạt kỹ năng "đồng đội ngã", không tính vào Resonance, Fusion hay đếm hệ. | PO (D-8) |
+| BR-CARD-05 | **Ký ức phong ấn** gắn 1-1 với một Anima gốc có kỹ năng Passive. Là vật phẩm tiêu hao trong kho (không phải Card Instance, không NFT, không giao dịch): kho tối đa **5** cái cho mọi loại gộp. Dùng trong trận: kích hoạt Passive của Anima gốc cho **1 lượt**, yêu cầu có ít nhất 1 Anima cùng hệ trên sân (Passive áp lên Anima do người chơi chọn); hồi chiêu chung 3 lượt, mỗi lượt tối đa 1 cái, dùng xong mất. Cấm trong Ranked PvP; dùng được ở trận luyện tập, Story, sự kiện. | PO (D-8, D-11) |
 | BR-CARD-06 | Chỉ số, kỹ năng, mạch truyện, công thức Hợp thể là **bất biến** sau khi Card Definition phát hành (vì gắn với NFT). Cân bằng game bằng thể thức và danh sách cấm (BR-PVP-08). | PO + BA |
-| BR-CARD-07 | Set Awakening 100 thẻ = **80 Anima + 20 bài hỗ trợ** (khoảng 12 Tiếng vọng, 8 Ký ức phong ấn), thiết kế theo 15–20 mạch truyện. | PO + BA |
+| BR-CARD-07 | Set Awakening 100 thẻ = **100 Anima**, thiết kế theo 15–20 mạch truyện. Mỗi Anima giữ 1 kỹ năng riêng (BR-SKL-01); cứ mỗi Anima giữ Passive thì có 1 loại Ký ức phong ấn tương ứng (ước tính 25 loại). | PO (D-10, D-16) |
+| BR-CARD-08 | Ký ức phong ấn có 4 nguồn: nhiệm vụ Story, sự kiện, Battle Pass, và mua bằng Gem (**tối đa 1 cái mỗi tuần mỗi tài khoản**). Giá Gem do Finance chốt (Q-58). Mất khi dùng; không hoàn lại. | PO (D-11) |
+| BR-CARD-09 | Ký ức phong ấn không có số lượng phát hành giới hạn (BR-SUP-01 chỉ áp dụng cho Anima). Hiển thị trong kho, không có serial hay trang chi tiết NFT. | PO + BA (D-11) |
+| BR-CARD-10 | Kỹ năng Poison và Regen là trạng thái dự trữ (trần 3 lớp; Regen 5% HP mỗi lớp). Set Awakening không có thẻ nào gây ra chúng, nên chưa xuất hiện trong trận; bổ sung khi có kỹ năng ở set sau. | PO + BA (D-13) |
 
 ## 10.19. Bộ bài (DECK)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-DECK-01 | Bộ bài có **đúng 30 lá**: ít nhất 24 Anima; Tiếng vọng + Ký ức phong ấn **tối đa 6 lá**. | PO + BA |
+| BR-DECK-01 | Bộ bài có **đúng 30 lá**: toàn bộ là Anima; không có bài hỗ trợ. | PO + BA |
 | BR-DECK-02 | Mỗi Card Definition tối đa 2 bản trong một bộ; Legendary và Secret Rare tối đa 1 bản. | PO + BA |
 | BR-DECK-03 | Mỗi bộ tối đa 4 Epic, 2 Legendary, 1 Secret Rare. | PO + BA |
 | BR-DECK-04 | Bộ bài chỉ gồm Card Instance ở trạng thái **Owned** của chính tài khoản, kể cả thẻ gắn chặt tài khoản. Không dùng thẻ Listed, In Auction, Locked, Withdrawing, In Wallet, Burned. | PO + BA |
@@ -1024,11 +1028,25 @@ Lưu ý: với 5 thẻ/pack và 4% Legendary + 1% Secret mỗi slot, xác suất
 | BR-DECK-08 | Trong lúc trận diễn ra, mọi Card Instance của bộ bài đang dùng bị khóa với niêm yết, rèn, rút NFT; mở khóa khi trận kết thúc. | PO + BA |
 | BR-DECK-09 | Dạng Hợp thể không nằm trong bộ bài (theo công thức, BR-FUS-04). | PO + BA |
 
+## 10.19A. Kỹ năng và trận đấu (SKL)
+
+Chi tiết cơ chế, bảng kỹ năng từng hệ nằm ở [SKILLS_ANIMA.md](SKILLS_ANIMA.md); mục này chỉ ghi quy tắc nghiệp vụ.
+
+| ID | Quy tắc | Nguồn |
+|---|---|---|
+| BR-SKL-01 | Mỗi Anima giữ đúng 1 kỹ năng (Active, Passive hoặc Trigger) lấy từ 4 kỹ năng cấp thẻ của hệ nó. Resonance, Ultimate, Fusion là khả năng cấp đội, không gắn với thẻ. | PO (D-1) |
+| BR-SKL-02 | Kỹ năng lên kẻ địch chịu tương khắc ±20% (người dùng khắc mục tiêu +20%, bị khắc −20%). Đòn thường vẫn theo BR-BTL-05. Sát thương kỹ năng nhân 10 so với bảng thiết kế. | PO (D-2) |
+| BR-SKL-03 | Sát thương kỹ năng bị DEF giảm `min(50%, DEF/(DEF+100))` (DEF quy đổi ÷10). Kỹ năng hệ Nihilum và sát thương thật (Oblivion, Void Touch, Void's Edge, The Nameless) bỏ qua DEF. | PO (D-5) |
+| BR-SKL-04 | Emotion Meter chung 0–100. Ultimate cần Meter ≥ 50 và sau khi dùng Meter = Meter − 20. Ultimate của Anima **Secret Rare** tiêu đủ 50 (không hoàn) và có độ lớn hiệu ứng ×1,5 (sát thương, hồi máu; không đổi thời lượng). | PO (D-4, D-12) |
+| BR-SKL-05 | Trần cộng dồn: Overcharge +75% (8 lượt), Rage Bound +50%, Radiant Aura +25% DEF, Burn 5 lớp, Slow 2 lớp, Shield 3 lớp, Regen 3 lớp, Poison 3 lớp. | PO (D-6) |
+| BR-SKL-06 | Bất tử chặn sát thương trực tiếp, không chặn Burn/Poison; HP không xuống dưới 1. | PO (D-7) |
+| BR-SKL-07 | Hồi sinh (The Void Calls, vật phẩm) không tính là đồng đội ngã; rút bài khỏi sân cũng không; ngã lần hai sau hồi sinh thì tính. The Void Calls: 1 lần mỗi Nihilum, giữ buff/debuff, hồi 30% HP. | PO (D-9) |
+
 ## 10.20. Luật trận đấu (BTL)
 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
-| BR-BTL-01 | Mỗi Keeper có **8,000 máu**. Mỗi bên có 3 ô Anima và 2 ô Ký ức phong ấn. | PO + BA |
+| BR-BTL-01 | Mỗi Keeper có **8,000 máu**. Mỗi bên có 3 ô Anima và một mộ (nơi Anima ngã rời sân). Không còn ô Ký ức phong ấn trên sân; Ký ức phong ấn dùng từ kho theo BR-CARD-05. | PO + BA |
 | BR-BTL-02 | Thứ tự đi trước chọn ngẫu nhiên (commit–reveal, BR-PF). Mỗi bên bốc 5 lá đầu trận và được đổi tay một lần (trả cả 5, xào lại, bốc 5). Người đi sau bốc thêm 1 lá đầu trận (Q-55). | PO + BA |
 | BR-BTL-03 | Đầu mỗi lượt bốc 1 lá. Năng lượng Cộng hưởng của lượt thứ n = min(n, 6); không cộng dồn sang lượt sau. | PO + BA |
 | BR-BTL-04 | Anima vừa ra sân không tấn công trong lượt đó, trừ khi có kỹ năng cho phép. Mỗi Anima tấn công tối đa 1 lần mỗi lượt. | PO + BA |
@@ -1624,6 +1642,7 @@ Giữ nguyên NFR-01 → NFR-10 từ Master Document §3.10, bổ sung tiêu ch�
 | Q-53 | Phần thưởng ngày 6 và 7 của nhiệm vụ Tân thủ (đề xuất 200 Coin mỗi ngày)? | PO | BR-NEW-03 |
 | Q-54 | Nội dung và độ dài cốt truyện Act 1 (số màn, số trùm)? | PO + Content | US-13.5 |
 | Q-55 | Bù cho người đi sau: bốc thêm 1 lá (đề xuất) hay +1 Cộng hưởng ở lượt đầu? | Game Designer | BR-BTL-02 |
+| Q-58 | Giá Gem của Ký ức phong ấn (mua 1 lần/tuần)? | Finance + PO | BR-CARD-08 |
 | Q-56 | Số công thức Hợp thể và số mạch truyện trong set Awakening? | PO + Content | BR-FUS, BR-CARD-07 |
 | Q-57 | Có muốn đưa phần đánh trận của Đấu trường lên R1 không? (ước tính thêm 3–4 sprint) | PO | Phạm vi 4.1 |
 

@@ -2113,23 +2113,21 @@ Tính năng: Bộ bài (BR-DECK)
 
     @R2 @bien
     Sơ đồ kịch bản: SC-DECK-01 — Kiểm tra bộ bài khi lưu
-      Cho trước bộ bài gồm <anima> Anima và <hỗ trợ> bài hỗ trợ, <điều kiện thêm>
+      Cho trước bộ bài gồm <anima> Anima, <điều kiện thêm>
       Khi P1 lưu bộ bài
       Thì kết quả là <kết quả>
 
       Ví dụ:
-        | anima | hỗ trợ | điều kiện thêm                               | kết quả                   |
-        | 24    | 6      | không                                        | thành công                |
-        | 25    | 5      | không                                        | thành công                |
-        | 23    | 7      | không                                        | SUPPORT_LIMIT_EXCEEDED    |
-        | 24    | 5      | không                                        | DECK_SIZE_INVALID         |
-        | 25    | 6      | không                                        | DECK_SIZE_INVALID         |
-        | 30    | 0      | có 3 bản "Driftkoi"                          | COPY_LIMIT_EXCEEDED       |
-        | 30    | 0      | có 2 bản cùng một Legendary                  | COPY_LIMIT_EXCEEDED       |
-        | 30    | 0      | có 5 thẻ Epic                                | RARITY_LIMIT_EXCEEDED     |
-        | 30    | 0      | có 2 Secret Rare khác nhau                   | RARITY_LIMIT_EXCEEDED     |
-        | 30    | 0      | có 1 thẻ đang niêm yết trên chợ              | CARD_NOT_AVAILABLE        |
-        | 30    | 0      | có 1 thẻ đang nằm trong ví ngoài (In Wallet) | CARD_NOT_IN_ACCOUNT       |
+        | anima | điều kiện thêm                               | kết quả                   |
+        | 30    | không                                        | thành công                |
+        | 29    | không                                        | DECK_SIZE_INVALID         |
+        | 31    | không                                        | DECK_SIZE_INVALID         |
+        | 30    | có 3 bản "Driftkoi"                          | COPY_LIMIT_EXCEEDED       |
+        | 30    | có 2 bản cùng một Legendary                  | COPY_LIMIT_EXCEEDED       |
+        | 30    | có 5 thẻ Epic                                | RARITY_LIMIT_EXCEEDED     |
+        | 30    | có 2 Secret Rare khác nhau                   | RARITY_LIMIT_EXCEEDED     |
+        | 30    | có 1 thẻ đang niêm yết trên chợ              | CARD_NOT_AVAILABLE        |
+        | 30    | có 1 thẻ đang nằm trong ví ngoài (In Wallet) | CARD_NOT_IN_ACCOUNT       |
 
   Quy tắc: BR-DECK-05 — Số bộ được lưu
 
@@ -2588,7 +2586,7 @@ Tính năng: Người chơi mới (BR-NEW)
       Khi người dùng "N1" tạo tài khoản thành công
       Thì N1 nhận 5 Card Instance Anima rarity Common
       Và 5 thẻ thuộc 5 hệ khác nhau trong {Umbryx, Pyraxis, Aqualis, Terrakin, Ventara, Voltaris, Luminara}
-      Và không thẻ nào thuộc hệ Nihilum hoặc là bài hỗ trợ
+      Và không thẻ nào thuộc hệ Nihilum
       Và cả 5 thẻ được đánh dấu gắn chặt tài khoản
 
   Quy tắc: BR-NEW-04 — Thẻ gắn chặt tài khoản
@@ -2665,6 +2663,70 @@ Tính năng: Người chơi mới (BR-NEW)
 ```
 
 ---
+
+## 12E. Tính năng: Kỹ năng, Echo, Ký ức phong ấn (SKL)
+
+```gherkin
+Tính năng: Kỹ năng và thẻ đặc biệt (BR-SKL, BR-CARD-04/05/08)
+  Quy tắc: BR-SKL-04 — Chi phí Ultimate
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-SKL-01 — Meter sau Ultimate
+      Cho trước Emotion Meter là <trước> và Anima <loại> đang dùng được Ultimate
+      Khi người chơi dùng Ultimate
+      Thì Meter còn <sau>
+
+      Ví dụ:
+        | trước | loại        | sau |
+        | 50    | thường      | 30  |
+        | 80    | thường      | 60  |
+        | 49    | thường      | không dùng được |
+        | 50    | Secret Rare | 0   |
+        | 49    | Secret Rare | không dùng được |
+
+  Quy tắc: BR-SKL-06 — Bất tử
+
+    @R2
+    Kịch bản: SC-SKL-02 — Bất tử không chặn Burn
+      Cho trước Anima của P1 đang bất tử và đang chịu 2 lớp Burn
+      Khi tới lượt của P1
+      Thì Anima nhận sát thương Burn nhưng HP không xuống dưới 1
+      Và đòn thường, kỹ năng của địch lên Anima đó không gây sát thương
+
+  Quy tắc: BR-CARD-04 — Echo
+
+    @R2
+    Kịch bản: SC-SKL-03 — Echo sinh ra khi Anima ngã
+      Cho trước Anima A của P1 có Passive và ngã, kết quả quay Echo là trúng (30%)
+      Khi A rời sân
+      Thì ô của A có Echo với 50% ATK/DEF/HP, SPD 100%, chỉ giữ Passive
+      Và Echo biến mất sau 2 lượt của P1
+      Và Echo ngã không sinh Echo khác và không kích hoạt kỹ năng "đồng đội ngã"
+
+  Quy tắc: BR-CARD-05 — Ký ức phong ấn
+
+    @R2 @bien
+    Sơ đồ kịch bản: SC-SKL-04 — Điều kiện dùng Ký ức phong ấn
+      Cho trước P1 có Ký ức phong ấn của Anima hệ Pyraxis, <điều kiện>
+      Khi P1 dùng nó
+      Thì kết quả là <kết quả>
+
+      Ví dụ:
+        | điều kiện                                  | kết quả                       |
+        | có Anima Pyraxis trên sân, chế độ luyện tập | thành công, Passive hiệu lực 1 lượt |
+        | không có Anima Pyraxis trên sân            | NO_MATCHING_ELEMENT           |
+        | vừa dùng một Ký ức khác 2 lượt trước       | ON_COOLDOWN                   |
+        | đã dùng một cái trong lượt này             | ALREADY_USED_THIS_TURN        |
+        | trận Ranked PvP                            | NOT_ALLOWED_IN_RANKED         |
+
+    @R2
+    Kịch bản: SC-SKL-05 — Kho tối đa 5 và mua Gem 1 lần/tuần
+      Cho trước P1 đã có 5 Ký ức phong ấn
+      Khi P1 nhận thêm từ nhiệm vụ Story
+      Thì phần thưởng bị từ chối hoặc chuyển thành quà bù theo cấu hình
+      Và khi P1 mua Ký ức bằng Gem lần thứ hai trong cùng tuần thì nhận lỗi WEEKLY_LIMIT_REACHED
+      Và Ký ức phong ấn không niêm yết được trên chợ (CARD_NOT_TRADABLE)
+```
 
 ## 13. Rà soát edge case
 

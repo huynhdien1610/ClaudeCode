@@ -292,7 +292,7 @@ Các mục dưới đây mô tả **trải nghiệm cần đạt**. Quy tắc ng
 
 | Nội dung | Số lượng | Trạng thái |
 |---|---|---|
-| Set "Awakening" (art + story VI/EN) | 100 thẻ = 80 Anima + 20 bài hỗ trợ, có chỉ số chiến đấu và mạch truyện (BR-CARD-07; BRD CF-06: danh sách hiện chỉ có 96) | Chưa có |
+| Set "Awakening" (art + story VI/EN) | 100 thẻ Anima (Ký ức phong ấn là vật phẩm kho, không tính vào 100), có chỉ số chiến đấu và mạch truyện (BR-CARD-07; BRD CF-06: danh sách hiện chỉ có 96) | Chưa có |
 | Pack Definition | Gói chào mừng, pack cơ bản Tân thủ, Standard **[Đề xuất thêm Premium]** | Chưa có |
 | Animation theo rarity | 6 bậc | Có spec, chưa có asset |
 | Sound | ≥ 20 sound, 5 layer | Có spec, chưa có asset |
