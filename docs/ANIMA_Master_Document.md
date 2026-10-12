@@ -1091,6 +1091,10 @@ Chốt theo ủy quyền của PO ngày 2026-10-12; PO có thể đảo lại b�
 
 ---
 
+## 10.8 Đấu trường: trạng thái triển khai (2026-10-12)
+- **Đã cài:** luyện tập với máy; xếp hạng PvP (ghép trận Glicko-2, đồng hồ lượt, Arena Point, lịch sử, bảng xếp hạng, phát lại); BR-PVP-10…13 trong BRD v1.2.
+- **Chưa cài:** 8 sàn đấu và luật sàn (BR-ARN-01…04); Cộng minh theo mạch truyện và Hợp thể theo công thức (BR-FUS); Thách đấu cược AP; Giao hữu; mùa xếp hạng và thưởng mùa; thể thức Standard/Eternal; không ghép cùng thiết bị hoặc SĐT; gắn cờ dàn xếp trận cho Fraud Analyst; kết nối thời gian thực (hiện máy khách hỏi lại mỗi 1,5 giây).
+
 ## GHI CHÚ CUỐI
 
 Tài liệu này là **bản thiết kế tổng thể** cho dự án ANIMA: Echoes of the Heart.

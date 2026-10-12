@@ -99,6 +99,14 @@ export type BattleView = {
 };
 export type MemoryItem = { defId: number; name: string; element: string; rarity: string; skill: string; qty: number };
 export type MemoryOverview = { stock: MemoryItem[]; total: number; max: number; available: MemoryItem[]; gemPrice: number; canBuyThisWeek: boolean; weekStart: string };
+export type ArenaOverview = {
+  rating: number; rd: number; games: number; wins: number; ap: number; queue: { joinedAt: string; waitedSeconds: number } | null; activeMatchId: string | null;
+  rules: { turnSeconds: number; bankSeconds: number; winAp: number };
+};
+export type ArenaClock = { turnSeconds: number; deadline: string | null; serverTime: string; bankMs: { you: number; opponent: number }; active: "you" | "opponent" | null };
+export type ArenaView = BattleView & { mode: "ranked"; opponentName: string; clock: ArenaClock; rating: { before: number; delta: number | null; ap: number } | null };
+export type ArenaHistoryItem = { id: string; opponentName: string; status: "InProgress" | "Finished"; won: boolean | null; reason: string | null; createdAt: string; ratingDelta: number | null; ap: number };
+export type ArenaRank = { name: string; rating: number; games: number; wins: number };
 export type BattleSummary = { id: string; status: "InProgress" | "Finished"; won: boolean | null; reason: string | null; createdAt: string };
 
 export type Listing = {
@@ -151,6 +159,13 @@ export const api = {
   battles: () => request<BattleSummary[]>("GET", "/v1/battles"),
   battle: (id: string) => request<BattleView>("GET", `/v1/battles/${id}`),
   battleAct: (id: string, a: { type: string; hand?: number; slot?: number; target?: number; id?: string }) => request<BattleView>("POST", `/v1/battles/${id}/actions`, a),
+  arena: () => request<ArenaOverview>("GET", "/v1/arena"),
+  arenaJoin: (deckId: string) => request<{ queued: boolean; matchId: string | null }>("POST", "/v1/arena/queue", { deckId }),
+  arenaLeave: () => request<void>("DELETE", "/v1/arena/queue"),
+  arenaMatch: (id: string) => request<ArenaView>("GET", `/v1/arena/matches/${id}`),
+  arenaAct: (id: string, a: { type: string; hand?: number; slot?: number; target?: number; id?: string }) => request<ArenaView>("POST", `/v1/arena/matches/${id}/actions`, a),
+  arenaHistory: () => request<ArenaHistoryItem[]>("GET", "/v1/arena/matches"),
+  arenaLeaderboard: () => request<ArenaRank[]>("GET", "/v1/arena/leaderboard"),
   memories: () => request<MemoryOverview>("GET", "/v1/memories"),
   memoryBuy: (cardDefinitionId: number) => request<MemoryOverview>("POST", "/v1/memories/purchase", { cardDefinitionId }, { idem: true }),
   marketRules: () => request<MarketRules>("GET", "/v1/market/rules"),

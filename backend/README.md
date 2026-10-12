@@ -15,7 +15,7 @@ Development bật `Dev:MockTopUp` (nạp Gem giả: `POST /v1/dev/topup`) và `I
 | Lệnh | Việc |
 |---|---|
 | `dotnet build backend/Anima.sln` | Build (cảnh báo là lỗi) |
-| `dotnet test backend/Anima.sln` | 385 test (162 đơn vị, 48 kiến trúc, 175 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
+| `dotnet test backend/Anima.sln` | 398 test (167 đơn vị, 51 kiến trúc, 180 tích hợp): đơn vị, kiến trúc, tích hợp trên PostgreSQL thật |
 | `dotnet format backend/Anima.sln --verify-no-changes` | Kiểm tra định dạng |
 | `UPDATE_OPENAPI=1 dotnet test backend/tests/Anima.IntegrationTests --filter OpenApiContract` | Cập nhật snapshot hợp đồng API khi cố ý đổi API |
 
@@ -46,6 +46,7 @@ backend/
 | Deck | `deck` | bộ bài 30 lá Anima, tối đa 10 bộ, bộ mặc định, kiểm luật BR-DECK-01→04, gỡ thẻ rời trạng thái Owned (BR-DECK-06), `IDeckApi.RequireBattleReadyAsync` cho trận (BR-DECK-07) | BR-DECK-01→07 |
 | Battle | `battle` | máy đấu lõi thuần logic (BR-BTL, BR-ELM: Cộng hưởng, tấn công, hệ khắc/sinh, chuỗi nhân quả, đột tử, hết giờ, đổi tay), tất định và phát lại được; bot luyện tập; trận luyện tập lưu seed + hành động. kỹ năng thẻ, Emotion Meter, Ultimate, Fusion, tương khắc ±20% (xem docs/SKILLS_ANIMA.md). **Chưa có**: Tiếng vọng, Ký ức phong ấn, luật sàn, hẹn giờ thật, giao hữu, xếp hạng | BR-BTL-01→10, BR-ELM-01→06 (không có BR-ARN) |
 | Memory | `memory` | Ký ức phong ấn: kho tối đa 5 (không phải Card Instance), mua Gem 1 lần/tuần (giá tạm 50 Gem, Q-58), `IMemoryApi.GrantAsync` cho Story/sự kiện/Battle Pass, chốt kho lúc vào trận |
+| Arena | `arena` | Đấu trường xếp hạng PvP: hàng đợi và ghép trận theo điểm Glicko-2 (cửa sổ rộng dần), giới hạn 3 trận mỗi cặp mỗi ngày, đồng hồ lượt xử lý lười ở máy chủ (20s + quỹ 30s), Arena Point, lịch sử, bảng xếp hạng, phát lại. Dùng lại máy đấu của Battle |
 | Market | `market` | chợ P2P giá cố định: niêm yết (1/3/7 ngày, khoảng giá theo rarity), mua nguyên tử + idempotent, hủy, hết hạn (worker + quét lười), phí người bán 5% làm tròn lên. **Chưa có**: đấu giá (BR-MKT-07→10), CS gỡ listing/hủy giao dịch (BR-MKT-11), kiểm tra cùng thiết bị | BR-MKT-01→06 |
 | Quest | `quest` | nhiệm vụ Tân thủ 7 ngày, nhận thưởng (pack cơ bản gắn chặt tài khoản, 200 Coin ngày 6–7), làm bù đến hết ngày 7 | BR-NEW-03/04/05 |
 | Payment | `payment` | nạp Gem qua cổng web: bảng giá công khai, đơn hàng, webhook ký HMAC idempotent, hoàn tiền thu hồi Gem (có thể âm → Restricted NEGATIVE_GEM, nạp bù tự gỡ); cổng giả lập `sandbox`, cổng thật cài `IPaymentGateway` | BR-WEB-04/05, BR-WAL-02/04, SC-WAL-01/02/06/07/10–15 |

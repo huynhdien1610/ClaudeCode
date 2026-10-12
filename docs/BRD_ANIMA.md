@@ -4,7 +4,7 @@
 | Thuộc tính | Giá trị |
 |---|---|
 | Mã tài liệu | BRD-ANIMA-001 |
-| Phiên bản | 1.1 (Draft, chờ PO duyệt) |
+| Phiên bản | 1.2 (Draft, chờ PO duyệt) |
 | Ngày | 2026-10-07 |
 | Nguồn | [ANIMA_Master_Document.md](ANIMA_Master_Document.md) v1.0 (2026-10-05) |
 | Trạng thái | **DRAFT — Chờ Product Owner xác nhận** |
@@ -22,6 +22,7 @@
 | 0.4 | 2026-10-06 | Tài sản số: số lượng phát hành, commit–reveal, Lò rèn, quy đổi Gem ↔ Coin, NFT (trước là CR-002) |
 | 0.5 | 2026-10-06 | Phát hành toàn cầu, 4 ngôn ngữ, ma trận quốc gia (trước là CR-003) |
 | 0.6 | 2026-10-06 | Đấu trường, gói chào mừng, nhiệm vụ Tân thủ (trước là CR-004) |
+| **1.2** | 2026-10-12 | Đấu trường xếp hạng PvP cài đặt (module Arena): chốt cách ghép trận, xử lý hết giờ, Arena Point mỗi trận thắng; thêm BR-PVP-10…13 |
 | **1.1** | 2026-10-12 | Chốt hệ thống kỹ năng và luật Echo / Ký ức phong ấn (PO, [SKILLS_ANIMA.md](SKILLS_ANIMA.md) D-1…D-15): thẻ sưu tầm còn 2 loại (Anima, Ký ức phong ấn); Echo thành đơn vị tạm thời trong trận; bộ bài 30 Anima; bỏ ô Ký ức trên sân; sửa BR-CARD-01/04/05/07, BR-DECK-01, BR-BTL-01; thêm BR-CARD-08…10, BR-SKL-01…07 |
 | **1.0** | 2026-10-07 | Hợp nhất baseline: bỏ nhãn CR; sửa các chỗ mâu thuẫn giữa phần gốc và phần bổ sung (đổi Gem ↔ Coin, FTUE, phạm vi, trạng thái thẻ); bổ sung luồng Lò rèn, NFT, trận đấu (7.7 → 7.9), vòng đời thẻ chưa lật và trận đấu (8.5, 8.6), thực thể, tích hợp, API, NFR còn thiếu |
 
@@ -1100,6 +1101,10 @@ Chi tiết cơ chế, bảng kỹ năng từng hệ nằm ở [SKILLS_ANIMA.md](
 | BR-PVP-06 | Ghép trận xếp hạng theo điểm kỹ năng (Glicko-2). Không ghép hai tài khoản cùng thiết bị, cùng fingerprint hoặc cùng SĐT. Mỗi cặp người chơi tối đa 3 trận xếp hạng hoặc thách đấu cược với nhau mỗi ngày. | PO + BA |
 | BR-PVP-07 | Phát hiện dàn xếp trận: đầu hàng sớm lặp lại, tỷ lệ thắng bất thường giữa một cặp → gắn cờ cho Fraud Analyst; AP, hạng và phần thưởng liên quan có thể bị thu hồi. | PO + BA |
 | BR-PVP-08 | Thể thức **Standard** (thẻ của 2 mùa gần nhất) và **Eternal** (mọi thẻ). Danh sách cấm/hạn chế cập nhật đầu mùa, công bố trước ít nhất 7 ngày. Không sửa chỉ số thẻ đã phát hành. | PO + BA |
+| BR-PVP-10 | **Cửa sổ ghép trận:** chênh điểm tối đa 100 khi vừa vào hàng đợi, rộng thêm 25 điểm mỗi giây chờ (tính theo người chờ lâu hơn trong cặp). Mỗi tài khoản chỉ một trận đang đánh; mỗi tài khoản một dòng trong hàng đợi. Mặc định điểm 1500, độ lệch 350, độ biến động 0,06. | PO (giao BA/Dev chốt, 2026-10-12) |
+| BR-PVP-11 | **Hết giờ xử lý ở máy chủ:** hạn lượt = 20 giây + quỹ dự phòng còn lại; không có tiến trình nền, mỗi lần ai đó đọc hoặc đánh trận thì các lượt đã quá hạn được áp dụng và ghi vào nhật ký như hành động thường. Hết 3 lượt liên tiếp của một bên thì bên đó thua (đồng thời là cách xử lý mất kết nối quá 60 giây, BR-BTL-07). Không chốt tay đầu trong 20 giây thì máy chủ tự giữ tay. | PO (giao BA/Dev chốt, 2026-10-12) |
+| BR-PVP-12 | **Arena Point ở trận xếp hạng:** người thắng được 10 AP; người thua 0. Đầu hàng tính là thua. Cập nhật điểm Glicko-2 và AP xảy ra đúng một lần khi trận kết thúc, cùng giao dịch với kết quả. | PO (giao BA/Dev chốt, 2026-10-12) |
+| BR-PVP-13 | Trận xếp hạng cấm Ký ức phong ấn (BR-CARD-05) và không dùng bot. Sau khi trận kết thúc, hai bên xem được phát lại (seed và bộ bài hai bên). | PO + BA |
 | BR-PVP-09 | Thách đấu cược AP là một tính năng riêng trong ma trận quốc gia (BR-GEO-02), tắt được theo thị trường. | PO + BA |
 
 ## 10.25. Người chơi mới (NEW)
