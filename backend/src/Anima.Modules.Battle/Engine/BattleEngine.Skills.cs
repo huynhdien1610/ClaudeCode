@@ -7,14 +7,15 @@ public enum HitKind { Attack, Skill, Reflect, Spread, Burn, SelfDamage, Ultimate
 /// <summary>Kỹ năng, trạng thái, Emotion Meter, Resonance, Ultimate, Fusion. Số liệu và quy ước: docs/SKILLS_ANIMA.md.</summary>
 public static partial class BattleEngine
 {
-    public const int SkillScale = 10, UltimateCost = 50, UltimateRefund = 30, MeterMax = 100, SurgeTurns = 2, SurgePct = 20, OverchargeStacks = 8, OverchargeCapPct = 75, BurnStacks = 3, BurnStacksTwinFury = 5, SlowStacks = 2, ShieldStacks = 3, EchoTurnsDefault = 2, BaseSpd = 100;
+    public const int SkillScale = 10, UltimateCost = 50, UltimateRefund = 30, MeterMax = 100, SurgeTurns = 2, SurgePct = 20, OverchargeStacks = 8, OverchargeCapPct = 75, BurnStacks = 3, BurnStacksTwinFury = 5, SlowStacks = 2, ShieldStacks = 3, EchoTurnsDefault = 2, BaseSpd = 100, MemoryCooldown = 3;
+    public const double SecretUltimateBoost = 1.5;
     private const double SpdDodgeFactor = 0.25, DefReductionCap = 0.5, DefHalfPoint = 100;
 
     // ---------- Tra cứu ----------
     private static IEnumerable<(int Slot, FieldAnima F)> Alive(BattlePlayer p) =>
         p.Field.Select((f, i) => (i, f)).Where(x => x.f is not null).Select(x => (x.i, x.f!));
 
-    private static bool HasSkill(FieldAnima f, string id) => f.SkillId == id;
+    private static bool HasSkill(FieldAnima f, string id) => f.SkillId == id || f.BorrowedSkill == id;
     private static bool Has(FieldAnima f, string kind) => f.Statuses.Any(s => s.Kind == kind);
     /// <summary>Số Anima thật cùng hệ trên sân (Echo tạm thời không tính vào Resonance/Fusion).</summary>
     private static int CountElement(BattlePlayer p, string element) => p.Field.Count(f => f is not null && !f.IsEcho && f.Card.Element == element);
@@ -372,29 +373,33 @@ public static partial class BattleEngine
         var side = s.Active; var me = s.Me; var foes = s.Opp; var target = a.Target ?? -1;
         if (def.Target == SkillTarget.Enemy) EnemyAt(s, side, target);
         if (def.Target == SkillTarget.Ally) AllyAt(s, side, target);
-        s.Meter = s.Meter - UltimateCost + UltimateRefund; f.Attacked = true;      // D-4: tiêu 50, hoàn 30 (net −20)
+        var secret = f.Card.Rarity == "secret";                                           // D-12: Secret Rare tiêu đủ 50, hiệu ứng ×1,5
+        s.Meter = secret ? s.Meter - UltimateCost : s.Meter - UltimateCost + UltimateRefund; f.Attacked = true;      // D-4: tiêu 50, hoàn 30 (net −20)
+        var up = secret ? SecretUltimateBoost : 1.0;
         Emit(s, "ultimate", side, ("card", f.Card.Name), ("skill", def.Name), ("id", def.Id));
 
         // Echo of Loss: một Aqualis bên địch (sẵn sàng) giảm 50% sát thương Ultimate này.
         var echo = Alive(foes).Select(x => x.F).FirstOrDefault(x => HasSkill(x, "aqualis.echo_of_loss") && x.Cd.GetValueOrDefault("aqualis.echo_of_loss") == 0 && !Has(x, "stun"));
         var mult = 1.0;
         if (echo is not null) { mult = 0.5; echo.Cd["aqualis.echo_of_loss"] = 2; Emit(s, "echo_of_loss", 1 - side, ("card", echo.Card.Name)); }
+        mult *= up;
         void Ult(FieldAnima t, int slot, double pts, bool ignoreDef = false) => Hit(s, side, f, 1 - side, slot, SkillDamageAmount(f, t, pts, ignoreDef, mult), HitKind.Ultimate);
+        void UHeal(FieldAnima t, double pct) => Heal(s, side, t, (int)Math.Round(pct * up));
 
         switch (def.Id)
         {
-            case "luminara.ultimate": { var t = AllyAt(s, side, target); Heal(s, side, t, 100); ClearDebuffs(t); break; }
+            case "luminara.ultimate": { var t = AllyAt(s, side, target); UHeal(t, 100); ClearDebuffs(t); break; }
             case "umbryx.ultimate":
                 foreach (var (slot, t) in Alive(foes).ToList()) Ult(t, slot, 60);
-                Heal(s, side, f, 30); break;
+                UHeal(f, 30); break;
             case "pyraxis.ultimate":
                 {
                     var t = foes.Field[target]!; Ult(t, target, 100);
-                    if (foes.Field[target] != t) Heal(s, side, f, 50);
+                    if (foes.Field[target] != t) UHeal(f, 50);
                     break;
                 }
-            case "aqualis.ultimate": foreach (var (_, t) in Alive(me).ToList()) { Heal(s, side, t, 50); ClearDebuffs(t); } break;
-            case "terrakin.ultimate": AddStatus(s, side, f, "invuln", 2); foreach (var (_, t) in Alive(me).ToList()) Heal(s, side, t, 30); break;
+            case "aqualis.ultimate": foreach (var (_, t) in Alive(me).ToList()) { UHeal(t, 50); ClearDebuffs(t); } break;
+            case "terrakin.ultimate": AddStatus(s, side, f, "invuln", 2); foreach (var (_, t) in Alive(me).ToList()) UHeal(t, 30); break;
             case "ventara.ultimate":
                 for (var i = 0; i < 5; i++)
                 {
@@ -411,6 +416,28 @@ public static partial class BattleEngine
                 break;
             case "nihilum.ultimate": { var t = foes.Field[target]!; Ult(t, target, 120, ignoreDef: true); SelfLoss(s, side, f, 30); break; }
         }
+        Recalc(s);
+    }
+
+    // ---------- Ký ức phong ấn (BR-CARD-05) ----------
+    /// <summary>
+    /// Dùng một Ký ức phong ấn trong kho: Anima cùng hệ do người chơi chọn (<c>Slot</c>) được mượn Passive của Anima gốc từ lúc dùng đến đầu lượt kế tiếp của chủ.
+    /// <c>Id</c> là id thẻ Anima gốc. Hồi chiêu chung 3 lượt, mỗi lượt một cái; không dùng khi trận cấm (Ranked).
+    /// </summary>
+    private static void UseMemory(BattleState s, BattleAction a)
+    {
+        var side = s.Active; var me = s.Me;
+        if (!s.MemoryAllowed) throw new BattleException("NOT_ALLOWED_IN_RANKED", "Sealed Memories cannot be used in this match");
+        if (!int.TryParse(a.Id, out var defId)) throw new BattleException("INVALID_ACTION", "A Sealed Memory id is required");
+        var mem = me.Memories.FirstOrDefault(m => m.DefId == defId) ?? throw new BattleException("MEMORY_NOT_AVAILABLE", "You do not have this Sealed Memory");
+        if (me.MemoryThisTurn) throw new BattleException("ALREADY_USED_THIS_TURN", "You can use only one Sealed Memory per turn");
+        if (me.MemoryCd > 0) throw new BattleException("ON_COOLDOWN", $"Sealed Memories are cooling down for {me.MemoryCd} more turn(s)");
+        var slot = a.Slot ?? -1;
+        if (slot is < 0 or >= BattlePlayer.Slots || me.Field[slot] is not { IsEcho: false } t || t.Card.Element != mem.Element)
+            throw new BattleException("NO_MATCHING_ELEMENT", $"Choose one of your {mem.Element} Anima on the field");
+        me.Memories.Remove(mem);
+        t.BorrowedSkill = mem.Skill; me.MemoryCd = MemoryCooldown; me.MemoryThisTurn = true;
+        Emit(s, "memory", side, ("card", t.Card.Name), ("skill", mem.Skill), ("source", mem.DefId));
         Recalc(s);
     }
 
@@ -483,7 +510,8 @@ public static partial class BattleEngine
     private static void StartTurnEffects(BattleState s, int side)
     {
         var p = s.Players[side];
-        p.FusionThisTurn = false;
+        p.FusionThisTurn = false; p.MemoryThisTurn = false; p.MemoryCd = Math.Max(0, p.MemoryCd - 1);
+        foreach (var (_, bf) in Alive(p)) if (bf.BorrowedSkill is not null) { bf.BorrowedSkill = null; Emit(s, "memory_ends", side, ("card", bf.Card.Name)); }
         foreach (var (_, f) in Alive(p)) foreach (var k in f.Cd.Keys.ToList()) f.Cd[k] = Math.Max(0, f.Cd[k] - 1);
 
         // Radiant Aura: cộng dồn DEF cho đồng đội; hết nguồn thì mất.

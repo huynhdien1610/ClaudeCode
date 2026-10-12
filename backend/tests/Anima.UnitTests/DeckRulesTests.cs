@@ -13,7 +13,7 @@ public class DeckRulesTests
 
     private static string[] Rules(IEnumerable<DeckCard> cards) => DeckRules.Validate(cards.ToList()).Select(v => v.Rule).Distinct().ToArray();
 
-    [Fact(DisplayName = "BR-DECK-01: bộ 30 lá, 24+ Anima, tối đa 6 lá hỗ trợ — hợp lệ")]
+    [Fact(DisplayName = "BR-DECK-01: bộ đúng 30 lá Anima — hợp lệ")]
     public void ValidDeck() => Assert.Empty(Rules(Valid()));
 
     [Theory(DisplayName = "BR-DECK-01: sai số lượng lá")]
@@ -26,14 +26,11 @@ public class DeckRulesTests
         Assert.Contains("DECK_SIZE", Rules(cards));
     }
 
-    [Fact(DisplayName = "BR-DECK-01: 6 lá hỗ trợ được, 7 lá thì không; dưới 24 Anima thì không")]
-    public void SupportLimits()
+    [Fact(DisplayName = "BR-DECK-01: bộ bài chỉ gồm Anima — một lá khác loại (Echo, Ký ức phong ấn) làm bộ không hợp lệ")]
+    public void AnimaOnly()
     {
-        List<DeckCard> With(int support) => Enumerable.Range(1, 30 - support).Select(i => C(i)).Concat(Enumerable.Range(100, support).Select(i => C(i, "rare", CardTypes.Echo))).ToList();
-        Assert.Empty(Rules(With(6)));
-        var seven = Rules(With(7));
-        Assert.Contains("DECK_SUPPORT_MAX", seven); Assert.Contains("DECK_ANIMA_MIN", seven);
-        Assert.Contains("DECK_ANIMA_MIN", Rules(With(7)));
+        var cards = Enumerable.Range(1, 29).Select(i => C(i)).Concat([C(100, "rare", CardTypes.Seal)]).ToList();
+        Assert.Contains("DECK_ANIMA_ONLY", Rules(cards));
     }
 
     [Fact(DisplayName = "BR-DECK-02: tối đa 2 bản mỗi thẻ; Legendary và Secret chỉ 1 bản")]

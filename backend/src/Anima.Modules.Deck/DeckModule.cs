@@ -14,16 +14,14 @@ public sealed record DeckViolation(string Rule, string Message);
 /// <summary>Luật bộ bài thuần (không phụ thuộc DB) để dùng lại khi vào trận (BR-DECK-07) và test.</summary>
 public static class DeckRules
 {
-    public const int Size = 30, MinAnima = 24, MaxSupport = 6, MaxCopies = 2, MaxEpic = 4, MaxLegendary = 2, MaxSecret = 1, MaxDecks = 10;
+    public const int Size = 30, MaxCopies = 2, MaxEpic = 4, MaxLegendary = 2, MaxSecret = 1, MaxDecks = 10;
 
     public static IReadOnlyList<DeckViolation> Validate(IReadOnlyCollection<DeckCard> cards)
     {
         var v = new List<DeckViolation>();
         if (cards.Count != Size) v.Add(new("DECK_SIZE", $"A deck needs exactly {Size} cards (has {cards.Count})"));
-        var anima = cards.Count(c => c.CardType == CardTypes.Anima);
-        var support = cards.Count - anima;
-        if (anima < MinAnima) v.Add(new("DECK_ANIMA_MIN", $"At least {MinAnima} Anima are required (has {anima})"));
-        if (support > MaxSupport) v.Add(new("DECK_SUPPORT_MAX", $"At most {MaxSupport} Echo/Sealed Memory cards are allowed (has {support})"));
+        var other = cards.Count(c => c.CardType != CardTypes.Anima);                     // BR-DECK-01: bộ bài chỉ gồm Anima; Ký ức phong ấn nằm trong kho (BR-CARD-05)
+        if (other > 0) v.Add(new("DECK_ANIMA_ONLY", $"A deck holds only Anima cards ({other} other cards found)"));
         foreach (var g in cards.GroupBy(c => c.CardDefinitionId))
         {
             var cap = g.First().Rarity is "legendary" or "secret" ? 1 : MaxCopies;     // BR-DECK-02

@@ -30,3 +30,4 @@ NODE_PATH="${NODE_PATH:-$(npm root -g)}" BASE_URL=http://localhost:3000 API_LOG=
 NODE_PATH="${NODE_PATH:-$(npm root -g)}" BASE_URL=http://localhost:3000 API=http://127.0.0.1:5080 node e2e/battle.mjs
 NODE_PATH="${NODE_PATH:-$(npm root -g)}" BASE_URL=http://localhost:3000 API=http://127.0.0.1:5080 API_LOG="$LOG" node e2e/guardian.mjs
 NODE_PATH="${NODE_PATH:-$(npm root -g)}" BASE_URL=http://localhost:3000 API=http://127.0.0.1:5080 API_LOG="$LOG" node e2e/market.mjs
+NODE_PATH="${NODE_PATH:-$(npm root -g)}" BASE_URL=http://localhost:3000 API=http://127.0.0.1:5080 node e2e/memory.mjs

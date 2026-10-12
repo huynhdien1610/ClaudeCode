@@ -1082,7 +1082,7 @@ Các quyết định PO chốt ngày 2026-10-12 cho hệ thống kỹ năng và 
 ## 10.7 Quyết định bổ sung (đóng các điểm còn mở)
 Chốt theo ủy quyền của PO ngày 2026-10-12; PO có thể đảo lại bằng cách sửa mục này và BRD.
 - **Loại thẻ:** sưu tầm còn Anima và Ký ức phong ấn. Echo không còn là thẻ; bài Buff và bài Bẫy cũ, ô Ký ức trên sân bị bỏ (BR-CARD-01/04/05). Set Awakening = 100 Anima; bộ bài = 30 Anima.
-- **Ký ức phong ấn:** gắn 1-1 với Anima có Passive (≈ 25 loại), nằm trong kho (tối đa 5, không NFT, không giao dịch, không rèn, không ra từ pack, không giới hạn phát hành); nguồn Story, sự kiện, Battle Pass, Gem (1 lần/tuần, giá chờ Finance: Q-58).
+- **Ký ức phong ấn:** gắn 1-1 với Anima có Passive (24 loại), nằm trong kho (tối đa 5, không NFT, không giao dịch, không rèn, không ra từ pack, không giới hạn phát hành); nguồn Story, sự kiện, Battle Pass, Gem (1 lần/tuần, giá chờ Finance: Q-58).
 - **Ultimate Secret Rare:** tiêu đủ 50 Meter (không hoàn), độ lớn hiệu ứng ×1,5; hệ số tinh chỉnh khi mô phỏng cân bằng (Q-51).
 - **Poison, Regen:** trạng thái dự trữ, Set Awakening chưa có kỹ năng gây ra (BR-CARD-10).
 - **Echo:** chỉ kích hoạt Passive của bản gốc (Trigger không).

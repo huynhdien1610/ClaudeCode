@@ -16,12 +16,12 @@ Nguồn: bản thiết kế "Hệ thống Kỹ năng Thẻ & Các Chế độ Đ
 | D-8 | Thẻ Tiếng vọng (Echo) | Đơn vị tạm thời không sưu tầm: khi một Anima ngã, 30% sinh Echo (50% ATK/DEF/HP, SPD 100%, chỉ giữ kỹ năng Passive, tồn tại 2 lượt, đánh và bị đánh được, có thể làm lá chắn). Echo không tính vào Resonance/Fusion/đồng đội ngã. |
 | D-9 | Hồi sinh vs "ngã" | Hồi sinh (The Void Calls, vật phẩm) **không** tính "đồng đội ngã"; rút bài khỏi sân cũng không; ngã lần 2 sau hồi sinh có tính. The Void Calls 1 lần/Nihilum, giữ buff/debuff, hồi 30% HP. |
 | D-10 | Loại thẻ | Sưu tầm còn Anima và Ký ức phong ấn; Echo là đơn vị tạm thời trong trận. Bỏ bài Buff/Bẫy và 2 ô Ký ức trên sân. Đã sửa BRD (BR-CARD-01/04/05, BR-DECK-01, BR-BTL-01). |
-| D-11 | Ký ức phong ấn | Vật phẩm kho gắn 1-1 với Anima gốc có Passive; tối đa 5; không NFT, không giao dịch, không rèn, không ra từ pack; nguồn Story/sự kiện/Battle Pass/Gem 1 lần/tuần. Dùng: Passive gốc 1 lượt, cần ≥1 Anima cùng hệ, CD chung 3, 1 cái/lượt, cấm Ranked. |
+| D-11 | Ký ức phong ấn | Vật phẩm kho gắn 1-1 với Anima gốc có Passive; tối đa 5; không NFT, không giao dịch, không rèn, không ra từ pack; nguồn Story/sự kiện/Battle Pass/Gem 1 lần/tuần. Dùng: Passive gốc từ lúc dùng đến đầu lượt kế tiếp của chủ, cần ≥1 Anima cùng hệ, CD chung 3, 1 cái/lượt, cấm Ranked. |
 | D-12 | Ultimate Secret Rare | Tiêu đủ 50 Meter (không hoàn), độ lớn hiệu ứng ×1,5 (sát thương, hồi máu); không đổi thời lượng hay số mục tiêu. |
 | D-13 | Poison, Regen | Trạng thái dự trữ (trần 3 lớp, Regen 5% HP/lớp); Set Awakening không có nguồn nên engine chưa cần cài. |
 | D-14 | Echo và Trigger | Echo chỉ giữ Passive; dòng "kích hoạt Trigger" trong bản thiết kế gốc bỏ. |
 | D-15 | Diễn giải ⚑ | Xác nhận: DEF ÷10, Surge cộng cả DEF, Unyielding sống sót 1 lần ở 1 HP, Burn 3/5. |
-| D-16 | Thành phần set | Set Awakening = 100 Anima; Ký ức phong ấn (≈ 25) nằm ngoài 100. |
+| D-16 | Thành phần set | Set Awakening = 100 Anima; Ký ức phong ấn (24 loại) nằm ngoài 100. |
 
 ## 2. Bổ sung: tương khắc ±20% lên kỹ năng
 
@@ -150,11 +150,4 @@ Lấy từ yêu cầu của PO: *"ngũ hành tương khắc sẽ giảm 20% kh�
 
 ## 6. Việc còn mở
 
-Không còn câu hỏi thiết kế mở. Chốt D-4…D-16 đã vào BRD v1.1 (BR-CARD-01/04/05/07/08/09/10, BR-SKL-01…07) và Master mục 10. Còn một điểm ngoài phạm vi kỹ năng: giá Gem của Ký ức phong ấn (Q-58, Finance).
-
-**Việc code còn lại** (làm sau khi tài liệu đóng):
-1. Bỏ Echo khỏi loại thẻ: seed, chợ, bộ bài, giao diện sưu tầm.
-2. Bộ bài đổi thành 30 Anima (BR-DECK-01); bỏ giới hạn bài hỗ trợ.
-3. Kho Ký ức phong ấn (tối đa 5, liên kết Anima gốc), API dùng trong trận, cấm Ranked, mua Gem 1 lần/tuần.
-4. Ultimate Secret Rare: tiêu 50, ×1,5.
-5. Cập nhật test và giao diện theo các mục trên.
+Không còn việc mở về thiết kế hay code kỹ năng. Đã cài: Echo, Ký ức phong ấn (module Memory, kho tối đa 5, mua Gem 1 lần/tuần, dùng trong trận qua hành động `memory`), Ultimate Secret Rare ×1,5, bộ bài 30 Anima. Còn một điểm ngoài phạm vi kỹ năng: giá Gem của Ký ức phong ấn (Q-58, Finance; đang đặt tạm 50 Gem trong `MemoryRules.GemPrice`). Chưa nối: nguồn Story/sự kiện/Battle Pass (chưa có hệ thống đó; đã có `IMemoryApi.GrantAsync` cho chúng gọi) và cấm trong Ranked PvP (engine đã có cờ `MemoryAllowed`, chưa có chế độ Ranked).

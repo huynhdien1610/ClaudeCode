@@ -7,10 +7,9 @@ const valid = () => Array.from({ length: 15 }, (_, i) => [a(i + 1), a(i + 1)]).f
 
 test("bộ 30 lá hợp lệ", () => assert.deepEqual(validateDeck(valid()), []));
 test("sai số lượng", () => { assert.deepEqual(validateDeck(valid().slice(1)), ["DECK_SIZE"]); });
-test("tối đa 6 lá hỗ trợ; dưới 24 Anima", () => {
-  const withSupport = (n: number) => [...Array.from({ length: 30 - n }, (_, i) => a(i + 1)), ...Array.from({ length: n }, (_, i) => a(100 + i, "rare", "echo"))];
-  assert.deepEqual(validateDeck(withSupport(6)), []);
-  assert.deepEqual(validateDeck(withSupport(7)).sort(), ["DECK_ANIMA_MIN", "DECK_SUPPORT_MAX"]);
+test("bộ bài chỉ gồm Anima: một lá khác loại làm bộ không hợp lệ", () => {
+  const deck = [...Array.from({ length: 29 }, (_, i) => a(i + 1)), a(100, "rare", "seal")];
+  assert.deepEqual(validateDeck(deck), ["DECK_ANIMA_ONLY"]);
 });
 test("bản sao: tối đa 2; Legendary/Secret 1", () => {
   const base = Array.from({ length: 28 }, (_, i) => a(i + 1));

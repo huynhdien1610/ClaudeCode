@@ -91,7 +91,7 @@ internal sealed class CatalogService(IUnitOfWork uow) : ICatalogApi
 
     public async Task<IReadOnlyList<int>> AvailableCardIdsAsync(string rarity, CancellationToken ct, string? cardType = null, string? element = null) =>
         await uow.QueryAsync(@"SELECT d.id FROM catalog.card_definition d JOIN catalog.edition e ON e.card_definition_id=d.id JOIN catalog.season s ON s.id=d.season_id
-            WHERE d.rarity=@r AND d.published AND NOT d.discontinued AND s.status='open' AND e.issued < e.max_supply AND (@t::text IS NULL OR d.card_type=@t) AND (@el::text IS NULL OR d.element=@el) ORDER BY d.id",
+            WHERE d.rarity=@r AND d.card_type='anima' AND d.published AND NOT d.discontinued AND s.status='open' AND e.issued < e.max_supply AND (@t::text IS NULL OR d.card_type=@t) AND (@el::text IS NULL OR d.element=@el) ORDER BY d.id",
             r => r.GetInt32(0), ct, ("r", rarity), ("t", cardType), ("el", element));
 
     public async Task<int?> TryIssueAsync(int id, CancellationToken ct) =>

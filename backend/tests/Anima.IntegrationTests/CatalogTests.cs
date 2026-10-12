@@ -7,16 +7,14 @@ public sealed class CatalogTests(ApiFixture fx) : IClassFixture<ApiFixture>
 {
     private async Task<List<System.Text.Json.JsonElement>> AllCards() => (await new Player.Anon(fx).Get("/v1/cards")).Body.EnumerateArray().ToList();
 
-    [Fact(DisplayName = "BR-CARD-07: set Awakening có 100 thẻ = 80 Anima + 12 Tiếng vọng + 8 Ký ức phong ấn")]
+    [Fact(DisplayName = "BR-CARD-07: set Awakening có 100 thẻ, toàn bộ là Anima")]
     public async Task SetComposition()
     {
         var cards = await AllCards();
         Assert.Equal(100, cards.Count);
-        Assert.Equal(80, cards.Count(c => c.GetProperty("type").GetString() == "anima"));
-        Assert.Equal(12, cards.Count(c => c.GetProperty("type").GetString() == "echo"));
-        Assert.Equal(8, cards.Count(c => c.GetProperty("type").GetString() == "seal"));
+        Assert.All(cards, c => Assert.Equal("anima", c.GetProperty("type").GetString()));
         var byRarity = cards.GroupBy(c => c.GetProperty("rarity").GetString()).ToDictionary(g => g.Key!, g => g.Count());
-        Assert.Equal(new Dictionary<string, int> { ["common"] = 39, ["uncommon"] = 22, ["rare"] = 21, ["epic"] = 10, ["legendary"] = 7, ["secret"] = 1 }, byRarity);
+        Assert.Equal(new Dictionary<string, int> { ["common"] = 40, ["uncommon"] = 24, ["rare"] = 20, ["epic"] = 8, ["legendary"] = 7, ["secret"] = 1 }, byRarity);
         Assert.Equal(8, cards.Select(c => c.GetProperty("element").GetString()).Distinct().Count());
     }
 
@@ -32,13 +30,6 @@ public sealed class CatalogTests(ApiFixture fx) : IClassFixture<ApiFixture>
             Assert.All(new[] { atk, def, hp }, v => Assert.Equal(0, v % 50));
             Assert.InRange(cost, 1, 6);
         }
-    }
-
-    [Fact(DisplayName = "BR-CARD-01: Tiếng vọng và Ký ức phong ấn không có chỉ số ATK/DEF/HP")]
-    public async Task SupportCardsHaveNoCombatStats()
-    {
-        foreach (var c in (await AllCards()).Where(c => c.GetProperty("type").GetString() != "anima"))
-            Assert.Equal(System.Text.Json.JsonValueKind.Null, c.GetProperty("atk").ValueKind);
     }
 
     [Fact(DisplayName = "BR-SUP-01: số lượng phát hành tối đa theo rarity công khai")]

@@ -995,6 +995,40 @@
         }
       }
     },
+    "/v1/memories": {
+      "get": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/memories/purchase": {
+      "post": {
+        "tags": [
+          "Anima.Api"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuyMemoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/v1/battles/practice": {
       "post": {
         "tags": [
@@ -2025,6 +2059,23 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "BuyMemoryRequest": {
+        "required": [
+          "cardDefinitionId"
+        ],
+        "type": "object",
+        "properties": {
+          "cardDefinitionId": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },

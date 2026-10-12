@@ -55,7 +55,7 @@ export default function DecksPage() {
             <label>{t("decks.name")}<input value={name} maxLength={40} onChange={(e) => setName(e.target.value)} data-testid="deck-name" /></label>
             <div className="row wrap">
               <span className={`chip ${stats.total === 30 ? "" : "muted"}`} data-testid="deck-count">{t("decks.count", { n: stats.total })}</span>
-              <span className="chip">{t("decks.anima", { a: stats.anima })}</span><span className="chip">{t("decks.support", { s: stats.support })}</span>
+              <span className="chip">{t("decks.anima", { a: stats.anima })}</span>
               <span className="chip" data-testid="deck-valid" data-valid={rules.length === 0}>{rules.length === 0 ? t("decks.valid") : t("decks.invalid")}</span>
             </div>
             {rules.length > 0 && <ul className="muted" style={{ margin: 0, paddingLeft: 18 }}>{rules.map((r) => <li key={r}>{t(`decks.rule.${r}` as never)}</li>)}</ul>}

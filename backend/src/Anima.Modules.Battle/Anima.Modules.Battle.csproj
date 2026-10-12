@@ -4,6 +4,7 @@
     <ProjectReference Include="../Anima.SharedKernel/Anima.SharedKernel.csproj" />
     <ProjectReference Include="../Anima.Modules.Catalog/Anima.Modules.Catalog.csproj" />
     <ProjectReference Include="../Anima.Modules.Deck/Anima.Modules.Deck.csproj" />
+    <ProjectReference Include="../Anima.Modules.Memory/Anima.Modules.Memory.csproj" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations/*.sql" />

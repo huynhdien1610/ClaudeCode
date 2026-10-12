@@ -3,6 +3,9 @@ namespace Anima.Battle.Engine;
 /// <summary>Chỉ số thẻ chốt tại lúc bắt đầu trận (thẻ phát hành là bất biến, BR-CARD-06).</summary>
 public sealed record BattleCard(int DefId, string Name, string Element, string Type, string Rarity, int Cost, int Atk, int Def, int Hp, string? Skill = null);
 
+/// <summary>Một Ký ức phong ấn trong kho, chốt lúc vào trận: id thẻ Anima gốc, hệ và kỹ năng Passive của nó.</summary>
+public sealed record MemoryCard(int DefId, string Element, string Skill, string Name = "");
+
 /// <summary>Hiệu ứng tạm thời trên một Anima. <c>Turns</c> giảm 1 ở cuối lượt của chủ sở hữu Anima.</summary>
 public sealed class Status
 {
@@ -32,6 +35,8 @@ public sealed class FieldAnima
     /// <summary>Thẻ Tiếng vọng tạm thời sinh ra khi một Anima ngã (docs/SKILLS_ANIMA.md D-8): 50% chỉ số, chỉ giữ Passive, tồn tại 2 lượt, không sưu tầm được.</summary>
     public bool IsEcho { get; init; }
     public int EchoTurns { get; set; }
+    /// <summary>Passive mượn từ Ký ức phong ấn, hết hiệu lực ở đầu lượt kế tiếp của chủ.</summary>
+    public string? BorrowedSkill { get; set; }
     public Dictionary<string, int> Cd { get; } = [];
     public HashSet<string> Used { get; } = [];
     // Tính lại sau mỗi thay đổi (BattleEngine.Recalc):
@@ -62,6 +67,10 @@ public sealed class BattlePlayer
     public HashSet<string> TeamUsed { get; } = [];
     public int SurgeLeft { get; set; }
     public bool FusionThisTurn { get; set; }
+    /// <summary>Ký ức phong ấn còn lại trong trận (BR-CARD-05); hồi chiêu chung và giới hạn một cái mỗi lượt.</summary>
+    public List<MemoryCard> Memories { get; } = [];
+    public int MemoryCd { get; set; }
+    public bool MemoryThisTurn { get; set; }
     public bool FieldEmpty => Field.All(f => f is null);
 }
 
@@ -91,6 +100,8 @@ public sealed class BattleState
     /// <summary>Emotion Meter chung hai bên, 0–100.</summary>
     public int Meter { get; set; }
     public int NextUid { get; set; } = 1;
+    /// <summary>False ở trận Ranked PvP: cấm dùng Ký ức phong ấn.</summary>
+    public bool MemoryAllowed { get; init; } = true;
     /// <summary>Xác suất (%) một Anima ngã sinh ra Echo trong ô của nó. Test đặt 0 để kiểm riêng.</summary>
     public int EchoChancePct { get; set; } = 30;
     public BattlePlayer Me => Players[Active];

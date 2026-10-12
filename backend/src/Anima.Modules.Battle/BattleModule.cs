@@ -4,6 +4,7 @@ using Anima.Battle.Engine;
 using Anima.Catalog;
 using Anima.Contracts;
 using Anima.Deck;
+using Anima.Memory;
 using Anima.SharedKernel;
 
 namespace Anima.Battle;
@@ -29,17 +30,18 @@ public sealed class BattleModule : IModule
     }
 }
 
-public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom random, IDeckApi decks, ICatalogApi catalog)
+public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom random, IDeckApi decks, ICatalogApi catalog, IMemoryApi memories)
 {
     private static readonly JsonSerializerOptions J = new(JsonSerializerDefaults.Web);
     private const int Human = 0, BotSide = 1;
 
-    private sealed record MatchRow(Guid Id, Guid AccountId, string Status, byte[] Seed, List<BattleCard> Player, List<BattleCard> BotCards, List<BattleAction> Actions, int? Winner, string? Reason, DateTimeOffset CreatedAt);
+    private sealed record MatchRow(Guid Id, Guid AccountId, string Status, byte[] Seed, List<BattleCard> Player, List<BattleCard> BotCards, List<BattleAction> Actions, int? Winner, string? Reason, DateTimeOffset CreatedAt, List<MemoryCard> Memories);
 
-    private const string Cols = "id,account_id,status,seed,player_cards::text,bot_cards::text,actions::text,winner,reason,created_at";
+    private const string Cols = "id,account_id,status,seed,player_cards::text,bot_cards::text,actions::text,winner,reason,created_at,memories::text";
     private static MatchRow Map(Npgsql.NpgsqlDataReader r) => new(r.GetGuid(0), r.GetGuid(1), r.GetString(2), r.GetFieldValue<byte[]>(3),
         JsonSerializer.Deserialize<List<BattleCard>>(r.GetString(4), J)!, JsonSerializer.Deserialize<List<BattleCard>>(r.GetString(5), J)!,
-        JsonSerializer.Deserialize<List<BattleAction>>(r.GetString(6), J)!, r.IsDBNull(7) ? null : r.GetInt32(7), r.IsDBNull(8) ? null : r.GetString(8), r.GetFieldValue<DateTimeOffset>(9));
+        JsonSerializer.Deserialize<List<BattleAction>>(r.GetString(6), J)!, r.IsDBNull(7) ? null : r.GetInt32(7), r.IsDBNull(8) ? null : r.GetString(8), r.GetFieldValue<DateTimeOffset>(9),
+        JsonSerializer.Deserialize<List<MemoryCard>>(r.GetString(10), J)!);
 
     private async Task<MatchRow> Load(Guid acc, Guid id, bool forUpdate, CancellationToken ct) =>
         (await uow.QueryAsync($"SELECT {Cols} FROM battle.match WHERE id=@i AND account_id=@a" + (forUpdate ? " FOR UPDATE" : ""), Map, ct, ("i", id), ("a", acc))).FirstOrDefault()
@@ -58,7 +60,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
 
     private static BattleState Rebuild(MatchRow m)
     {
-        var s = BattleEngine.Start(new BattleSetup(m.Seed, m.Player, m.BotCards));
+        var s = BattleEngine.Start(new BattleSetup(m.Seed, m.Player, m.BotCards, m.Memories));
         foreach (var a in m.Actions) BattleEngine.Apply(s, a);
         return s;
     }
@@ -84,15 +86,17 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
         var seed = random.Bytes(32);
         var bot = await BotDeckAsync(seed, ct);
 
-        var m = new MatchRow(Guid.NewGuid(), acc, "InProgress", seed, player, bot, [], null, null, clock.UtcNow);
-        var s = BattleEngine.Start(new BattleSetup(seed, player, bot));
+        // BR-CARD-05: chốt Ký ức phong ấn trong kho lúc vào trận (mỗi cái lặp theo số lượng) để trận phát lại được.
+        var stock = (await memories.StockAsync(acc, ct)).SelectMany(i => Enumerable.Repeat(new MemoryCard(i.DefId, i.Element, i.Skill, i.Name), i.Qty)).ToList();
+        var m = new MatchRow(Guid.NewGuid(), acc, "InProgress", seed, player, bot, [], null, null, clock.UtcNow, stock);
+        var s = BattleEngine.Start(new BattleSetup(seed, player, bot, stock));
         var log = new List<BattleAction>();
         RunBot(s, log);                                                                           // máy giữ tay đầu ngay
         try
         {
-            await uow.ExecAsync(@"INSERT INTO battle.match(id,account_id,mode,deck_id,status,seed,player_cards,bot_cards,actions,created_at)
-                VALUES(@i,@a,'practice',@d,'InProgress',@s,@p::jsonb,@b::jsonb,@l::jsonb,@now)", ct,
-                ("i", m.Id), ("a", acc), ("d", deckId), ("s", seed), ("p", JsonSerializer.Serialize(player, J)), ("b", JsonSerializer.Serialize(bot, J)), ("l", JsonSerializer.Serialize(log, J)), ("now", m.CreatedAt));
+            await uow.ExecAsync(@"INSERT INTO battle.match(id,account_id,mode,deck_id,status,seed,player_cards,bot_cards,actions,created_at,memories)
+                VALUES(@i,@a,'practice',@d,'InProgress',@s,@p::jsonb,@b::jsonb,@l::jsonb,@now,@mem::jsonb)", ct,
+                ("i", m.Id), ("a", acc), ("d", deckId), ("s", seed), ("p", JsonSerializer.Serialize(player, J)), ("b", JsonSerializer.Serialize(bot, J)), ("l", JsonSerializer.Serialize(log, J)), ("now", m.CreatedAt), ("mem", JsonSerializer.Serialize(stock, J)));
         }
         catch (Npgsql.PostgresException e) when (e.SqlState == "23505") { throw DomainException.Conflict("MATCH_IN_PROGRESS", "Finish or concede your current practice match first"); }
         return View(m with { Actions = log }, s);
@@ -118,6 +122,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
         {
             var a = new BattleAction(Human, req.Type ?? "", req.Hand, req.Slot, req.Target, req.Id);
             BattleEngine.Apply(s, a); log.Add(a);
+            if (a.Type == "memory") await memories.ConsumeAsync(acc, int.Parse(a.Id!), ct);                  // tiêu thẻ trong kho; lỗi sau đó rollback cả hành động
             RunBot(s, log);
         }
         catch (BattleException e) { throw new DomainException(e.Code, e.Message, e.Code is "INVALID_ACTION" or "TARGET_INVALID" ? 400 : 409); }
@@ -169,6 +174,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
             feared = f.Statuses.Any(x => x.Kind == "fear"),
             dodge = f.DodgePct,
             echo = f.IsEcho ? (int?)f.EchoTurns : null,
+            borrowed = f.BorrowedSkill is null ? null : SkillCatalog.Find(f.BorrowedSkill)?.Name,
             statuses = f.Statuses.Select(x => new { kind = x.Kind, turns = x.Turns >= 90 ? (int?)null : x.Turns, value = x.Value, stacks = x.Stacks }),
         };
     }
@@ -193,7 +199,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
             firstPlayer = s.First == Human ? "you" : "opponent",
             meter = s.Meter,
             surge = new { you = me.SurgeLeft, opponent = opp.SurgeLeft },
-            you = new { keeper = me.Keeper, energy = me.Energy, deck = me.Deck.Count, mulliganAvailable = s.Phase == BattlePhase.Mulligan && !me.Decided && !me.MulliganUsed, decided = me.Decided, hand = me.Hand.Select((c, i) => new { index = i, c.DefId, c.Name, c.Element, c.Type, c.Rarity, c.Cost, c.Atk, c.Def, c.Hp }), field = me.Field.Select(Anima), graveyard = me.Graveyard.Count, fusions },
+            you = new { memories = me.Memories.GroupBy(x => x.DefId).Select(g => new { defId = g.Key, name = g.First().Name, element = g.First().Element, skill = SkillCatalog.Find(g.First().Skill)?.Name, qty = g.Count() }), memoryReady = s.MemoryAllowed && !me.MemoryThisTurn && me.MemoryCd == 0, memoryCd = me.MemoryCd, keeper = me.Keeper, energy = me.Energy, deck = me.Deck.Count, mulliganAvailable = s.Phase == BattlePhase.Mulligan && !me.Decided && !me.MulliganUsed, decided = me.Decided, hand = me.Hand.Select((c, i) => new { index = i, c.DefId, c.Name, c.Element, c.Type, c.Rarity, c.Cost, c.Atk, c.Def, c.Hp }), field = me.Field.Select(Anima), graveyard = me.Graveyard.Count, fusions },
             opponent = new { keeper = opp.Keeper, hand = opp.Hand.Count, deck = opp.Deck.Count, field = opp.Field.Select(Anima), graveyard = opp.Graveyard.Count },
             result = s.Result is null ? null : new { won = s.Result.Winner == Human, reason = s.Result.Reason },
             events = s.Events.TakeLast(60).Select(e => new { e.Seq, e.Kind, side = e.Player == Human ? "you" : "opponent", data = e.Data }),

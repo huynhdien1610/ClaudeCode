@@ -59,15 +59,17 @@ internal sealed class CatalogSeeder(IUnitOfWork uow) : IModuleSeeder
         ["Tidelet"] = ("", "harbor"),
     };
 
-    // (tên, hệ, rarity, loại)
-    private static readonly (string, string, string, string)[] Support =
+    // 20 Anima bổ sung (id 81–100) cho đủ 100 thẻ của set; (hệ, tên, rarity, chi phí, kiểu chỉ số). Thẻ tạm, chờ thiết kế nội dung thật.
+    private static readonly (string Element, string Name, string Rarity, int Cost, string Style)[] Extras =
     [
-        ("Dawnsong", "Luminara", "common", "echo"), ("Veilsong", "Umbryx", "common", "echo"), ("Cinderword", "Pyraxis", "common", "echo"), ("Tidesong", "Aqualis", "common", "echo"),
-        ("Rootword", "Terrakin", "uncommon", "echo"), ("Galeword", "Ventara", "uncommon", "echo"), ("Sparkchant", "Voltaris", "uncommon", "echo"), ("Hollowhymn", "Nihilum", "uncommon", "echo"),
-        ("Hymn of Sunrise", "Luminara", "rare", "echo"), ("Lullaby of Tides", "Aqualis", "rare", "echo"), ("Chorus of Storms", "Voltaris", "rare", "echo"), ("Requiem of Tears", "Umbryx", "epic", "echo"),
-        ("Unspoken Vow", "Umbryx", "common", "seal"), ("Smoldering Grudge", "Pyraxis", "common", "seal"), ("Stone Promise", "Terrakin", "common", "seal"),
-        ("Sunken Letter", "Aqualis", "uncommon", "seal"), ("Wind-Locked Wish", "Ventara", "uncommon", "seal"),
-        ("Snapped Wire", "Voltaris", "rare", "seal"), ("Lantern Memory", "Luminara", "rare", "seal"), ("Memory of Nothing", "Nihilum", "epic", "seal"),
+        ("Luminara", "Lanternfly", "common", 1, "bal"), ("Luminara", "Gladsong", "uncommon", 3, "def"), ("Luminara", "Haloweaver", "rare", 4, "atk"),
+        ("Umbryx", "Dimwhisper", "common", 2, "def"), ("Umbryx", "Twilight Moth", "uncommon", 3, "bal"), ("Umbryx", "Cloakwraith", "rare", 4, "def"),
+        ("Pyraxis", "Kindlepaw", "common", 2, "atk"), ("Pyraxis", "Smolderwing", "uncommon", 3, "atk"), ("Pyraxis", "Magmaroar", "rare", 4, "atk"),
+        ("Aqualis", "Ripplekit", "common", 1, "bal"), ("Aqualis", "Tidecaller", "uncommon", 3, "bal"), ("Aqualis", "Lagoon Oracle", "rare", 4, "def"),
+        ("Terrakin", "Dustpup", "common", 2, "def"), ("Terrakin", "Ironroot", "uncommon", 3, "def"),
+        ("Ventara", "Thistledown", "common", 1, "bal"), ("Ventara", "Cirrus Fox", "uncommon", 3, "atk"),
+        ("Voltaris", "Zapling", "common", 2, "atk"), ("Voltaris", "Coilhound", "uncommon", 3, "bal"),
+        ("Nihilum", "Gray Whisper", "common", 2, "bal"), ("Nihilum", "Hush Drifter", "uncommon", 3, "def"),
     ];
 
     private static readonly Dictionary<string, int> MaxSupply = new() { ["common"] = 50_000, ["uncommon"] = 20_000, ["rare"] = 5_000, ["epic"] = 1_000, ["legendary"] = 300, ["secret"] = 100 };
@@ -129,8 +131,12 @@ internal sealed class CatalogSeeder(IUnitOfWork uow) : IModuleSeeder
                     var sp = Specials.GetValueOrDefault(names[i]);
                     all.Add(new Def(names[i], el, rarity, CardTypes.Anima, Cost10[i], Style10[i], CardSkills[el][i % 4], sp.Arc));
                 }
-            foreach (var (n, el, r, t) in Support)
-                all.Add(new Def(n, el, r, t, r switch { "rare" => 2, "epic" => 3, _ => 1 }));
+            var extraIdx = new Dictionary<string, int>();
+            foreach (var (el, n, r, c, st) in Extras)
+            {
+                var k = extraIdx.GetValueOrDefault(el) + 10; extraIdx[el] = k - 9;
+                all.Add(new Def(n, el, r, CardTypes.Anima, c, st, CardSkills[el][k % 4]));
+            }
 
             foreach (var d in all)
             {

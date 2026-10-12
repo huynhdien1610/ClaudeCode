@@ -129,7 +129,8 @@ public sealed class BattleTests(ApiFixture fx) : IClassFixture<ApiFixture>
         var rows = new List<(string Element, string Skill)>();
         await using (var cmd = fx.Db.CreateCommand("SELECT element, skill_id FROM catalog.card_definition WHERE card_type='anima'"))
         await using (var r = await cmd.ExecuteReaderAsync()) while (await r.ReadAsync()) rows.Add((r.GetString(0), r.IsDBNull(1) ? "" : r.GetString(1)));
-        Assert.Equal(80, rows.Count);
+        Assert.Equal(100, rows.Count);
+        Assert.Equal(Anima.Battle.Engine.SkillCatalog.All.Where(d => d.Kind == Anima.Battle.Engine.SkillKind.Passive).Select(d => d.Id).Order(), Anima.Contracts.PassiveSkills.Ids.Order());   // Ký ức phong ấn chỉ cho Passive
         Assert.All(rows, x => Assert.Contains(x.Skill, Anima.Battle.Engine.SkillCatalog.CardSkills(x.Element)));
 
         var v = await p.Post("/v1/battles/practice", new { deckId = deck });

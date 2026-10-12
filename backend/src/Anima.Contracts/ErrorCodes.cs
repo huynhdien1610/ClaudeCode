@@ -48,6 +48,11 @@ namespace Anima.Contracts
         public const string SealedCardNotTradable = "SEALED_CARD_NOT_TRADABLE";
         public const string SealedCardAlreadyRevealed = "SEALED_CARD_ALREADY_REVEALED";
 
+        // Ký ức phong ấn
+        public const string MemoryStockFull = "MEMORY_STOCK_FULL";
+        public const string MemoryWeeklyLimit = "WEEKLY_LIMIT_REACHED";
+        public const string MemoryNotAvailable = "MEMORY_NOT_AVAILABLE";
+
         // Quản trị
         public const string Forbidden = "FORBIDDEN";
         public const string SelfApprovalForbidden = "SELF_APPROVAL_FORBIDDEN";

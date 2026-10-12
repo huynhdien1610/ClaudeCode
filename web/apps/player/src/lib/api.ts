@@ -85,7 +85,7 @@ export type DeckView = { id: string; name: string; isDefault: boolean; valid: bo
 export type BattleStatus = { kind: string; turns: number | null; value: number; stacks: number };
 export type BattleSkill = { id: string; name: string; kind: string; target: "none" | "enemy" | "ally" | "self" | "allenemies" | "allallies"; cooldown: number; cooldownMax: number };
 export type BattleAnima = {
-  name: string; element: string; defId: number; atk: number; def: number; hp: number; maxHp: number; canAttack: boolean; summoned: boolean; echo?: number | null; feared: boolean; dodge: number;
+  name: string; element: string; defId: number; atk: number; def: number; hp: number; maxHp: number; canAttack: boolean; summoned: boolean; echo?: number | null; borrowed?: string | null; feared: boolean; dodge: number;
   skill: BattleSkill | null; ultimate: { name: string; target: BattleSkill["target"] }; statuses: BattleStatus[];
 } | null;
 export type BattleFusion = { id: string; name: string; elements: string[]; target: "none" | "enemy" | "ally"; used: boolean; available: boolean };
@@ -93,10 +93,12 @@ export type BattleHandCard = { index: number; defId: number; name: string; eleme
 export type BattleEvent = { seq: number; kind: string; side: "you" | "opponent"; data: Record<string, unknown> };
 export type BattleView = {
   id: string; status: "InProgress" | "Finished"; phase: "mulligan" | "main" | "finished"; yourTurn: boolean; turn: number; firstPlayer: "you" | "opponent"; meter: number; surge: { you: number; opponent: number };
-  you: { keeper: number; energy: number; deck: number; mulliganAvailable: boolean; decided: boolean; hand: BattleHandCard[]; field: BattleAnima[]; graveyard: number; fusions: BattleFusion[] };
+  you: { memories: { defId: number; name: string; element: string; skill: string | null; qty: number }[]; memoryReady: boolean; memoryCd: number; keeper: number; energy: number; deck: number; mulliganAvailable: boolean; decided: boolean; hand: BattleHandCard[]; field: BattleAnima[]; graveyard: number; fusions: BattleFusion[] };
   opponent: { keeper: number; hand: number; deck: number; field: BattleAnima[]; graveyard: number };
   result: { won: boolean; reason: string } | null; events: BattleEvent[]; actionCount: number;
 };
+export type MemoryItem = { defId: number; name: string; element: string; rarity: string; skill: string; qty: number };
+export type MemoryOverview = { stock: MemoryItem[]; total: number; max: number; available: MemoryItem[]; gemPrice: number; canBuyThisWeek: boolean; weekStart: string };
 export type BattleSummary = { id: string; status: "InProgress" | "Finished"; won: boolean | null; reason: string | null; createdAt: string };
 
 export type Listing = {
@@ -149,6 +151,8 @@ export const api = {
   battles: () => request<BattleSummary[]>("GET", "/v1/battles"),
   battle: (id: string) => request<BattleView>("GET", `/v1/battles/${id}`),
   battleAct: (id: string, a: { type: string; hand?: number; slot?: number; target?: number; id?: string }) => request<BattleView>("POST", `/v1/battles/${id}/actions`, a),
+  memories: () => request<MemoryOverview>("GET", "/v1/memories"),
+  memoryBuy: (cardDefinitionId: number) => request<MemoryOverview>("POST", "/v1/memories/purchase", { cardDefinitionId }, { idem: true }),
   marketRules: () => request<MarketRules>("GET", "/v1/market/rules"),
   marketListings: (q: MarketQuery, locale: string) => {
     const p = new URLSearchParams({ locale }); Object.entries(q).forEach(([k, v]) => v !== undefined && v !== "" && p.set(k, String(v)));

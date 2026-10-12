@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anima.Modules.Battle", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anima.Modules.Market", "src\Anima.Modules.Market\Anima.Modules.Market.csproj", "{471DFEE4-CA71-4645-9307-7E0364A964F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anima.Modules.Memory", "src\Anima.Modules.Memory\Anima.Modules.Memory.csproj", "{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -297,6 +299,18 @@ Global
 		{471DFEE4-CA71-4645-9307-7E0364A964F6}.Release|x64.Build.0 = Release|Any CPU
 		{471DFEE4-CA71-4645-9307-7E0364A964F6}.Release|x86.ActiveCfg = Release|Any CPU
 		{471DFEE4-CA71-4645-9307-7E0364A964F6}.Release|x86.Build.0 = Release|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Debug|x64.Build.0 = Debug|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Debug|x86.Build.0 = Debug|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Release|x64.ActiveCfg = Release|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Release|x64.Build.0 = Release|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Release|x86.ActiveCfg = Release|Any CPU
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -322,5 +336,6 @@ Global
 		{6996EF9D-3887-4B8C-B144-B2F6DF5D757C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{69B2C7BB-2107-4731-90BD-F3DA4FA29DE1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{471DFEE4-CA71-4645-9307-7E0364A964F6} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{DFE32BDD-DC4F-431D-BDB5-5D0015FCC0D0} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

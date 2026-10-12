@@ -12,6 +12,7 @@ type Sel =
   | { kind: "attack"; slot: number }
   | { kind: "skill" | "ultimate"; slot: number; name: string; target: Target }
   | { kind: "fusion"; id: string; name: string; target: Target }
+  | { kind: "memory"; defId: number; element: string; name: string }
   | null;
 
 export default function BattlePage() {
@@ -105,7 +106,7 @@ export default function BattlePage() {
     <button className={`btn slot ${extra ?? ""}`} data-testid={testid} disabled={busy || !onClick} onClick={onClick} style={{ minHeight: 96, flexDirection: "column", alignItems: "flex-start", textAlign: "left" }}>
       {a ? <>
         <b>{a.name}</b><small>{a.element}{a.skill ? ` · ${a.skill.name}${a.skill.cooldown > 0 ? ` (${t("battle.cd", { n: a.skill.cooldown })})` : ""}` : ""}</small>
-        <small>ATK {a.atk} · DEF {a.def} · HP {a.hp}/{a.maxHp}{a.summoned ? " ✦" : ""}{a.echo != null ? ` ✧ ${a.echo}` : ""}</small>
+        <small>ATK {a.atk} · DEF {a.def} · HP {a.hp}/{a.maxHp}{a.summoned ? " ✦" : ""}{a.echo != null ? ` ✧ ${a.echo}` : ""}{a.borrowed ? ` ✎ ${a.borrowed}` : ""}</small>
         {a.statuses.length > 0 && <small className="muted" data-testid="statuses">{a.statuses.map(statusLabel).join(" · ")}</small>}
       </> : <span className="muted">—</span>}
     </button>
@@ -139,6 +140,7 @@ export default function BattlePage() {
           {view.you.field.map((a, i) => (
             <div key={i}>{slotView(a, `my-slot-${i}`,
               myTurn && sel?.kind === "hand" && !a ? () => void act({ type: "play", hand: sel.index, slot: i })
+                : myTurn && sel?.kind === "memory" && a && a.echo == null && a.element === sel.element ? () => void act({ type: "memory", id: String(sel.defId), slot: i })
                 : myTurn && allyTargeting && a ? () => fire(i)
                 : myTurn && !targeting && a?.canAttack ? () => setSel(sel?.kind === "actor" && sel.slot === i ? null : { kind: "actor", slot: i }) : undefined,
               sel && "slot" in sel && sel.slot === i ? "primary" : "")}</div>
@@ -157,6 +159,7 @@ export default function BattlePage() {
         {sel?.kind === "actor" && <p className="muted">{t("battle.hintActor")}</p>}
         {targeting && targeting.kind !== "attack" && <p className="muted">{t("battle.hintTarget", { skill: targeting.name })}</p>}
         {sel?.kind === "attack" && <p className="muted">{t("battle.hintAttack")}</p>}
+        {sel?.kind === "memory" && <p className="muted">{t("battle.hintMemory", { element: sel.element })}</p>}
       </section>
 
       <section className="panel grid"><h3>{t("battle.hand")}</h3>
@@ -169,6 +172,13 @@ export default function BattlePage() {
             </button>
           ))}
         </div>
+        {myTurn && view.you.memories.length > 0 && (
+          <div data-testid="memories"><h3>{t("battle.memories")}</h3>
+            <div className="row wrap">{view.you.memories.map((m) => <button key={m.defId} className={`btn ${sel?.kind === "memory" && sel.defId === m.defId ? "primary" : ""}`} disabled={busy || !view.you.memoryReady} data-testid="memory"
+              onClick={() => setSel(sel?.kind === "memory" && sel.defId === m.defId ? null : { kind: "memory", defId: m.defId, element: m.element, name: m.name })}>{m.name} ×{m.qty} <small className="muted">({m.skill})</small></button>)}
+              {view.you.memoryCd > 0 && <span className="chip">{t("battle.cd", { n: view.you.memoryCd })}</span>}</div>
+          </div>
+        )}
         {myTurn && view.you.fusions.some((f) => f.available) && (
           <div data-testid="fusions"><h3>{t("battle.fusions")}</h3>
             <div className="row wrap">{view.you.fusions.filter((f) => f.available).map((f) => <button key={f.id} className="btn" disabled={busy} data-testid="fusion" onClick={() => chooseFusion(f)}>{f.name} <small className="muted">({f.elements.join(" + ")})</small></button>)}</div>

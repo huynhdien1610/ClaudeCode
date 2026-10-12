@@ -2,7 +2,7 @@ using Anima.Contracts;
 
 namespace Anima.Battle.Engine;
 
-public sealed record BattleSetup(byte[] Seed, IReadOnlyList<BattleCard> Deck0, IReadOnlyList<BattleCard> Deck1);
+public sealed record BattleSetup(byte[] Seed, IReadOnlyList<BattleCard> Deck0, IReadOnlyList<BattleCard> Deck1, IReadOnlyList<MemoryCard>? Memories0 = null, bool MemoryAllowed = true);
 
 /// <summary>
 /// Luật trận đấu thuần logic (BR-BTL, BR-ELM). Không đụng DB/đồng hồ/ngẫu nhiên hệ thống: cùng <see cref="BattleSetup"/> và cùng chuỗi
@@ -53,7 +53,8 @@ public static partial class BattleEngine
     public static BattleState Start(BattleSetup setup)
     {
         var rng = new DeterministicRng(setup.Seed);
-        var s = new BattleState { Players = [new BattlePlayer { Deck = [.. setup.Deck0] }, new BattlePlayer { Deck = [.. setup.Deck1] }], Rng = rng };
+        var s = new BattleState { Players = [new BattlePlayer { Deck = [.. setup.Deck0] }, new BattlePlayer { Deck = [.. setup.Deck1] }], Rng = rng, MemoryAllowed = setup.MemoryAllowed };
+        if (setup.Memories0 is not null) s.Players[0].Memories.AddRange(setup.Memories0);
         rng.Shuffle(s.Players[0].Deck); rng.Shuffle(s.Players[1].Deck);
         s.First = rng.Next(2);                                                       // BR-BTL-02: thứ tự đi trước ngẫu nhiên
         s.Active = s.First;
@@ -103,6 +104,7 @@ public static partial class BattleEngine
             case "skill": UseSkill(s, a); break;
             case "ultimate": UseUltimate(s, a); break;
             case "fusion": UseFusion(s, a); break;
+            case "memory": UseMemory(s, a); break;
             case "end": EndTurn(s); break;
             default: throw new BattleException("INVALID_ACTION", $"Unknown action '{a.Type}'");
         }

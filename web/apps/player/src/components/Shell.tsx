@@ -5,7 +5,7 @@ import { useEffect, type ReactNode } from "react";
 import { useApp } from "@/lib/app";
 import { LOCALES, type Locale } from "@/lib/i18n";
 
-const NAV = [["/home", "nav.home"], ["/store", "nav.store"], ["/packs", "nav.packs"], ["/quests", "nav.quests"], ["/collection", "nav.collection"], ["/market", "nav.market"], ["/decks", "nav.decks"], ["/battle", "nav.battle"], ["/forge", "nav.forge"], ["/wallet", "nav.wallet"], ["/account", "nav.account"]] as const;
+const NAV = [["/home", "nav.home"], ["/store", "nav.store"], ["/packs", "nav.packs"], ["/quests", "nav.quests"], ["/collection", "nav.collection"], ["/market", "nav.market"], ["/decks", "nav.decks"], ["/memories", "nav.memories"], ["/battle", "nav.battle"], ["/forge", "nav.forge"], ["/wallet", "nav.wallet"], ["/account", "nav.account"]] as const;
 
 export function LanguageSelect() {
   const { locale, setLocale, t } = useApp();

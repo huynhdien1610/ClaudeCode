@@ -10,16 +10,14 @@ public sealed class DeckTests(ApiFixture fx) : IClassFixture<ApiFixture>
     /// <summary>Chọn tham lam 30 thẻ thỏa luật từ bộ sưu tập; null nếu không đủ.</summary>
     internal static List<Guid>? PickValid(IEnumerable<JsonElement> items)
     {
-        var picked = new List<Guid>(); var support = 0; var perDef = new Dictionary<int, int>(); var perRarity = new Dictionary<string, int>();
+        var picked = new List<Guid>(); var perDef = new Dictionary<int, int>(); var perRarity = new Dictionary<string, int>();
         foreach (var i in items)
         {
             var card = i.GetProperty("card"); var def = card.GetProperty("id").GetInt32(); var rarity = card.GetProperty("rarity").GetString()!;
             var cap = rarity is "legendary" or "secret" ? 1 : 2;
             var rcap = rarity switch { "epic" => 4, "legendary" => 2, "secret" => 1, _ => 99 };
-            var isSupport = card.GetProperty("type").GetString() != "anima";
-            if ((isSupport && support >= 6) || perDef.GetValueOrDefault(def) >= cap || perRarity.GetValueOrDefault(rarity) >= rcap) continue;
+            if (perDef.GetValueOrDefault(def) >= cap || perRarity.GetValueOrDefault(rarity) >= rcap) continue;
             perDef[def] = perDef.GetValueOrDefault(def) + 1; perRarity[rarity] = perRarity.GetValueOrDefault(rarity) + 1;
-            if (isSupport) support++;
             picked.Add(i.GetProperty("id").GetGuid());
             if (picked.Count == 30) return picked;
         }
