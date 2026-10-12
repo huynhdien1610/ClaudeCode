@@ -13,6 +13,12 @@ public interface ICollectionApi
     /// <summary>Khóa dòng (FOR UPDATE, theo thứ tự id để tránh deadlock) các thẻ; trả về những thẻ tìm thấy.</summary>
     Task<IReadOnlyList<CardInstance>> LockAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
     Task BurnAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
+    /// <summary>Đổi trạng thái một thẻ nếu đang đúng <paramref name="from"/> và thuộc <paramref name="owner"/>. Trả về false nếu không khớp.</summary>
+    Task<bool> TrySetStateAsync(Guid id, Guid owner, string from, string to, CancellationToken ct);
+    /// <summary>Trả các thẻ đang Listed về Owned (hết hạn/hủy niêm yết).</summary>
+    Task ReleaseListedAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
+    /// <summary>Chuyển chủ một thẻ đang Listed sang <paramref name="newOwner"/>, trạng thái Owned; ghi nhận "đã sở hữu" để đọc Story Fragment.</summary>
+    Task TransferListedAsync(Guid id, Guid newOwner, CancellationToken ct);
     /// <summary>Đọc (không khóa) các thẻ theo id, thuộc bất kỳ chủ nào; thẻ không tồn tại bị bỏ qua.</summary>
     Task<IReadOnlyList<CardInstance>> GetManyAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
     /// <summary>Số thẻ gắn chặt tài khoản (còn sở hữu) theo Card Definition — dùng cho BR-NEW-05.</summary>
@@ -69,6 +75,19 @@ public sealed class CollectionService(IUnitOfWork uow, IClock clock) : ICollecti
 
     public async Task<IReadOnlyList<CardInstance>> GetManyAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct) =>
         await uow.QueryAsync($"SELECT {Cols} FROM collection.card_instance WHERE id = ANY(@ids)", Map, ct, ("ids", ids.ToArray()));
+
+    public async Task<bool> TrySetStateAsync(Guid id, Guid owner, string from, string to, CancellationToken ct) =>
+        await uow.ExecAsync("UPDATE collection.card_instance SET state=@t WHERE id=@i AND owner_id=@o AND state=@f", ct, ("t", to), ("i", id), ("o", owner), ("f", from)) == 1;
+
+    public Task ReleaseListedAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct) =>
+        uow.ExecAsync("UPDATE collection.card_instance SET state='Owned' WHERE id = ANY(@ids) AND state='Listed'", ct, ("ids", ids.ToArray()));
+
+    public async Task TransferListedAsync(Guid id, Guid newOwner, CancellationToken ct)
+    {
+        var defId = await uow.ScalarAsync<int?>("UPDATE collection.card_instance SET owner_id=@o, state='Owned' WHERE id=@i AND state='Listed' RETURNING card_definition_id", ct, ("o", newOwner), ("i", id))
+            ?? throw DomainException.Conflict(ErrorCodes.CardLocked, "The card is not listed");
+        await uow.ExecAsync("INSERT INTO collection.discovery(account_id,card_definition_id,first_at) VALUES(@a,@d,@now) ON CONFLICT DO NOTHING", ct, ("a", newOwner), ("d", defId), ("now", clock.UtcNow));
+    }
 
     public Task BurnAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct) =>
         uow.ExecAsync("UPDATE collection.card_instance SET state='Burned' WHERE id = ANY(@ids)", ct, ("ids", ids.ToArray()));

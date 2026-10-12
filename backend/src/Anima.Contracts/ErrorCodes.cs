@@ -75,6 +75,10 @@ namespace Anima.Contracts
         public const string RateLimited = "RATE_LIMITED";
         public const string GuardianConsentRequired = "GUARDIAN_CONSENT_REQUIRED";
         public const string GuardianTokenInvalid = "GUARDIAN_TOKEN_INVALID";
+        public const string ListingNotAvailable = "LISTING_NOT_AVAILABLE";
+        public const string SelfPurchaseForbidden = "SELF_PURCHASE_FORBIDDEN";
+        public const string PriceOutOfRange = "PRICE_OUT_OF_RANGE";
+        public const string CardNotTradable = "CARD_NOT_TRADABLE";
         public const string QuestExpired = "QUEST_EXPIRED";
         public const string QuestNotAvailable = "QUEST_NOT_AVAILABLE";
         public const string QuestNotComplete = "QUEST_NOT_COMPLETE";

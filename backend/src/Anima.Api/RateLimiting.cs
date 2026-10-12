@@ -24,7 +24,7 @@ public sealed class RateLimitOptions
 public static class RateLimiting
 {
     private static readonly string[] AuthPrefixes = ["/v1/auth", "/v1/accounts", "/v1/me/phone", "/admin/v1/auth", "/v1/guardian"];
-    private static readonly string[] EconomyPrefixes = ["/v1/packs", "/v1/pack-instances", "/v1/wallet/convert", "/v1/forge", "/v1/payments", "/v1/me/quests", "/v1/battles", "/v1/decks", "/v1/dev"];
+    private static readonly string[] EconomyPrefixes = ["/v1/packs", "/v1/pack-instances", "/v1/wallet/convert", "/v1/forge", "/v1/payments", "/v1/me/quests", "/v1/battles", "/v1/decks", "/v1/market", "/v1/dev"];
 
     public static string Group(HttpContext ctx)
     {
