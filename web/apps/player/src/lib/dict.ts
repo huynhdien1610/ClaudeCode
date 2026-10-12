@@ -2,6 +2,7 @@
 export const en = {
   "app.tagline": "Collect the echoes of the heart.",
   "nav.home": "Home", "nav.store": "Store", "nav.packs": "Packs", "nav.collection": "Collection", "nav.forge": "Forge", "nav.wallet": "Wallet", "nav.account": "Account", "nav.logout": "Log out",
+  "card.cost": "Resonance cost",
   "battle.attack": "Attack", "battle.skill": "Skill", "battle.ultimate": "Ultimate",
   "battle.cd": "recharging {n}", "battle.meter": "Emotion {n}/100", "battle.meterHint": "At 50 an Ultimate can be used. At 100 an Emotional Surge gives every Anima +20% ATK and DEF for 2 turns.",
   "battle.surge": "Emotional Surge ({n})", "battle.fusions": "Emotional Fusion (once per match each)", "battle.hintTarget": "Pick a target for {skill}.",
@@ -97,6 +98,7 @@ type Dict = Record<Key, string>;
 export const vi: Dict = {
   "app.tagline": "Sưu tầm tiếng vọng của trái tim.",
   "nav.home": "Trang chủ", "nav.store": "Cửa hàng", "nav.packs": "Pack", "nav.collection": "Bộ sưu tập", "nav.forge": "Lò rèn", "nav.wallet": "Ví", "nav.account": "Tài khoản", "nav.logout": "Đăng xuất",
+  "card.cost": "Chi phí Cộng hưởng",
   "battle.attack": "Đánh thường", "battle.skill": "Kỹ năng", "battle.ultimate": "Tuyệt chiêu",
   "battle.cd": "hồi chiêu {n}", "battle.meter": "Cảm xúc {n}/100", "battle.meterHint": "Đạt 50 dùng được Tuyệt chiêu. Đạt 100 tạo Bùng nổ cảm xúc: mọi Anima +20% ATK và DEF trong 2 lượt.",
   "battle.surge": "Bùng nổ cảm xúc ({n})", "battle.fusions": "Hợp thể cảm xúc (mỗi loại 1 lần/trận)", "battle.hintTarget": "Chọn mục tiêu cho {skill}.",
@@ -190,6 +192,7 @@ export const vi: Dict = {
 export const zhHans: Dict = {
   "app.tagline": "收集心之回响。",
   "nav.home": "首页", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔炼炉", "nav.wallet": "钱包", "nav.account": "账户", "nav.logout": "退出登录",
+  "card.cost": "共鸣费用",
   "battle.attack": "普通攻击", "battle.skill": "技能", "battle.ultimate": "终极技",
   "battle.cd": "冷却 {n}", "battle.meter": "情绪 {n}/100", "battle.meterHint": "达到 50 可用终极技。达到 100 触发情绪爆发：所有 Anima 攻击和防御 +20%，持续 2 回合。",
   "battle.surge": "情绪爆发（{n}）", "battle.fusions": "情感融合（每种每局一次）", "battle.hintTarget": "为 {skill} 选择目标。",
@@ -283,6 +286,7 @@ export const zhHans: Dict = {
 export const zhHant: Dict = {
   "app.tagline": "收集心之迴響。",
   "nav.home": "首頁", "nav.store": "商店", "nav.packs": "卡包", "nav.collection": "收藏", "nav.forge": "熔煉爐", "nav.wallet": "錢包", "nav.account": "帳戶", "nav.logout": "登出",
+  "card.cost": "共鳴費用",
   "battle.attack": "普通攻擊", "battle.skill": "技能", "battle.ultimate": "終極技",
   "battle.cd": "冷卻 {n}", "battle.meter": "情緒 {n}/100", "battle.meterHint": "達到 50 可用終極技。達到 100 觸發情緒爆發：所有 Anima 攻擊和防禦 +20%，持續 2 回合。",
   "battle.surge": "情緒爆發（{n}）", "battle.fusions": "情感融合（每種每局一次）", "battle.hintTarget": "為 {skill} 選擇目標。",

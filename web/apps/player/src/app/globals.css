@@ -48,17 +48,10 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-
 .card { --w: 150px; width: var(--w); aspect-ratio: 2/3; border-radius: 8px; position: relative; perspective: 900px; flex: none; container-type: inline-size; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; }
 button.card { cursor: pointer; } button.card:hover .face { box-shadow: var(--shadow); }
 .card .inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.34,1.4,.64,1); } .card.flipped .inner { transform: rotateY(180deg); }
-.card .face, .card .back { position: absolute; inset: 0; border-radius: 8px; backface-visibility: hidden; overflow: hidden; }
+.card .face, .card .back { position: absolute; inset: 0; border-radius: 10px; backface-visibility: hidden; overflow: hidden; }
 .card .back { background: var(--ink) repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 2px, transparent 2px 9px); border: 2px solid var(--ink); display: grid; place-items: center; color: #e9e3d6; font-family: var(--font-display); font-size: 22cqw; font-weight: 700; }
-.card .face { transform: rotateY(180deg); background: #fff; border: 2px solid var(--rc, var(--r-common)); display: flex; flex-direction: column; padding: 6%; gap: 3%; }
-.card .art { flex: 1; display: grid; place-items: center; border-radius: 4px; position: relative; background: hsl(var(--hue) 45% 92%); font-size: 30cqw; color: hsl(var(--hue) 45% 34%); }
-.card .cost { position: absolute; top: 4px; left: 4px; width: 7cqw; height: 7cqw; min-width: 20px; min-height: 20px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 11px; font-style: normal; font-weight: 700; display: grid; place-items: center; }
-.card .name { font-size: 8.5cqw; font-weight: 700; line-height: 1.2; } .card .epithet { font-size: 6.5cqw; color: var(--text-3); line-height: 1.2; margin-top: -2%; }
-.card .stats { font-size: 7.5cqw; font-variant-numeric: tabular-nums; } .card .meta { font-size: 6.5cqw; color: var(--text-3); display: flex; justify-content: space-between; gap: 4px; } .card .band { height: 3%; min-height: 3px; border-radius: 2px; background: var(--rc, var(--r-common)); }
-.card .bound { position: absolute; top: 4px; right: 6px; font-size: 14px; color: var(--text-3); }
 .rarity-common { --rc: var(--r-common); } .rarity-uncommon { --rc: var(--r-uncommon); } .rarity-rare { --rc: var(--r-rare); } .rarity-epic { --rc: var(--r-epic); } .rarity-legendary { --rc: var(--r-legendary); } .rarity-secret { --rc: var(--r-secret); }
 .rarity-text { color: var(--rc); font-weight: 700; }
-.card.rarity-secret .face { border-style: double; border-width: 4px; }
 .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; justify-items: center; }
 .card-wrap { display: grid; gap: 4px; justify-items: center; } .card-wrap.sel .face { box-shadow: 0 0 0 3px var(--accent); }
 
@@ -88,3 +81,41 @@ button.card { cursor: pointer; } button.card:hover .face { box-shadow: var(--sha
 @media (prefers-reduced-motion: reduce) { .card .inner { transition-duration: .01s !important; } .pack-art.tearing, .stage .card.pop, .flash, .shake { animation: none !important; } .flash { display: none; } }
 
 .deck-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+
+
+/* ---- Thẻ bài 8 hệ cảm xúc ---- */
+@property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.el-Luminara { --fr: #d9a441; --bg: #fff1c7; --pl: #f6e2a0; --pt: #5e4210; --ac: #e8a317; }
+.el-Umbryx { --fr: #5a5890; --bg: #1c2034; --pl: #2c2f50; --pt: #d3e6f0; --ac: #8ab4f8; }
+.el-Pyraxis { --fr: #d9480f; --bg: #2c0f08; --pl: #7d1f0f; --pt: #ffe4c4; --ac: #ff8a3d; }
+.el-Aqualis { --fr: #4a90d9; --bg: #0f3a66; --pl: #17507f; --pt: #dcf1ff; --ac: #5cc8ff; }
+.el-Terrakin { --fr: #7d8a52; --bg: #3f4529; --pl: #5d4b2f; --pt: #f1e9d0; --ac: #b5c274; }
+.el-Ventara { --fr: #5fb89a; --bg: #e3f5ed; --pl: #2f7d62; --pt: #ffffff; --ac: #2fb68a; }
+.el-Voltaris { --fr: #8b5cf6; --bg: #1a1450; --pl: #2b2080; --pt: #ffe066; --ac: #ffd43b; }
+.el-Nihilum { --fr: #75658a; --bg: #241c2e; --pl: #3b3049; --pt: #e8ddf5; --ac: #b79ee0; }
+
+.card .face { transform: rotateY(180deg); display: flex; flex-direction: column; padding: 4cqw; gap: 2.5cqw; color: var(--pt); border: 3px solid var(--fr); background: var(--bg); }
+.card .plate { background: var(--pl); border-radius: 6px; padding: 2cqw 3cqw; text-align: center; line-height: 1.1; border: 1px solid color-mix(in srgb, var(--fr) 70%, transparent); }
+.card .plate .nm { display: block; font-size: 8.2cqw; font-family: var(--font-display); letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .plate .emo { font-size: 5.2cqw; opacity: .85; letter-spacing: .04em; text-transform: uppercase; }
+.card .art { flex: 1; min-height: 0; position: relative; border-radius: 6px; overflow: hidden; background: var(--art) center / cover no-repeat, hsl(var(--hue, 0) 40% 30%); border: 1px solid color-mix(in srgb, var(--fr) 80%, transparent); }
+.card .art .glyph { position: absolute; right: 4cqw; bottom: 2cqw; font-size: 12cqw; color: #fff; opacity: .55; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.card .cost { position: absolute; top: 3cqw; left: 3cqw; min-width: 9cqw; height: 9cqw; padding: 0 2cqw; border-radius: 999px; background: var(--ac); color: #111; font-size: 6.4cqw; font-style: normal; font-weight: 800; display: grid; place-items: center; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
+.card .bound { position: absolute; top: 3cqw; right: 3cqw; font-size: 8cqw; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
+.card .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2cqw; font-variant-numeric: tabular-nums; }
+.card .stats span { background: color-mix(in srgb, var(--pl) 85%, #000); border: 1px solid color-mix(in srgb, var(--fr) 60%, transparent); border-radius: 5px; display: grid; justify-items: center; padding: 1cqw 0; line-height: 1.05; }
+.card .stats small { font-size: 4.4cqw; opacity: .75; letter-spacing: .06em; } .card .stats b { font-size: 7.2cqw; color: var(--pt); }
+.card .stats.support { grid-template-columns: 1fr; } .card .stats.support small { font-size: 6cqw; opacity: .95; padding: 1.5cqw 0; }
+.card .skill { font-size: 5.4cqw; text-align: center; color: var(--ac); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .meta { font-size: 5.4cqw; color: var(--pt); opacity: .9; display: flex; justify-content: space-between; gap: 4px; } .card .meta .rarity-text { color: var(--ac); }
+
+/* Viền cầu vồng 7 sắc cho thẻ hiếm: viền là lớp nền conic-gradient phía sau phần ruột thẻ. */
+.card.rainbow .face { border: 4px solid transparent; background: linear-gradient(var(--bg), var(--bg)) padding-box, conic-gradient(from var(--angle), #ff3b3b, #ff9f1a, #ffe14d, #3ddc84, #3ea6ff, #4b4bff, #b44bff, #ff3b3b) border-box; }
+.card.rainbow.t1 .face { --angle: 0deg; }
+.card.rainbow.t2 .face { animation: spin-rainbow 8s linear infinite; }
+.card.rainbow.t3 .face { animation: spin-rainbow 5s linear infinite; box-shadow: 0 0 14px 1px rgba(255, 200, 80, .55); }
+.card.rainbow.t4 .face { animation: spin-rainbow 3s linear infinite; box-shadow: 0 0 20px 3px rgba(190, 120, 255, .65), 0 0 36px rgba(80, 180, 255, .4); }
+@keyframes spin-rainbow { to { --angle: 360deg; } }
+.card .shimmer { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%); background-size: 250% 100%; animation: shimmer 3.2s ease-in-out infinite; mix-blend-mode: screen; }
+@keyframes shimmer { 0% { background-position: 150% 0; } 60%, 100% { background-position: -50% 0; } }
+@media (prefers-reduced-motion: reduce) { .card.rainbow .face, .card .shimmer { animation: none !important; } }
