@@ -16,6 +16,7 @@
     <ProjectReference Include="../Anima.Modules.Payment/Anima.Modules.Payment.csproj" />
     <ProjectReference Include="../Anima.Modules.Deck/Anima.Modules.Deck.csproj" />
     <ProjectReference Include="../Anima.Modules.Memory/Anima.Modules.Memory.csproj" />
+    <ProjectReference Include="../Anima.Modules.Arena/Anima.Modules.Arena.csproj" />
     <ProjectReference Include="../Anima.Modules.Battle/Anima.Modules.Battle.csproj" />
     <ProjectReference Include="../Anima.Modules.Market/Anima.Modules.Market.csproj" />
   </ItemGroup>

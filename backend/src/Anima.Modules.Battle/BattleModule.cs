@@ -47,7 +47,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
         (await uow.QueryAsync($"SELECT {Cols} FROM battle.match WHERE id=@i AND account_id=@a" + (forUpdate ? " FOR UPDATE" : ""), Map, ct, ("i", id), ("a", acc))).FirstOrDefault()
         ?? throw DomainException.NotFound("Match");
 
-    private static BattleCard ToBattle(CardDefinition d) => new(d.Id, d.Name, d.Element, d.CardType, d.Rarity, d.Cost, d.Atk ?? 0, d.Def ?? 0, d.Hp ?? 0, d.Skill);
+    private static BattleCard ToBattle(CardDefinition d) => BattleCards.From(d);
 
     /// <summary>Bộ bài của máy: 15 Anima khác nhau (Common → Rare) × 2 bản, chọn tất định từ seed.</summary>
     private async Task<List<BattleCard>> BotDeckAsync(byte[] seed, CancellationToken ct)
@@ -99,13 +99,13 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
                 ("i", m.Id), ("a", acc), ("d", deckId), ("s", seed), ("p", JsonSerializer.Serialize(player, J)), ("b", JsonSerializer.Serialize(bot, J)), ("l", JsonSerializer.Serialize(log, J)), ("now", m.CreatedAt), ("mem", JsonSerializer.Serialize(stock, J)));
         }
         catch (Npgsql.PostgresException e) when (e.SqlState == "23505") { throw DomainException.Conflict("MATCH_IN_PROGRESS", "Finish or concede your current practice match first"); }
-        return View(m with { Actions = log }, s);
+        return BattleView.Build(m.Id, m.Status, Human, s, log.Count);
     }, ct);
 
     public async Task<object> GetAsync(Guid acc, Guid id, CancellationToken ct)
     {
         var m = await Load(acc, id, false, ct);
-        return View(m, Rebuild(m));
+        return BattleView.Build(m.Id, m.Status, Human, Rebuild(m), m.Actions.Count);
     }
 
     public async Task<object> ListAsync(Guid acc, CancellationToken ct) =>
@@ -131,7 +131,7 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
         await uow.ExecAsync("UPDATE battle.match SET actions=@l::jsonb, status=@st, winner=@w, reason=@r, finished_at=@f WHERE id=@i", ct,
             ("l", JsonSerializer.Serialize(all, J)), ("st", s.Phase == BattlePhase.Finished ? "Finished" : "InProgress"), ("w", s.Result?.Winner), ("r", s.Result?.Reason),
             ("f", s.Phase == BattlePhase.Finished ? clock.UtcNow : null), ("i", id));
-        return View(m with { Status = s.Phase == BattlePhase.Finished ? "Finished" : "InProgress", Actions = all, Winner = s.Result?.Winner, Reason = s.Result?.Reason }, s);
+        return BattleView.Build(m.Id, s.Phase == BattlePhase.Finished ? "Finished" : "InProgress", Human, s, all.Count);
     }, ct);
 
     /// <summary>Dữ liệu phát lại (BR-BTL-10): chỉ sau khi trận kết thúc (seed không lộ khi còn đang đánh). Kèm kết quả server tự phát lại để đối chiếu.</summary>
@@ -149,61 +149,6 @@ public sealed class BattleService(IUnitOfWork uow, IClock clock, ISecureRandom r
             actions = m.Actions,
             result = new { won = m.Winner == Human, reason = m.Reason },
             replayed = new { won = s.Result?.Winner == Human, reason = s.Result?.Reason, keeper = s.Players.Select(p => p.Keeper) },
-        };
-    }
-
-    // ---- Góc nhìn của người chơi: giấu tay và bộ bài đối thủ ----
-    private static object? Anima(FieldAnima? f)
-    {
-        if (f is null) return null;
-        var def = SkillCatalog.Find(f.SkillId);
-        var ult = SkillCatalog.UltimateOf(f.Card.Element);
-        return new
-        {
-            name = f.Card.Name,
-            element = f.Card.Element,
-            defId = f.Card.DefId,
-            atk = f.EffAtk,
-            def = f.EffDef,
-            hp = f.Hp,
-            maxHp = f.MaxHp,
-            canAttack = !f.Summoned && !f.Attacked && !f.Statuses.Any(x => x.Kind == "stun"),
-            summoned = f.Summoned,
-            skill = def is null ? null : new { id = def.Id, name = def.Name, kind = def.Kind.ToString().ToLowerInvariant(), target = def.Target.ToString().ToLowerInvariant(), cooldown = f.Cd.GetValueOrDefault(def.Id), cooldownMax = def.Cooldown },
-            ultimate = new { name = ult.Name, target = ult.Target.ToString().ToLowerInvariant() },
-            feared = f.Statuses.Any(x => x.Kind == "fear"),
-            dodge = f.DodgePct,
-            echo = f.IsEcho ? (int?)f.EchoTurns : null,
-            borrowed = f.BorrowedSkill is null ? null : SkillCatalog.Find(f.BorrowedSkill)?.Name,
-            statuses = f.Statuses.Select(x => new { kind = x.Kind, turns = x.Turns >= 90 ? (int?)null : x.Turns, value = x.Value, stacks = x.Stacks }),
-        };
-    }
-
-    private static object View(MatchRow m, BattleState s)
-    {
-        var me = s.Players[Human]; var opp = s.Players[BotSide];
-        var fusions = SkillCatalog.All.Where(d => d.Kind == SkillKind.Fusion).Select(d =>
-        {
-            var (a, b) = SkillCatalog.FusionElements[d.Id];
-            var onField = me.Field.Any(f => f?.Card.Element == a) && me.Field.Any(f => f?.Card.Element == b);
-            if (d.Id == "hopes_last_stand") onField &= me.Field.Where(f => f is not null).Sum(f => f!.Hp) * 100 < me.Field.Where(f => f is not null).Sum(f => f!.MaxHp) * 30;
-            return new { id = d.Id, name = d.Name, elements = new[] { a, b }, target = d.Target.ToString().ToLowerInvariant(), used = me.TeamUsed.Contains("fusion:" + d.Id), available = onField && !me.TeamUsed.Contains("fusion:" + d.Id) && !me.FusionThisTurn };
-        });
-        return new
-        {
-            id = m.Id,
-            status = m.Status,
-            phase = s.Phase.ToString().ToLowerInvariant(),
-            yourTurn = s.Phase == BattlePhase.Main && s.Active == Human,
-            turn = me.OwnTurns,
-            firstPlayer = s.First == Human ? "you" : "opponent",
-            meter = s.Meter,
-            surge = new { you = me.SurgeLeft, opponent = opp.SurgeLeft },
-            you = new { memories = me.Memories.GroupBy(x => x.DefId).Select(g => new { defId = g.Key, name = g.First().Name, element = g.First().Element, skill = SkillCatalog.Find(g.First().Skill)?.Name, qty = g.Count() }), memoryReady = s.MemoryAllowed && !me.MemoryThisTurn && me.MemoryCd == 0, memoryCd = me.MemoryCd, keeper = me.Keeper, energy = me.Energy, deck = me.Deck.Count, mulliganAvailable = s.Phase == BattlePhase.Mulligan && !me.Decided && !me.MulliganUsed, decided = me.Decided, hand = me.Hand.Select((c, i) => new { index = i, c.DefId, c.Name, c.Element, c.Type, c.Rarity, c.Cost, c.Atk, c.Def, c.Hp }), field = me.Field.Select(Anima), graveyard = me.Graveyard.Count, fusions },
-            opponent = new { keeper = opp.Keeper, hand = opp.Hand.Count, deck = opp.Deck.Count, field = opp.Field.Select(Anima), graveyard = opp.Graveyard.Count },
-            result = s.Result is null ? null : new { won = s.Result.Winner == Human, reason = s.Result.Reason },
-            events = s.Events.TakeLast(60).Select(e => new { e.Seq, e.Kind, side = e.Player == Human ? "you" : "opponent", data = e.Data }),
-            actionCount = m.Actions.Count,
         };
     }
 }

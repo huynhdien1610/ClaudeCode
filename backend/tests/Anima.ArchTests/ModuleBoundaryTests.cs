@@ -24,6 +24,7 @@ public class ModuleBoundaryTests
         ["Deck"] = (typeof(Anima.Deck.DeckModule).Assembly, ["Catalog", "Collection"]),
         ["Memory"] = (typeof(Anima.Memory.MemoryModule).Assembly, ["Catalog", "Wallet"]),
         ["Battle"] = (typeof(Anima.Battle.BattleModule).Assembly, ["Catalog", "Deck", "Memory"]),
+        ["Arena"] = (typeof(Anima.Arena.ArenaModule).Assembly, ["Catalog", "Deck", "Battle", "Identity"]),
         ["Market"] = (typeof(Anima.Market.MarketModule).Assembly, ["Identity", "Wallet", "Catalog", "Collection"]),
         ["Admin"] = (typeof(Anima.Admin.AdminModule).Assembly, ["Identity", "Catalog", "Economy", "Wallet"]),
     };

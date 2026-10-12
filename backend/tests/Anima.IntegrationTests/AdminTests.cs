@@ -353,7 +353,9 @@ public sealed class AdminTests(ApiFixture fx) : IClassFixture<ApiFixture>
         var id = issued.GetProperty("id").GetInt32();
         var del = await content.Delete($"/admin/v1/cards/{id}");
         Assert.Equal(HttpStatusCode.Conflict, del.Status); Assert.Equal("CARD_HAS_INSTANCES", del.Code);
-        Assert.Equal("CARD_PUBLISHED_IMMUTABLE", (await content.Delete("/admin/v1/cards/100")).Code);   // thẻ 100 chưa có bản nhưng đã phát hành cũng không xóa được
+        var unissued = (await content.Get("/admin/v1/cards")).Body.EnumerateArray().Where(c => c.GetProperty("issued").GetInt32() == 0).Select(c => c.GetProperty("id").GetInt32()).ToList();
+        Assert.NotEmpty(unissued);
+        Assert.Equal("CARD_PUBLISHED_IMMUTABLE", (await content.Delete($"/admin/v1/cards/{unissued[^1]}")).Code);   // thẻ chưa có bản nhưng đã phát hành cũng không xóa được
 
         // Ngừng phát hành 38/39 thẻ Common: mọi Common cấp mới chỉ còn là thẻ cuối cùng.
         var commons = (await content.Get("/admin/v1/cards")).Body.EnumerateArray().Where(c => c.GetProperty("rarity").GetString() == "common").Select(c => c.GetProperty("id").GetInt32()).ToList();
